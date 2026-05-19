@@ -1,75 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './src/app/**/*.{js,jsx,ts,tsx}',
-    './src/components/**/*.{js,jsx,ts,tsx}',
-    './src/features/**/*.{js,jsx,ts,tsx}',
-  ],
-  presets: [require('nativewind/preset')],
+  content: ['./app/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {
-      colors: {
-        background: '#F8F7FC',
-        card: '#FFFFFF',
-        primary: '#89FFFD',
-        secondary: '#EF32D9',
-        textPrimary: '#1A1A2E',
-        textSecondary: '#6B7280',
-        success: '#10B981',
-        warning: '#F59E0B',
-        danger: '#EF4444',
-        border: '#E5E7EB',
-      },
-      spacing: {
-        xs: 4,
-        sm: 8,
-        md: 16,
-        lg: 24,
-        xl: 32,
-        '2xl': 48,
-        '3xl': 64,
-        '4xl': 96,
-      },
-      borderRadius: {
-        sm: 8,
-        md: 12,
-        lg: 16,
-        xl: 20,
-        '2xl': 24,
-        '3xl': 32,
-        full: 9999,
-      },
-      boxShadow: {
-        sm: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.05,
-          shadowRadius: 2,
-          elevation: 2,
-        },
-        md: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.08,
-          shadowRadius: 4,
-          elevation: 4,
-        },
-        lg: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.12,
-          shadowRadius: 8,
-          elevation: 8,
-        },
-        xl: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.15,
-          shadowRadius: 16,
-          elevation: 12,
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };

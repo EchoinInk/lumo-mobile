@@ -4,12 +4,15 @@
     "slug": "lumo-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "lumomobile",
     "userInterfaceStyle": "automatic",
+
+    "icon": "./assets/images/icon.png",
+
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/icon.png"
     },
+
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -19,10 +22,12 @@
       },
       "predictiveBackGestureEnabled": false
     },
+
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -36,6 +41,7 @@
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true
     }
