@@ -1,0 +1,47 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Card } from '@/components/ui/Card';
+import { Text } from '@/components/ui/Text';
+import { Avatar } from '@/components/ui/Avatar';
+import { Colors, Spacing } from '@/theme/tokens';
+
+interface FocusCardProps {
+  title: string;
+  description: string;
+  icon?: React.ReactNode;
+  initials?: string;
+}
+
+export function FocusCard({ title, description, icon, initials }: FocusCardProps) {
+  return (
+    <Card variant="gradient" padding="lg" pressable style={styles.container}>
+      <View style={styles.header}>
+        {icon || (initials && <Avatar initials={initials} size="md" />)}
+        <Text variant="heading" color={Colors.textInverse} style={styles.title}>
+          {title}
+        </Text>
+      </View>
+      <Text variant="body" color={Colors.textInverse} style={styles.description}>
+        {description}
+      </Text>
+    </Card>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    gap: Spacing.md,
+  },
+  title: {
+    flex: 1,
+  },
+  description: {
+    lineHeight: 22,
+  },
+});
