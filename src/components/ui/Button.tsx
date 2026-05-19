@@ -1,3 +1,4 @@
+import { UX } from '@/constants/ux';
 import { Colors, Radius, Shadows, Spacing, Typography } from '@/theme/tokens';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
@@ -14,6 +15,9 @@ interface ButtonProps extends TouchableOpacityProps {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   haptic?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  reducedMotion?: boolean;
 }
 
 export function Button({ 
@@ -25,6 +29,9 @@ export function Button({
   leftIcon,
   rightIcon,
   haptic = true,
+  accessibilityLabel,
+  accessibilityHint,
+  reducedMotion = false,
   className = '',
   onPress,
   ...props 
@@ -42,19 +49,19 @@ export function Button({
         return {
           paddingHorizontal: Spacing.md,
           paddingVertical: Spacing.sm,
-          minHeight: 36,
+          minHeight: UX.touchTarget, // Ensure minimum touch target
         };
       case 'lg':
         return {
           paddingHorizontal: Spacing.xl,
           paddingVertical: Spacing.lg,
-          minHeight: 52,
+          minHeight: UX.touchTargetLarge,
         };
       default:
         return {
           paddingHorizontal: Spacing.lg,
           paddingVertical: Spacing.md,
-          minHeight: 44,
+          minHeight: UX.touchTarget,
         };
     }
   };
@@ -113,12 +120,25 @@ export function Button({
 
   const isDisabled = disabled || loading;
 
+  const getButtonLabel = () => {
+    if (accessibilityLabel) return accessibilityLabel;
+    if (typeof children === 'string') return children;
+    return '';
+  };
+
   return (
     <TouchableOpacity
       className={className}
       onPress={handlePress}
       disabled={isDisabled}
-      activeOpacity={0.7}
+      activeOpacity={reducedMotion ? 0.9 : 0.7}
+      accessibilityRole="button"
+      accessibilityLabel={getButtonLabel()}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{
+        disabled: isDisabled,
+        busy: loading,
+      }}
       style={{
         ...getSizeStyles(),
         ...getVariantStyles(),
@@ -131,7 +151,10 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={Colors.textInverse} />
+        <ActivityIndicator 
+          color={variant === 'ghost' ? Colors.primary : Colors.textInverse}
+          accessibilityLabel="Loading"
+        />
       ) : (
         <>
           {leftIcon}

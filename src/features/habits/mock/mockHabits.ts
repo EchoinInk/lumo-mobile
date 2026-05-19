@@ -1,0 +1,108 @@
+import { Habit } from '@/store/useHabitStore';
+
+export const mockHabits: Habit[] = [
+  {
+    id: '1',
+    title: 'Morning meditation',
+    description: '10 minutes of mindfulness meditation',
+    frequency: 'daily',
+    targetDays: [1, 2, 3, 4, 5, 6, 7],
+    completedDates: ['2026-05-18', '2026-05-19'],
+    color: '#6366f1',
+    icon: 'brain',
+    createdAt: '2026-05-01T06:00:00Z',
+    updatedAt: '2026-05-19T06:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Exercise',
+    description: '30 minutes of physical activity',
+    frequency: 'daily',
+    targetDays: [1, 2, 3, 4, 5],
+    completedDates: ['2026-05-17', '2026-05-18'],
+    color: '#10b981',
+    icon: 'activity',
+    createdAt: '2026-05-01T07:00:00Z',
+    updatedAt: '2026-05-18T07:30:00Z',
+  },
+  {
+    id: '3',
+    title: 'Read for 20 minutes',
+    description: 'Read a book or educational material',
+    frequency: 'daily',
+    targetDays: [1, 2, 3, 4, 5, 6, 7],
+    completedDates: ['2026-05-16', '2026-05-17', '2026-05-18', '2026-05-19'],
+    color: '#f59e0b',
+    icon: 'book',
+    createdAt: '2026-05-01T08:00:00Z',
+    updatedAt: '2026-05-19T21:00:00Z',
+  },
+  {
+    id: '4',
+    title: 'Drink 8 glasses of water',
+    description: 'Stay hydrated throughout the day',
+    frequency: 'daily',
+    targetDays: [1, 2, 3, 4, 5, 6, 7],
+    completedDates: ['2026-05-19'],
+    color: '#3b82f6',
+    icon: 'droplet',
+    createdAt: '2026-05-01T09:00:00Z',
+    updatedAt: '2026-05-19T20:00:00Z',
+  },
+  {
+    id: '5',
+    title: 'Weekly meal prep',
+    description: 'Prepare meals for the upcoming week',
+    frequency: 'weekly',
+    targetDays: [0],
+    completedDates: ['2026-05-11', '2026-05-18'],
+    color: '#ef4444',
+    icon: 'chef-hat',
+    createdAt: '2026-05-01T10:00:00Z',
+    updatedAt: '2026-05-18T14:00:00Z',
+  },
+  {
+    id: '6',
+    title: 'Journal before bed',
+    description: 'Write down thoughts and reflections',
+    frequency: 'daily',
+    targetDays: [1, 2, 3, 4, 5, 6, 7],
+    completedDates: ['2026-05-17', '2026-05-18'],
+    color: '#8b5cf6',
+    icon: 'pen',
+    createdAt: '2026-05-01T11:00:00Z',
+    updatedAt: '2026-05-18T23:00:00Z',
+  },
+  {
+    id: '7',
+    title: 'Practice guitar',
+    description: '30 minutes of guitar practice',
+    frequency: 'daily',
+    targetDays: [1, 3, 5],
+    completedDates: ['2026-05-15', '2026-05-17'],
+    color: '#ec4899',
+    icon: 'music',
+    createdAt: '2026-05-01T12:00:00Z',
+    updatedAt: '2026-05-17T19:00:00Z',
+  },
+  {
+    id: '8',
+    title: 'Weekly review',
+    description: 'Review progress and plan for next week',
+    frequency: 'weekly',
+    targetDays: [6],
+    completedDates: ['2026-05-10', '2026-05-17'],
+    color: '#14b8a6',
+    icon: 'calendar',
+    createdAt: '2026-05-01T13:00:00Z',
+    updatedAt: '2026-05-17T16:00:00Z',
+  },
+];
+
+export const seedMockHabits = (): void => {
+  // This function can be used to seed the store with mock data
+  // Import and call this in development or testing environments
+  // Example: import { seedMockHabits } from '@/features/habits/mock/mockHabits';
+  //          seedMockHabits();
+  console.log('Mock habits ready for seeding:', mockHabits.length);
+};

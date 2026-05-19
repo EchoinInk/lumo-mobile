@@ -1,3 +1,4 @@
+import { UX } from '@/constants/ux';
 import { Colors, Padding } from '@/theme/tokens';
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, ScrollViewProps, View, ViewProps } from 'react-native';
@@ -10,6 +11,8 @@ interface ScreenProps extends ViewProps {
   keyboardAvoiding?: boolean;
   backgroundColor?: string;
   scrollViewProps?: ScrollViewProps;
+  centered?: boolean;
+  accessibilityLabel?: string;
 }
 
 export function Screen({
@@ -20,6 +23,8 @@ export function Screen({
   backgroundColor = Colors.background,
   className = '',
   scrollViewProps,
+  centered = false,
+  accessibilityLabel,
   ...props
 }: ScreenProps) {
   const paddingValue = typeof padded === 'boolean' 
@@ -29,7 +34,17 @@ export function Screen({
   const content = (
     <View 
       className={`flex-1 ${className}`}
-      style={{ backgroundColor, paddingHorizontal: paddingValue, paddingVertical: paddingValue }}
+      style={{
+        backgroundColor,
+        paddingHorizontal: paddingValue,
+        paddingVertical: paddingValue,
+        maxWidth: UX.content.maxWidth,
+        alignSelf: centered ? 'center' : 'stretch',
+        width: centered ? '100%' : undefined,
+      }}
+      accessible={!!accessibilityLabel}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="adjustable"
       {...props}
     >
       {children}
@@ -38,7 +53,11 @@ export function Screen({
 
   if (keyboardAvoiding) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'left', 'right']}>
+      <SafeAreaView 
+        style={{ flex: 1, backgroundColor }} 
+        edges={['top', 'left', 'right']}
+        accessible={false}
+      >
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -48,6 +67,8 @@ export function Screen({
             <ScrollView 
               contentContainerStyle={{ flexGrow: 1 }}
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              accessible={false}
               {...scrollViewProps}
             >
               {content}
@@ -61,11 +82,17 @@ export function Screen({
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'left', 'right']}>
+    <SafeAreaView 
+      style={{ flex: 1, backgroundColor }} 
+      edges={['top', 'left', 'right']}
+      accessible={false}
+    >
       {scrollable ? (
         <ScrollView 
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          accessible={false}
           {...scrollViewProps}
         >
           {content}

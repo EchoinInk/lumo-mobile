@@ -1,40 +1,79 @@
-// MMKV storage service - to be configured with proper initialization
-// This is a placeholder for the MMKV singleton pattern
+import { createMMKV } from 'react-native-mmkv';
 
-export const mmkv = {
-  setString: (key: string, value: string) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('setString', key, value);
-  },
-  getString: (key: string) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('getString', key);
-    return null;
-  },
-  setNumber: (key: string, value: number) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('setNumber', key, value);
-  },
-  getNumber: (key: string) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('getNumber', key);
-    return null;
-  },
-  setBool: (key: string, value: boolean) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('setBool', key, value);
-  },
-  getBool: (key: string) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('getBool', key);
-    return null;
-  },
-  delete: (key: string) => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('delete', key);
-  },
-  clearAll: () => {
-    // TODO: Implement with proper MMKV initialization
-    console.log('clearAll');
-  },
+/**
+ * MMKV Storage Instance
+ * 
+ * Centralized MMKV storage instance for the application.
+ * Initialized once to avoid duplication and ensure consistency.
+ */
+export const storage = createMMKV();
+
+/**
+ * Get a string value from storage
+ */
+export const getString = (key: string): string | undefined => {
+  return storage.getString(key);
+};
+
+/**
+ * Set a string value in storage
+ */
+export const setString = (key: string, value: string): void => {
+  storage.set(key, value);
+};
+
+/**
+ * Get a number value from storage
+ */
+export const getNumber = (key: string): number | undefined => {
+  return storage.getNumber(key);
+};
+
+/**
+ * Set a number value in storage
+ */
+export const setNumber = (key: string, value: number): void => {
+  storage.set(key, value);
+};
+
+/**
+ * Get a boolean value from storage
+ */
+export const getBool = (key: string): boolean | undefined => {
+  return storage.getBoolean(key);
+};
+
+/**
+ * Set a boolean value in storage
+ */
+export const setBool = (key: string, value: boolean): void => {
+  storage.set(key, value);
+};
+
+/**
+ * Delete a key from storage
+ */
+export const deleteKey = (key: string): void => {
+  storage.remove(key);
+};
+
+/**
+ * Clear all keys from storage
+ */
+export const clearAll = (): void => {
+  storage.clearAll();
+};
+
+/**
+ * Check if a key exists in storage
+ */
+export const contains = (key: string): boolean => {
+  return storage.contains(key);
+};
+
+/**
+ * Get all keys from storage
+ */
+export const getAllKeys = (): string[] => {
+  return storage.getAllKeys();
 };

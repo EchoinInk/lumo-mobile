@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { TouchableOpacity, TouchableOpacityProps, View, ViewProps } from 'react-native';
 
-type CardVariant = 'default' | 'elevated' | 'gradient' | 'outlined' | 'glass';
+type CardVariant = 'default' | 'elevated' | 'gradient' | 'outlined' | 'glass' | 'interactive' | 'compact';
 
 interface CardProps extends ViewProps {
   children: React.ReactNode;
@@ -11,6 +11,8 @@ interface CardProps extends ViewProps {
   pressable?: boolean;
   onPress?: TouchableOpacityProps['onPress'];
   padding?: keyof typeof Spacing;
+  accessibilityLabel?: string;
+  reducedMotion?: boolean;
 }
 
 export function Card({ 
@@ -19,10 +21,12 @@ export function Card({
   pressable = false,
   onPress,
   padding = 'lg',
+  accessibilityLabel,
+  reducedMotion = false,
   className = '',
   ...props 
 }: CardProps) {
-  const paddingValue = Spacing[padding];
+  const paddingValue = variant === 'compact' ? Spacing.md : Spacing[padding];
 
   const getVariantStyles = () => {
     switch (variant) {
@@ -50,6 +54,18 @@ export function Card({
           borderRadius: Radius.lg,
           ...Shadows.soft,
         };
+      case 'interactive':
+        return {
+          backgroundColor: Colors.card,
+          borderRadius: Radius.lg,
+          ...Shadows.md,
+        };
+      case 'compact':
+        return {
+          backgroundColor: Colors.card,
+          borderRadius: Radius.md,
+          ...Shadows.sm,
+        };
       default:
         return {
           backgroundColor: Colors.card,
@@ -66,6 +82,8 @@ export function Card({
         ...getVariantStyles(),
         padding: paddingValue,
       }}
+      accessible={!!accessibilityLabel}
+      accessibilityLabel={accessibilityLabel}
       {...props}
     >
       {variant === 'gradient' ? (
@@ -87,7 +105,9 @@ export function Card({
     return (
       <TouchableOpacity 
         onPress={onPress}
-        activeOpacity={0.7}
+        activeOpacity={reducedMotion ? 0.9 : 0.7}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
         style={{ ...getVariantStyles() }}
       >
         {cardContent}
