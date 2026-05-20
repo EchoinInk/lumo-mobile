@@ -1,7 +1,7 @@
-import { ITaskRepository } from './taskRepository.types';
-import { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
+import { deleteKey, getString, setString } from '@/services/storage/mmkv';
 import { StorageKeys } from '@/services/storage/storageKeys';
-import { getString, setString, deleteKey } from '@/services/storage/mmkv';
+import { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
+import { ITaskRepository } from './taskRepository.types';
 
 /**
  * Task Local Repository
@@ -62,6 +62,8 @@ export class TaskLocalRepository implements ITaskRepository {
       completed: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      version: 1,
+      pendingSync: true,
     };
 
     const updatedTasks = [...tasks, newTask];
@@ -73,7 +75,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Generic create implementation for IRepository contract
    */
-  async create(input: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<Task> {
+  async create(input: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>): Promise<Task> {
     return this.createTask(input as CreateTaskInput);
   }
 
@@ -88,10 +90,13 @@ export class TaskLocalRepository implements ITaskRepository {
       throw new Error(`Task with id ${id} not found`);
     }
 
+    const current = tasks[taskIndex];
     const updatedTask: Task = {
-      ...tasks[taskIndex],
+      ...current,
       ...input,
       updatedAt: new Date().toISOString(),
+      version: (current.version ?? 0) + 1,
+      pendingSync: true,
     };
 
     tasks[taskIndex] = updatedTask;
@@ -134,10 +139,13 @@ export class TaskLocalRepository implements ITaskRepository {
       throw new Error(`Task with id ${id} not found`);
     }
 
+    const current = tasks[taskIndex];
     const updatedTask: Task = {
-      ...tasks[taskIndex],
-      completed: !tasks[taskIndex].completed,
+      ...current,
+      completed: !current.completed,
       updatedAt: new Date().toISOString(),
+      version: (current.version ?? 0) + 1,
+      pendingSync: true,
     };
 
     tasks[taskIndex] = updatedTask;
@@ -156,6 +164,24 @@ export class TaskLocalRepository implements ITaskRepository {
       console.error('Error saving tasks to storage:', error);
       throw error;
     }
+  }
+
+  /**
+   * Mark an entity as successfully synced.
+   * Clears pendingSync and stamps lastSyncedAt.
+   * Called by sync processor after remote confirmation.
+   */
+  async markSynced(id: string): Promise<void> {
+    const tasks = await this.getTasks();
+    const taskIndex = tasks.findIndex((task) => task.id === id);
+    if (taskIndex === -1) return;
+
+    tasks[taskIndex] = {
+      ...tasks[taskIndex],
+      pendingSync: false,
+      lastSyncedAt: new Date().toISOString(),
+    };
+    await this.saveTasks(tasks);
   }
 
   /**

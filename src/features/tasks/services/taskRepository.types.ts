@@ -42,4 +42,10 @@ export interface ITaskRepository extends IRepository<Task> {
    * @returns Promise resolving to updated task
    */
   toggleTask(id: string): Promise<Task>;
+
+  /**
+   * Mark an entity as successfully synced.
+   * Clears pendingSync flag and stamps lastSyncedAt.
+   */
+  markSynced(id: string): Promise<void>;
 }

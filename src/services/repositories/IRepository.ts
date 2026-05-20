@@ -26,7 +26,7 @@ export interface IRepository<T> {
    * @param input - Entity data without system-generated fields
    * @returns Promise resolving to created entity
    */
-  create(input: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): Promise<T>;
+  create(input: Omit<T, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>): Promise<T>;
 
   /**
    * Update an existing entity

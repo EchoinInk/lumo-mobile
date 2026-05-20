@@ -9,6 +9,9 @@ export interface Task {
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
+  version: number;
+  lastSyncedAt?: string;
+  pendingSync?: boolean;
 }
 
 type TaskState = {
@@ -18,7 +21,7 @@ type TaskState = {
 };
 
 type TaskActions = {
-  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTaskCompletion: (id: string) => void;
@@ -43,6 +46,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          version: 1,
+          pendingSync: true,
         },
       ],
     })),
@@ -51,7 +56,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
     set((state) => ({
       tasks: state.tasks.map((task) =>
         task.id === id
-          ? { ...task, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...task, ...updates, updatedAt: new Date().toISOString(), version: (task.version ?? 0) + 1, pendingSync: true }
           : task
       ),
     })),
@@ -69,6 +74,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
               ...task,
               completed: !task.completed,
               updatedAt: new Date().toISOString(),
+              version: (task.version ?? 0) + 1,
+              pendingSync: true,
             }
           : task
       ),

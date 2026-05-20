@@ -1,5 +1,207 @@
 # Changelog
 
+## Phase 12 — Production Hardening
+
+### Added
+- **Error System** (src/services/error/): errorLogger.ts for calm error logging, errorClassifier.ts for intelligent error categorization, errorRecovery.ts for graceful recovery with exponential backoff
+- **Analytics Services** (src/services/analytics/): analyticsService.ts for lightweight event tracking, analyticsEvents.ts for typed event definitions, analyticsQueue.ts for offline-safe event batching
+- **Feedback Components** (src/components/feedback/): ErrorState, ErrorBoundary, RetryView, OfflineView, EmptyState, LoadingState, SuccessState, SkeletonCard for calm, emotionally safe UX states
+- **Resilience Hooks** (src/hooks/): useRetry for patient retry logic, useOfflineState for offline awareness, useAsyncBoundary for async error handling
+- **Analytics Feature** (src/features/analytics/): useAnalyticsStore for analytics preferences, analyticsFeatureService for feature-level tracking, analyticsHelpers for utility functions
+- **Error Type Definitions** (src/types/errors.ts): AppError, ErrorLog, ErrorClassification, ErrorRecoveryOptions, ErrorBoundaryState
+- **Analytics Type Definitions** (src/types/analytics.ts): AnalyticsEvent, AnalyticsEventPayload, AnalyticsQueueEntry, AnalyticsConfig, AnalyticsSession
+- **Feedback Constants** (src/constants/emptyStates.ts): Emotionally intelligent empty state messages for all features
+- **Feedback Message Constants** (src/constants/feedbackMessages.ts): Calm error, success, loading, retry, and offline messages
+
+### Error Philosophy
+- **Emotionally Safe**: Errors feel reassuring, not alarming
+- **No Technical Jargon**: "Something didn't work" instead of "Fatal exception"
+- **Forgiving**: Users are never punished for failures
+- **Calm Recovery**: Gentle retry with exponential backoff, no aggressive loops
+- **Graceful Degradation**: Offline states feel safe, expected, non-destructive
+
+### Error Classification
+- **Network Errors**: Connection issues with retry support
+- **Storage Errors**: Data persistence problems with fallback
+- **Auth Errors**: Authentication failures with reset strategy
+- **Validation Errors**: Input validation with ignore strategy
+- **Sync Errors**: Sync failures with retry and local safety
+- **Unknown Errors**: Fallback to calm general messaging
+
+### Empty State Philosophy
+- **Supportive Tone**: "A gentle place to begin" instead of "You haven't completed anything yet"
+- **Lightweight Encouragement**: No pressure, no gamification
+- **Clear Next Action**: Always provide a path forward
+- **Calm Composition**: Spacious, breathable, not overwhelming
+
+### Loading State Philosophy
+- **Skeleton Placeholders**: Preserved layout stability
+- **Soft Transitions**: No flashing, no layout jumps
+- **Avoid Spinner Overload**: Contextual loading only
+- **Predictable Rendering**: Consistent patterns across features
+
+### Retry Architecture
+- **Exponential Backoff**: Calm delay progression (1s, 2s, 4s)
+- **Max Retries**: 3 attempts by default, configurable
+- **Offline Awareness**: Respects network state
+- **Safe Cancellation**: Can be cancelled without side effects
+- **Progress Feedback**: Shows attempt count without pressure
+
+### Offline UX Philosophy
+- **Safe Messaging**: "Changes will sync when you're back online" instead of "Connection lost"
+- **Expected Behavior**: Offline feels normal, not exceptional
+- **Non-Destructive**: Emphasizes data safety
+- **Retry Awareness**: Clear when sync will happen
+- **Degraded Gracefully**: Features work when possible
+
+### Analytics Philosophy
+- **Behavioral Insight**: Track task completion, onboarding drop-off, feature adoption
+- **NOT Surveillance**: No personal behavioral profiling, no session reconstruction
+- **Opt-Out Support**: Users can disable analytics anytime
+- **Offline-Safe**: Queue events locally, flush when online
+- **Lightweight Payloads**: Minimal data, no bloat
+- **Batched Delivery**: Efficient event flushing
+
+### Analytics Architecture
+- **Feature → Analytics Service → Queue → Provider**: Clean abstraction, no vendor lock-in
+- **Event Batching**: 10 events per batch, configurable
+- **Flush Interval**: 30 seconds, configurable
+- **Queue Persistence**: MMKV storage, survives app restarts
+- **Max Queue Size**: 100 events, FIFO eviction
+- **Typed Events**: Full TypeScript coverage
+
+### Error Boundaries
+- **Screen-Level Boundaries**: Graceful fallback per screen
+- **Safe Logging Hooks**: Errors logged without exposing stack traces
+- **Retry Support**: Users can retry failed screens
+- **Error Classification**: Different recovery strategies per error type
+- **No App Crashes**: Errors contained, never crash entire app tree
+
+### Accessibility + Feedback
+- **Reduced Motion**: All feedback components respect reduced motion
+- **Dynamic Font Sizing**: Text scales with system preferences
+- **Calm Contrast**: No flashing error states, no jittery loaders
+- **Predictable Layouts**: Stable feedback states, no layout jumps
+- **Touch Targets**: 44x44 minimum for all interactive elements
+
+### Performance Requirements
+- **Lightweight Feedback**: Minimal component overhead
+- **No Rerender Storms**: Memoized where appropriate
+- **Layout Stability**: Skeletons preserve structure
+- **Minimal Animation**: Subtle motion only, reduced motion support
+- **Efficient Queuing**: Analytics batching prevents spam
+
+### Design Language
+- **Soft & Spacious**: Calm spacing, not cluttered
+- **Emotionally Calm**: No alarming reds everywhere
+- **Restrained Blur**: Subtle depth, not overwhelming
+- **Supportive Copy**: Warm, reassuring language
+- **Intentional States**: Every state has purpose and clarity
+
+## Phase 11 — Advanced UX Layer
+
+### Added
+- **Animation Primitives** (src/animations/): Reusable animation system with transitions, presets, haptics, motion utilities, and reduced motion support
+- **Animated Components** (src/components/animated/): FadeIn, ScalePress, AnimatedCard, SharedTransitionCard, and CelebrationPulse components with calm, subtle animations
+- **Onboarding Components** (src/components/onboarding/): OnboardingContainer, OnboardingProgress, FocusSelectionCard, PreferenceSelector, and WelcomeHero components for calm, emotionally intelligent onboarding
+- **Onboarding Feature Architecture** (src/features/onboarding/): Complete onboarding flow with hooks (useOnboardingFlow, useOnboardingValidation), screens (OnboardingScreen), and utilities
+- **Onboarding Services** (src/services/onboarding/): onboardingService.ts and dashboardPersonalization.ts for onboarding logic and dashboard personalization
+- **Onboarding Store** (src/store/useOnboardingStore.ts): Zustand store for onboarding state and progress with MMKV persistence
+- **Accessibility Store** (src/store/useAccessibilityStore.ts): Zustand store for accessibility preferences including reduced motion, haptic feedback, and visual preferences
+- **Type Definitions** (src/types/onboarding.ts, src/types/accessibility.ts): Complete type definitions for onboarding data, personalization, and accessibility preferences
+- **Onboarding Constants** (src/constants/onboarding.ts): Centralized configuration for onboarding flow, options, and personalization defaults
+
+### Motion Philosophy
+- All animations are subtle, calm, and respect reduced motion preferences
+- Motion reduces friction and improves clarity, never competes for attention
+- Haptic feedback is used sparingly and intentionally (selection, completion, onboarding progression)
+- Blur effects used minimally for overlays and depth without readability loss
+- No flashy, hyperactive, or dopamine-driven animations
+
+### Onboarding Flow
+- **Step 1**: "What do you struggle with most?" — Multi-select struggle areas (tasks, routines, meals, overwhelm, budgeting, consistency)
+- **Step 2**: "How do you prefer planning?" — Single-select planning preference (minimal, visual, structured, flexible)
+- **Step 3**: "Choose your focus areas" — Multi-select focus areas (habits, tasks, meals, wellness, fitness)
+- Onboarding choices drive dashboard personalization (feature visibility, density, card style)
+- Calm, reassuring, emotionally safe onboarding experience
+
+### Accessibility
+- Reduced motion support integrated across all animations
+- Haptic feedback can be disabled via accessibility preferences
+- Animation intensity scaling (none, reduced, normal)
+- Motion priority system (essential vs optional animations)
+- All animations respect system and app-level accessibility preferences automatically
+
+### Dependencies
+- `react-native-reanimated` — Animation library
+- `expo-haptics` — Haptic feedback
+- `expo-blur` — Blur effects for depth
+
+### Architecture
+- Feature-first onboarding architecture with hooks, screens, services, and utilities
+- Modular animation primitives that can be composed across the app
+- Centralized motion configuration in src/animations/motion.ts
+- Reduced motion utilities in src/animations/reducedMotion.ts
+- Haptic utilities in src/animations/haptics.ts with intensity control
+- Onboarding persistence via MMKV through Zustand persist middleware
+- Dashboard personalization generated from onboarding choices
+
+### UX Tone
+- Emotional intelligence and safety prioritized over gamification
+- Calm, breathable, supportive interactions
+- No achievement pressure, streak obsession, or urgency
+- Subtle delight through gentle motion and warm haptics
+- Reduced overwhelm through personalized first-run experience
+
+## Phase 9 — Backend & Sync Architecture
+
+### Added
+- **Supabase Infrastructure**: Typed Supabase client with `expo-secure-store` session persistence, URL polyfill, and environment variable configuration
+- **Authentication Foundation**: Auth service, auth store (Zustand), auth types, session restoration, hydration handling — supports sign in, sign up, sign out, and session restore
+- **Offline-First Sync Queue**: MMKV-persisted operation queue with create/update/delete support, retry tracking, failure handling, and queue persistence across app restarts
+- **Sync Processor**: Background queue processor that auto-triggers on connectivity change, processes entries sequentially with retry logic, and supports per-entity-type handler registration
+- **Sync-Aware Repository**: `TaskSyncRepository` wrapping local repository with optimistic writes — updates MMKV instantly, enqueues sync operation, triggers background sync
+- **Network Awareness**: `NetInfo`-based connectivity utilities with online/offline detection, reactive listeners, sync gating, and `waitForOnline()` helper
+- **Retry Utility**: Exponential backoff with jitter for resilient network operations, configurable max attempts, delay, and retry callbacks
+- **Secure Storage Adapter**: `expo-secure-store` wrapper with web fallback, providing Supabase-compatible storage interface for auth token persistence
+- **Auth Hook** (`useAuth`): Thin hook exposing auth state and actions to screens
+- **Sync Status Hook** (`useSyncStatus`): Hook for UI components to display sync state, pending count, and connectivity
+- **App Initialization Module** (`services/init.ts`): Bootstrap sequence for network monitoring, sync processor, and auth session restoration
+- **Environment Setup**: `.env.example` with Supabase configuration, `.env` added to `.gitignore`
+- **Setup Documentation**: `docs/backend-setup.md` covering architecture, data flow, file structure, extension guide, and security notes
+
+### Dependencies
+- `@supabase/supabase-js` — Supabase client SDK
+- `expo-secure-store` — Native keychain/keystore token storage
+- `react-native-url-polyfill` — URL API polyfill for React Native
+- `@react-native-community/netinfo` — Network connectivity detection
+- `zustand` — State management (now in package.json)
+- `react-native-mmkv` — MMKV storage (now in package.json)
+
+### Architecture
+- Repository pattern enforced: UI → Hook → Repository → API Service → Supabase
+- Local-first writes with optimistic updates — user interactions never block on network
+- Sync queue persists in MMKV, survives app restarts, processes when online
+- Sync handlers registered per entity type — extensible to habits, meals, budget
+- Auth tokens secured via `expo-secure-store` (native) with `localStorage` web fallback
+- Repository factory (`services/repositories/index.ts`) swaps between sync and local implementations
+- Storage keys centralized in `services/storage/storageKeys.ts`
+
+### Changed
+- Updated `tsconfig.json` with `baseUrl` and `paths` for `@/` alias resolution
+- Updated `app/_layout.tsx` to call `initializeBackend()` on mount
+- Updated repository factory to use `taskSyncRepository` as default
+- Updated `.gitignore` to exclude `.env` files
+
+### Notes
+- No auth screens implemented — this phase is infrastructure only
+- No React Query — sync is handled via queue + processor pattern
+- Supabase client gracefully warns if env vars are missing (app still runs locally)
+- Sync processor is a scaffold — entity handlers registered as features connect to backend
+- All code is strongly typed with no `any` usage
+
+---
+
 ## Phase 8 — Performance Architecture
 
 ### Added

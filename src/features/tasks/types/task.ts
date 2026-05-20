@@ -1,10 +1,12 @@
+import type { SyncableMetadata } from '@/types/sync';
+
 export type TaskPriority = 'low' | 'medium' | 'high';
 
 export type TaskStatus = 'todo' | 'completed';
 
 export type TaskFilter = 'all' | 'active' | 'completed' | 'high' | 'medium' | 'low';
 
-export interface Task {
+export interface Task extends SyncableMetadata {
   id: string;
   title: string;
   description?: string;

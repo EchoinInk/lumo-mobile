@@ -22,6 +22,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T08:00:00Z',
     updatedAt: '2026-05-20T08:00:00Z',
+    version: 1,
   },
   {
     id: '2',
@@ -32,6 +33,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T09:00:00Z',
     updatedAt: '2026-05-20T09:00:00Z',
+    version: 1,
   },
   {
     id: '3',
@@ -42,6 +44,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T10:00:00Z',
     updatedAt: '2026-05-20T10:00:00Z',
+    version: 1,
   },
 
   // Today's tasks - medium priority
@@ -54,6 +57,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T11:00:00Z',
     updatedAt: '2026-05-20T11:00:00Z',
+    version: 1,
   },
   {
     id: '5',
@@ -64,6 +68,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T07:00:00Z',
     updatedAt: '2026-05-20T07:00:00Z',
+    version: 1,
   },
   {
     id: '6',
@@ -74,6 +79,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T12:00:00Z',
     updatedAt: '2026-05-20T12:00:00Z',
+    version: 1,
   },
 
   // Today's tasks - low priority
@@ -86,6 +92,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T13:00:00Z',
     updatedAt: '2026-05-20T13:00:00Z',
+    version: 1,
   },
   {
     id: '8',
@@ -96,6 +103,7 @@ export const mockTasks: Task[] = [
     dueDate: new Date().toISOString().split('T')[0],
     createdAt: '2026-05-20T14:00:00Z',
     updatedAt: '2026-05-20T14:00:00Z',
+    version: 1,
   },
 
   // Overdue tasks
@@ -108,6 +116,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-18',
     createdAt: '2026-05-15T10:00:00Z',
     updatedAt: '2026-05-15T10:00:00Z',
+    version: 1,
   },
   {
     id: '10',
@@ -118,6 +127,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-19',
     createdAt: '2026-05-17T09:00:00Z',
     updatedAt: '2026-05-17T09:00:00Z',
+    version: 1,
   },
 
   // Completed tasks
@@ -130,6 +140,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-19',
     createdAt: '2026-05-18T16:00:00Z',
     updatedAt: '2026-05-19T10:30:00Z',
+    version: 1,
   },
   {
     id: '12',
@@ -140,6 +151,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-18',
     createdAt: '2026-05-17T18:00:00Z',
     updatedAt: '2026-05-18T19:00:00Z',
+    version: 1,
   },
   {
     id: '13',
@@ -150,6 +162,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-18',
     createdAt: '2026-05-17T08:00:00Z',
     updatedAt: '2026-05-18T08:30:00Z',
+    version: 1,
   },
 
   // Future tasks
@@ -162,6 +175,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-25',
     createdAt: '2026-05-20T15:00:00Z',
     updatedAt: '2026-05-20T15:00:00Z',
+    version: 1,
   },
   {
     id: '15',
@@ -172,6 +186,7 @@ export const mockTasks: Task[] = [
     dueDate: '2026-05-22',
     createdAt: '2026-05-20T16:00:00Z',
     updatedAt: '2026-05-20T16:00:00Z',
+    version: 1,
   },
 ];
 

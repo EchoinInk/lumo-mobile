@@ -1,0 +1,103 @@
+/**
+ * AnimatedCard Component
+ * 
+ * A card component with gentle entrance and elevation animations.
+ * Subtle depth animation on press/hover.
+ */
+
+import React, { useState } from 'react';
+import {
+  View,
+  ViewStyle,
+  StyleSheet,
+  GestureResponderEvent,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
+import { softFadeIn } from '@/animations/transitions';
+import { useTheme } from '@/hooks/use-theme';
+import { Colors } from '@/theme/colors';
+
+interface AnimatedCardProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  elevated?: boolean;
+  onPress?: (event: GestureResponderEvent) => void;
+  testID?: string;
+}
+
+export const AnimatedCard: React.FC<AnimatedCardProps> = ({
+  children,
+  style,
+  elevated = false,
+  onPress,
+  testID,
+}) => {
+  const { isDark } = useTheme();
+  const isPressed = useSharedValue(false);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = withTiming(isPressed.value ? 0.98 : 1, {
+      duration: 150,
+    });
+
+    const translateY = withTiming(isPressed.value ? -2 : 0, {
+      duration: 150,
+    });
+
+    return {
+      transform: [{ scale }, { translateY }],
+    };
+  });
+
+  const handlePressIn = () => {
+    if (onPress) {
+      isPressed.value = true;
+    }
+  };
+
+  const handlePressOut = () => {
+    isPressed.value = false;
+  };
+
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: isDark ? Colors.card : Colors.card,
+      shadowColor: isDark ? '#000' : '#000',
+    },
+    animatedStyle,
+    style,
+  ];
+
+  return (
+    <Animated.View
+      entering={softFadeIn()}
+      style={cardStyle}
+      onStartShouldSetResponder={() => !!onPress}
+      onResponderGrant={handlePressIn}
+      onResponderRelease={handlePressOut}
+      onResponderTerminate={handlePressOut}
+      testID={testID}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 16,
+    padding: 16,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+});

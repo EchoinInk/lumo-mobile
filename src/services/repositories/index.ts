@@ -1,23 +1,30 @@
 import { taskLocalRepository } from '@/features/tasks/services/taskLocalRepository';
+import { taskSyncRepository } from '@/features/tasks/services/taskSyncRepository';
 
 /**
  * Repository Factory
- * 
+ *
  * Centralized repository ownership for the application.
- * This allows future migration to different backends (Supabase, Firebase, etc.)
- * without touching UI code - simply swap the implementation here.
- * 
+ * Swap implementations here — UI code never changes.
+ *
+ * Default: sync-aware repositories (local + queue).
+ * Fallback: local-only repositories (no sync).
+ *
  * Usage:
  *   import { repositories } from '@/services/repositories';
  *   const tasks = await repositories.tasks.getTasks();
  */
 export const repositories = {
-  tasks: taskLocalRepository,
-  
-  // Future repositories can be added here:
-  // habits: habitLocalRepository,
-  // meals: mealLocalRepository,
-  // budget: budgetLocalRepository,
+  /** Sync-aware: local writes + enqueues to sync queue */
+  tasks: taskSyncRepository,
+
+  /** Local-only access (useful for offline-only features or testing) */
+  tasksLocal: taskLocalRepository,
+
+  // Future repositories:
+  // habits: habitSyncRepository,
+  // meals: mealSyncRepository,
+  // budget: budgetSyncRepository,
 } as const;
 
 /**

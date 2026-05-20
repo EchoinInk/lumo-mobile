@@ -1,0 +1,166 @@
+/**
+ * Task Sync Repository
+ *
+ * Wraps TaskLocalRepository with sync queue integration.
+ * Implements the offline-first pattern:
+ *
+ *   1. Update local cache instantly (optimistic)
+ *   2. Enqueue sync operation
+ *   3. Attempt background sync
+ *
+ * UI never blocks on network. Sync failures are retried automatically.
+ *
+ * Flow: Screen → Hook → taskSyncRepository → local + sync queue
+ */
+
+import { enqueue, hasPendingOperations } from '@/services/sync';
+import { processQueue } from '@/services/sync/syncProcessor';
+import { isOnline } from '@/utils/network';
+import type { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
+import { taskLocalRepository } from './taskLocalRepository';
+import type { ITaskRepository } from './taskRepository.types';
+
+class TaskSyncRepository implements ITaskRepository {
+  /**
+   * Get all tasks — reads from local cache only.
+   * Network fetch is handled by background sync.
+   */
+  async getTasks(): Promise<Task[]> {
+    return taskLocalRepository.getTasks();
+  }
+
+  async getAll(): Promise<Task[]> {
+    return taskLocalRepository.getAll();
+  }
+
+  async getById(id: string): Promise<Task | null> {
+    return taskLocalRepository.getById(id);
+  }
+
+  /**
+   * Create a task optimistically.
+   * Updates local storage immediately, then enqueues sync.
+   */
+  async createTask(input: CreateTaskInput): Promise<Task> {
+    // 1. Update local cache instantly
+    const task = await taskLocalRepository.createTask(input);
+
+    // 2. Enqueue sync operation with version for conflict detection
+    enqueue({
+      entityType: 'task',
+      operationType: 'create',
+      entityId: task.id,
+      payload: task as unknown as Record<string, unknown>,
+      entityVersion: task.version,
+    });
+
+    // 3. Attempt background sync (non-blocking)
+    this.triggerSync();
+
+    return task;
+  }
+
+  async create(input: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>): Promise<Task> {
+    return this.createTask(input as CreateTaskInput);
+  }
+
+  /**
+   * Update a task optimistically.
+   */
+  async updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
+    // 1. Update local cache instantly
+    const task = await taskLocalRepository.updateTask(id, input);
+
+    // 2. Enqueue sync operation with version for conflict detection
+    enqueue({
+      entityType: 'task',
+      operationType: 'update',
+      entityId: id,
+      payload: input as unknown as Record<string, unknown>,
+      entityVersion: task.version,
+    });
+
+    // 3. Attempt background sync (non-blocking)
+    this.triggerSync();
+
+    return task;
+  }
+
+  async update(id: string, input: Partial<Task>): Promise<Task> {
+    return this.updateTask(id, input);
+  }
+
+  /**
+   * Delete a task optimistically.
+   */
+  async deleteTask(id: string): Promise<void> {
+    // 1. Update local cache instantly
+    await taskLocalRepository.deleteTask(id);
+
+    // 2. Enqueue sync operation
+    enqueue({
+      entityType: 'task',
+      operationType: 'delete',
+      entityId: id,
+      payload: { id },
+    });
+
+    // 3. Attempt background sync (non-blocking)
+    this.triggerSync();
+  }
+
+  async delete(id: string): Promise<void> {
+    return this.deleteTask(id);
+  }
+
+  /**
+   * Toggle task completion optimistically.
+   */
+  async toggleTask(id: string): Promise<Task> {
+    // 1. Update local cache instantly
+    const task = await taskLocalRepository.toggleTask(id);
+
+    // 2. Enqueue sync operation with version for conflict detection
+    enqueue({
+      entityType: 'task',
+      operationType: 'update',
+      entityId: id,
+      payload: { completed: task.completed },
+      entityVersion: task.version,
+    });
+
+    // 3. Attempt background sync (non-blocking)
+    this.triggerSync();
+
+    return task;
+  }
+
+  /**
+   * Mark a task as successfully synced.
+   * Delegates to local repo to clear pendingSync and stamp lastSyncedAt.
+   */
+  async markSynced(id: string): Promise<void> {
+    return taskLocalRepository.markSynced(id);
+  }
+
+  /**
+   * Check if there are unsynced task operations.
+   */
+  hasPendingSync(): boolean {
+    return hasPendingOperations();
+  }
+
+  /**
+   * Trigger background sync attempt (non-blocking).
+   * Only fires if online. Failures are silently queued.
+   */
+  private triggerSync(): void {
+    if (!isOnline()) return;
+
+    processQueue().catch((error) => {
+      console.warn('[TaskSync] Background sync attempt failed:', error);
+    });
+  }
+}
+
+export const taskSyncRepository = new TaskSyncRepository();
