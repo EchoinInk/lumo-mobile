@@ -11,6 +11,7 @@ This document outlines the state management architecture for Lumo Mobile, focusi
 State is organized by domain, not by feature screens. Each domain owns its state and exposes typed actions.
 
 **Domains:**
+
 - Tasks
 - Habits
 - Meals
@@ -20,6 +21,7 @@ State is organized by domain, not by feature screens. Each domain owns its state
 ### 2. No Monolithic Global Store
 
 **❌ Anti-Pattern:**
+
 ```ts
 // DO NOT create a giant global store
 const useAppStore = create((set) => ({
@@ -34,6 +36,7 @@ const useAppStore = create((set) => ({
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Create isolated domain stores
 const useTaskStore = create<TaskStore>((set) => ({
@@ -70,6 +73,7 @@ export const useXStore = create<Store>((set) => ({
 ```
 
 **Example:**
+
 ```ts
 type TaskState = {
   tasks: Task[];
@@ -100,25 +104,36 @@ export const useTaskStore = create<TaskStore>((set) => ({
 ### Global State (Zustand Stores)
 
 **Use global state for:**
+
 - Domain data that needs to be shared across screens
 - User preferences and settings
 - Cached entities that need persistence
 - Business logic state
 
 **Examples:**
+
 ```ts
 // ✅ Correct: Domain data
-useTaskStore: { tasks, addTask, updateTask, deleteTask }
-useHabitStore: { habits, addHabit, toggleHabitCompletion }
-useSettingsStore: { settings, updateSettings }
+useTaskStore: {
+  (tasks, addTask, updateTask, deleteTask);
+}
+useHabitStore: {
+  (habits, addHabit, toggleHabitCompletion);
+}
+useSettingsStore: {
+  (settings, updateSettings);
+}
 
 // ❌ Incorrect: UI state
-useTaskStore: { isModalOpen, isFilterExpanded, selectedTab }
+useTaskStore: {
+  (isModalOpen, isFilterExpanded, selectedTab);
+}
 ```
 
 ### Local State (React useState)
 
 **Use local state for:**
+
 - Modal visibility
 - Form input values
 - Filter selections
@@ -127,14 +142,17 @@ useTaskStore: { isModalOpen, isFilterExpanded, selectedTab }
 - Screen-specific UI state
 
 **Examples:**
+
 ```ts
 // ✅ Correct: UI state in components
 const [isModalOpen, setIsModalOpen] = useState(false);
-const [filterValue, setFilterValue] = useState('');
+const [filterValue, setFilterValue] = useState("");
 const [isExpanded, setIsExpanded] = useState(true);
 
 // ❌ Incorrect: UI state in global store
-useTaskStore: { isModalOpen, filterValue, isExpanded }
+useTaskStore: {
+  (isModalOpen, filterValue, isExpanded);
+}
 ```
 
 ## Persistence Rules
@@ -142,6 +160,7 @@ useTaskStore: { isModalOpen, filterValue, isExpanded }
 ### What to Persist (✅)
 
 **Persist these using MMKV:**
+
 - Habits (user's habit tracking data)
 - Onboarding state (whether user completed onboarding)
 - User preferences (theme, language, notifications)
@@ -149,6 +168,7 @@ useTaskStore: { isModalOpen, filterValue, isExpanded }
 - Lightweight cached entities (domain data that should survive app restart)
 
 **Example:**
+
 ```ts
 export const useHabitStore = create<HabitStore>()(
   persist(
@@ -168,6 +188,7 @@ export const useHabitStore = create<HabitStore>()(
 ### What NOT to Persist (❌)
 
 **Do NOT persist:**
+
 - Modal visibility
 - Filter states
 - Temporary form input
@@ -176,6 +197,7 @@ export const useHabitStore = create<HabitStore>()(
 - Screen-specific UI state
 
 **Example:**
+
 ```ts
 // ❌ Incorrect: Persisting UI state
 export const useTaskStore = create<TaskStore>()(
@@ -183,17 +205,17 @@ export const useTaskStore = create<TaskStore>()(
     (set) => ({
       tasks: [],
       isModalOpen: false, // Don't persist this
-      filterValue: '',    // Don't persist this
+      filterValue: "", // Don't persist this
       // ...
     }),
-    { name: 'task-storage' }
-  )
+    { name: "task-storage" },
+  ),
 );
 
 // ✅ Correct: UI state in component
 function TaskScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterValue, setFilterValue] = useState('');
+  const [filterValue, setFilterValue] = useState("");
   // ...
 }
 ```
@@ -213,7 +235,9 @@ export class TaskRepository {
     // Current: Return from store or local storage
   }
 
-  async create(task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<Task> {
+  async create(
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Task> {
     // Future: POST to backend API
     // Current: Create locally
   }
@@ -236,7 +260,7 @@ export const taskRepository = new TaskRepository();
 
 ```ts
 // In UI components or services
-import { taskRepository } from '@/services/taskRepository';
+import { taskRepository } from "@/services/taskRepository";
 
 async function handleAddTask(taskData) {
   const newTask = await taskRepository.create(taskData);
@@ -256,6 +280,7 @@ async function handleAddTask(taskData) {
 ### 1. No Cross-Domain Dependencies
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Task store depending on habit store
 const useTaskStore = create<TaskStore>((set, get) => ({
@@ -268,6 +293,7 @@ const useTaskStore = create<TaskStore>((set, get) => ({
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Each store is isolated
 const useTaskStore = create<TaskStore>((set) => ({
@@ -286,6 +312,7 @@ const useHabitStore = create<HabitStore>((set) => ({
 Stores should be thin and focused on state management, not business logic.
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Store with complex business logic
 const useTaskStore = create<TaskStore>((set) => ({
@@ -301,6 +328,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Store focuses on state, repository handles logic
 const useTaskStore = create<TaskStore>((set) => ({
@@ -310,7 +338,9 @@ const useTaskStore = create<TaskStore>((set) => ({
 
 // Repository handles business logic
 export class TaskRepository {
-  async create(task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<Task> {
+  async create(
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Task> {
     // Validation
     // API calls
     // Data transformation
@@ -324,6 +354,7 @@ export class TaskRepository {
 State should be composable and granular.
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Giant nested state
 const useTaskStore = create<TaskStore>((set) => ({
@@ -333,8 +364,8 @@ const useTaskStore = create<TaskStore>((set) => ({
       filterModal: { isOpen: false, filters: {} },
     },
     filters: {
-      priority: 'all',
-      status: 'all',
+      priority: "all",
+      status: "all",
       dateRange: { start: null, end: null },
     },
   },
@@ -346,6 +377,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Flat, granular state
 const useTaskStore = create<TaskStore>((set) => ({
@@ -357,7 +389,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 
 // UI state in components
 const [isModalOpen, setIsModalOpen] = useState(false);
-const [filters, setFilters] = useState({ priority: 'all', status: 'all' });
+const [filters, setFilters] = useState({ priority: "all", status: "all" });
 ```
 
 ## Performance Constraints
@@ -365,15 +397,18 @@ const [filters, setFilters] = useState({ priority: 'all', status: 'all' });
 ### Avoid Excessive Subscriptions
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Subscribes to entire store, causes unnecessary rerenders
 function TaskList() {
-  const { tasks, addTask, updateTask, deleteTask, isLoading, error } = useTaskStore();
+  const { tasks, addTask, updateTask, deleteTask, isLoading, error } =
+    useTaskStore();
   // Rerenders on any state change
 }
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Use selectors for granular subscriptions
 function TaskList() {
@@ -386,33 +421,37 @@ function TaskList() {
 ### Avoid Giant Selectors
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Complex selector that runs on every render
-const filteredTasks = useTaskStore((state) => 
+const filteredTasks = useTaskStore((state) =>
   state.tasks
-    .filter(task => task.priority === 'high')
-    .filter(task => !task.completed)
+    .filter((task) => task.priority === "high")
+    .filter((task) => !task.completed)
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-    .map(task => ({ ...task, formattedDate: formatDate(task.dueDate) }))
+    .map((task) => ({ ...task, formattedDate: formatDate(task.dueDate) })),
 );
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Use useMemo for complex derived state
 const tasks = useTaskStore((state) => state.tasks);
-const filteredTasks = useMemo(() => 
-  tasks
-    .filter(task => task.priority === 'high')
-    .filter(task => !task.completed)
-    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)),
-  [tasks]
+const filteredTasks = useMemo(
+  () =>
+    tasks
+      .filter((task) => task.priority === "high")
+      .filter((task) => !task.completed)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)),
+  [tasks],
 );
 ```
 
 ### Avoid Deeply Nested State
 
 **❌ Anti-Pattern:**
+
 ```ts
 type State = {
   data: {
@@ -429,6 +468,7 @@ type State = {
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 type State = {
   tasks: Task[];
@@ -442,16 +482,18 @@ type State = {
 ### 1. Screen-Owned Persistence
 
 **❌ Anti-Pattern:**
+
 ```ts
 // Screen decides what to persist
 function TaskScreen() {
   const persistTask = (task) => {
-    localStorage.setItem('task', JSON.stringify(task)); // Direct storage access
+    localStorage.setItem("task", JSON.stringify(task)); // Direct storage access
   };
 }
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Store handles persistence
 const useTaskStore = create<TaskStore>()(
@@ -460,19 +502,20 @@ const useTaskStore = create<TaskStore>()(
       tasks: [],
       addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
     }),
-    { name: 'task-storage' }
-  )
+    { name: "task-storage" },
+  ),
 );
 ```
 
 ### 2. Business Logic in UI Primitives
 
 **❌ Anti-Pattern:**
+
 ```ts
 // UI component contains business logic
 function TaskItem({ task }) {
   const handleComplete = () => {
-    if (task.priority === 'high' && !task.completed) {
+    if (task.priority === "high" && !task.completed) {
       // Business logic in UI
       sendNotification();
       updateStreak();
@@ -484,27 +527,30 @@ function TaskItem({ task }) {
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Business logic in repository or store
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
-  toggleTaskCompletion: (id) => set((state) => ({
-    tasks: state.tasks.map(task => {
-      if (task.id === id && task.priority === 'high' && !task.completed) {
-        // Business logic here
-        sendNotification();
-        updateStreak();
-        calculatePoints();
-      }
-      return task.id === id ? { ...task, completed: !task.completed } : task;
-    }),
-  })),
+  toggleTaskCompletion: (id) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) => {
+        if (task.id === id && task.priority === "high" && !task.completed) {
+          // Business logic here
+          sendNotification();
+          updateStreak();
+          calculatePoints();
+        }
+        return task.id === id ? { ...task, completed: !task.completed } : task;
+      }),
+    })),
 }));
 ```
 
 ### 3. Giant Shared Stores
 
 **❌ Anti-Pattern:**
+
 ```ts
 // One store for everything
 const useAppStore = create((set) => ({
@@ -522,6 +568,7 @@ const useAppStore = create((set) => ({
 ```
 
 **✅ Correct Pattern:**
+
 ```ts
 // Isolated domain stores
 const useTaskStore = create<TaskStore>((set) => ({ ... }));
@@ -540,6 +587,7 @@ The MMKV storage layer provides a lightweight, fast key-value storage solution.
 **Location:** `src/store/storage.ts`
 
 **Key Functions:**
+
 - `getItem<T>(key: string): T | null` - Get typed value
 - `setItem<T>(key: string, value: T): void` - Set typed value
 - `removeItem(key: string): void` - Remove value
@@ -554,6 +602,7 @@ The persist helper bridges MMKV with Zustand's persist middleware.
 **Location:** `src/store/createPersistStorage.ts`
 
 **Usage:**
+
 ```ts
 import { createPersistStorage } from '@/store/createPersistStorage';
 
@@ -582,6 +631,7 @@ export const useHabitStore = create<HabitStore>()(
 8. **Granular subscriptions**: Use selectors to avoid unnecessary rerenders
 
 **File Structure:**
+
 ```
 src/
 ├── store/
