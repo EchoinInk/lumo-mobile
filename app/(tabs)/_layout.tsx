@@ -1,9 +1,14 @@
-import { TabBarBackground, TabBarIcon } from '@/components/navigation';
-import { Colors } from '@/theme/tokens';
-import { Tabs } from 'expo-router';
-import { CalendarDays, CheckSquare, HeartPulse, LayoutGrid, Menu } from 'lucide-react-native';
-import React from 'react';
-import { Platform } from 'react-native';
+import { TabBarBackground, TabBarIcon } from "@/src/components/navigation";
+import { Colors } from "@/src/theme/tokens";
+import { Tabs } from "expo-router";
+import {
+    CalendarDays,
+    CheckSquare,
+    HeartPulse,
+    LayoutGrid,
+    Menu,
+} from "lucide-react-native";
+import { Platform } from "react-native";
 
 export default function TabsLayout() {
   return (
@@ -14,26 +19,26 @@ export default function TabsLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textSecondary,
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 88 : 68,
+          height: Platform.OS === "ios" ? 88 : 68,
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          fontWeight: "500",
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: "Dashboard",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <LayoutGrid 
-                size={24} 
-                color={focused ? Colors.primary : Colors.textSecondary} 
+              <LayoutGrid
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
               />
             </TabBarIcon>
@@ -43,12 +48,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="tasks"
         options={{
-          title: 'Tasks',
+          title: "Tasks",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <CheckSquare 
-                size={24} 
-                color={focused ? Colors.primary : Colors.textSecondary} 
+              <CheckSquare
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
               />
             </TabBarIcon>
@@ -58,12 +63,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: 'Calendar',
+          title: "Calendar",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <CalendarDays 
-                size={24} 
-                color={focused ? Colors.primary : Colors.textSecondary} 
+              <CalendarDays
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
               />
             </TabBarIcon>
@@ -73,12 +78,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="health"
         options={{
-          title: 'Health',
+          title: "Health",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <HeartPulse 
-                size={24} 
-                color={focused ? Colors.primary : Colors.textSecondary} 
+              <HeartPulse
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
               />
             </TabBarIcon>
@@ -88,12 +93,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
+          title: "More",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <Menu 
-                size={24} 
-                color={focused ? Colors.primary : Colors.textSecondary} 
+              <Menu
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
               />
             </TabBarIcon>

@@ -1,17 +1,6 @@
-import { initializeBackend } from '@/services/init';
-import { Stack } from 'expo-router';
-import React, { useEffect } from 'react';
+import "@/src/global.css";
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  useEffect(() => {
-    initializeBackend();
-  }, []);
-
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

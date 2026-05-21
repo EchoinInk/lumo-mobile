@@ -1,21 +1,25 @@
-import { StatCard } from '@/components/cards/StatCard';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Screen } from '@/components/ui/Screen';
-import { Spacing } from '@/theme/tokens';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { DashboardHeader } from '../components/DashboardHeader';
-import { DashboardSection } from '../components/DashboardSection';
-import { QuickActions } from '../components/QuickActions';
-import { TodayFocusCard } from '../components/TodayFocusCard';
-import { WeeklyProgress } from '../components/WeeklyProgress';
+import { StatCard } from "@/src/components/cards/StatCard";
+import { EmptyState } from "@/src/components/ui/EmptyState";
+import { Screen } from "@/src/components/ui/Screen";
+import { Spacing } from "@/src/theme/tokens";
+import { StyleSheet, View } from "react-native";
+import { DashboardHeader } from "../components/DashboardHeader";
+import { DashboardSection } from "../components/DashboardSection";
+import { QuickActions } from "../components/QuickActions";
+import { TodayFocusCard } from "../components/TodayFocusCard";
+import { WeeklyProgress } from "../components/WeeklyProgress";
 
 export default function DashboardScreen() {
   // Mock static data for layout validation
   const mockStats = [
-    { label: 'Tasks Completed', value: '12', change: '+3 today', positive: true },
-    { label: 'Focus Time', value: '4h 32m', change: '+45m', positive: true },
-    { label: 'Habits Tracked', value: '8/10', change: '-1', positive: false },
+    {
+      label: "Tasks Completed",
+      value: "12",
+      change: "+3 today",
+      positive: true,
+    },
+    { label: "Focus Time", value: "4h 32m", change: "+45m", positive: true },
+    { label: "Habits Tracked", value: "8/10", change: "-1", positive: false },
   ];
 
   return (
@@ -26,7 +30,7 @@ export default function DashboardScreen() {
       {/* Stats Grid */}
       <View style={styles.statsGrid}>
         {mockStats.map((stat, index) => (
-          <StatCard 
+          <StatCard
             key={index}
             label={stat.label}
             value={stat.value}
@@ -53,7 +57,7 @@ export default function DashboardScreen() {
 
       {/* Empty State Demo */}
       <DashboardSection title="Upcoming">
-        <EmptyState 
+        <EmptyState
           title="No upcoming events"
           description="You're all caught up for today"
         />
@@ -64,8 +68,8 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: Spacing.md,
     marginBottom: Spacing.lg,
   },

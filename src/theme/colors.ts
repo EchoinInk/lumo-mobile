@@ -1,91 +1,84 @@
+// Neurodivergent-friendly dark theme colors
+// Designed for reduced visual stress and sensory comfort
+
+export const colors = {
+  // Base backgrounds - deep, calming dark tones
+  background: "#0B0C10",
+  surface: "#12141A",
+  surfaceElevated: "#1A1D26",
+  surfacePressed: "#232634",
+
+  // Text colors - high contrast but soft
+  text: {
+    primary: "#FFFFFF",
+    secondary: "#A1A1AA",
+    muted: "#6B7280",
+    inverse: "#0B0C10",
+  },
+
+  // Accent colors - soft purple for calm focus
+  accent: {
+    primary: "#7C5CFF",
+    soft: "#A78BFA",
+    muted: "#5B4A9C",
+  },
+
+  // Semantic colors - softened for reduced visual stress
+  semantic: {
+    success: "#10B981",
+    successSoft: "rgba(16, 185, 129, 0.15)",
+    warning: "#F59E0B",
+    warningSoft: "rgba(245, 158, 11, 0.15)",
+    danger: "#EF4444",
+    dangerSoft: "rgba(239, 68, 68, 0.15)",
+    info: "#3B82F6",
+    infoSoft: "rgba(59, 130, 246, 0.15)",
+  },
+
+  // Border colors - subtle separation
+  border: "#232634",
+  borderLight: "#2A2D3A",
+  borderFocus: "#7C5CFF",
+
+  // Overlay for modals and sheets
+  overlay: "rgba(0, 0, 0, 0.7)",
+
+  // Gradients - minimal, calming
+  gradients: {
+    accent: ["#7C5CFF", "#A78BFA"] as const,
+    surface: ["#12141A", "#1A1D26"] as const,
+  },
+} as const;
+
+// Legacy export for compatibility
 export const Colors = {
-  // Base colors
-  background: '#F8F7FC',
-  backgroundAlt: '#F0F0F5',
-  card: '#FFFFFF',
-  cardGlass: 'rgba(255, 255, 255, 0.7)',
-  
-  // Brand colors - soft blue/pink gradients
-  primary: '#89FFFD',
-  primarySoft: '#A8FFF8',
-  secondary: '#EF32D9',
-  secondarySoft: '#F5A8E8',
-  accent: '#C084FC',
-  
-  // Text colors
-  textPrimary: '#1A1A2E',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
-  textInverse: '#FFFFFF',
-  
-  // Semantic colors
-  success: '#10B981',
-  successSoft: '#D1FAE5',
-  warning: '#F59E0B',
-  warningSoft: '#FEF3C7',
-  danger: '#EF4444',
-  dangerSoft: '#FEE2E2',
-  info: '#3B82F6',
-  infoSoft: '#DBEAFE',
-  
-  // Border colors
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
-  borderDark: '#D1D5DB',
-  
-  // Gradient colors
-  gradientStart: '#89FFFD',
-  gradientEnd: '#EF32D9',
-  gradientBlue: '#667EEA',
-  gradientPurple: '#764BA2',
-  gradientWarm: '#FF6B6B',
-  
-  // Overlay colors
-  overlay: 'rgba(0, 0, 0, 0.4)',
-  overlayLight: 'rgba(0, 0, 0, 0.2)',
+  background: colors.background,
+  backgroundAlt: colors.surface,
+  card: colors.surfaceElevated,
+  cardGlass: "rgba(26, 29, 38, 0.8)",
+  primary: colors.accent.primary,
+  primarySoft: colors.accent.soft,
+  secondary: colors.accent.primary,
+  secondarySoft: colors.accent.soft,
+  accent: colors.accent.primary,
+  textPrimary: colors.text.primary,
+  textSecondary: colors.text.secondary,
+  textTertiary: colors.text.muted,
+  textInverse: colors.text.inverse,
+  success: colors.semantic.success,
+  successSoft: colors.semantic.successSoft,
+  warning: colors.semantic.warning,
+  warningSoft: colors.semantic.warningSoft,
+  danger: colors.semantic.danger,
+  dangerSoft: colors.semantic.dangerSoft,
+  info: colors.semantic.info,
+  infoSoft: colors.semantic.infoSoft,
+  border: colors.border,
+  borderLight: colors.borderLight,
+  borderDark: colors.border,
+  overlay: colors.overlay,
+  overlayLight: "rgba(0, 0, 0, 0.4)",
 } as const;
 
 export type ColorKey = keyof typeof Colors;
-
-// Dark mode colors
-export const DarkColors = {
-  background: '#0F0F1A',
-  backgroundAlt: '#1A1A2E',
-  card: '#1E1E32',
-  cardGlass: 'rgba(30, 30, 50, 0.7)',
-  
-  primary: '#89FFFD',
-  primarySoft: '#5AD9D6',
-  secondary: '#EF32D9',
-  secondarySoft: '#C529AF',
-  accent: '#C084FC',
-  
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A0A0B0',
-  textTertiary: '#707080',
-  textInverse: '#1A1A2E',
-  
-  success: '#34D399',
-  successSoft: '#064E3B',
-  warning: '#FBBF24',
-  warningSoft: '#78350F',
-  danger: '#F87171',
-  dangerSoft: '#7F1D1D',
-  info: '#60A5FA',
-  infoSoft: '#1E3A8A',
-  
-  border: '#2A2A3E',
-  borderLight: '#3A3A4E',
-  borderDark: '#1A1A2E',
-  
-  gradientStart: '#89FFFD',
-  gradientEnd: '#EF32D9',
-  gradientBlue: '#667EEA',
-  gradientPurple: '#764BA2',
-  gradientWarm: '#FF6B6B',
-  
-  overlay: 'rgba(0, 0, 0, 0.6)',
-  overlayLight: 'rgba(0, 0, 0, 0.4)',
-} as const;
-
-export type DarkColorKey = keyof typeof DarkColors;
+export type ColorsType = typeof colors;
