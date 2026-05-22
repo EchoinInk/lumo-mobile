@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Text } from '@/components/ui/Text';
-import { TaskFilter } from '../types/task';
-import { Colors, Spacing } from '@/theme/tokens';
+import { Text } from "@/components/ui/Text";
+import { Colors, Spacing } from "@/theme/tokens";
+import React from "react";
+import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { TaskFilter } from "../types/task";
 
 interface TaskFilterPillsProps {
   selectedFilter: TaskFilter;
@@ -11,18 +10,21 @@ interface TaskFilterPillsProps {
 }
 
 const filters: { value: TaskFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'active', label: 'Active' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'high', label: 'High' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'low', label: 'Low' },
+  { value: "all", label: "All" },
+  { value: "active", label: "Active" },
+  { value: "completed", label: "Completed" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
 ];
 
-export function TaskFilterPills({ selectedFilter, onFilterChange }: TaskFilterPillsProps) {
+export function TaskFilterPills({
+  selectedFilter,
+  onFilterChange,
+}: TaskFilterPillsProps) {
   return (
-    <ScrollView 
-      horizontal 
+    <ScrollView
+      horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
     >
@@ -53,7 +55,7 @@ export function TaskFilterPills({ selectedFilter, onFilterChange }: TaskFilterPi
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.sm,
     paddingBottom: Spacing.sm,
   },

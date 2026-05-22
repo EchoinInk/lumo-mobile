@@ -1,12 +1,16 @@
-import type { SyncableMetadata } from '@/types/sync';
+export type TaskPriority = "low" | "medium" | "high";
 
-export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskStatus = "todo" | "completed";
 
-export type TaskStatus = 'todo' | 'completed';
+export type TaskFilter =
+  | "all"
+  | "active"
+  | "completed"
+  | "high"
+  | "medium"
+  | "low";
 
-export type TaskFilter = 'all' | 'active' | 'completed' | 'high' | 'medium' | 'low';
-
-export interface Task extends SyncableMetadata {
+export interface Task {
   id: string;
   title: string;
   description?: string;
@@ -15,6 +19,12 @@ export interface Task extends SyncableMetadata {
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
+  /** @deprecated Sync metadata - unused in local-only mode */
+  version?: number;
+  /** @deprecated Sync metadata - unused in local-only mode */
+  lastSyncedAt?: string;
+  /** @deprecated Sync metadata - unused in local-only mode */
+  pendingSync?: boolean;
 }
 
 export interface CreateTaskInput {

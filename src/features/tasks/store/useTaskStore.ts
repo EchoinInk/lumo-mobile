@@ -1,140 +1,82 @@
-import { create } from 'zustand';
-import { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
-import { taskLocalRepository } from '../services/taskLocalRepository';
+import { create } from "zustand";
+import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 
 /**
- * Task Store State
+ * Generate a simple unique ID (no crypto dependency)
  */
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+}
+
 type TaskState = {
   tasks: Task[];
-  isLoading: boolean;
-  error: string | null;
 };
 
-/**
- * Task Store Actions
- */
 type TaskActions = {
-  loadTasks: () => Promise<void>;
-  createTask: (input: CreateTaskInput) => Promise<Task>;
-  updateTask: (id: string, input: UpdateTaskInput) => Promise<Task>;
-  deleteTask: (id: string) => Promise<void>;
-  toggleTask: (id: string) => Promise<Task>;
-  setError: (error: string | null) => void;
+  addTask: (input: CreateTaskInput) => Task;
+  toggleTask: (id: string) => void;
+  deleteTask: (id: string) => void;
+  updateTask: (id: string, input: UpdateTaskInput) => void;
 };
+
+type TaskStore = TaskState & TaskActions;
 
 /**
  * Task Store
- * 
- * Domain-specific Zustand store for task state management.
- * Orchestrates repository calls and maintains UI-safe state.
- * 
- * Responsibilities:
- * - Orchestrate repository calls
- * - Maintain UI-safe state (tasks, loading, error)
- * - Expose actions for UI components
- * 
- * Store MUST NOT:
- * - Directly use MMKV
- * - Contain serialization logic
- * - Manage UI filters or modals
+ *
+ * Pure in-memory Zustand store for task state management.
+ * No persistence, no async, no backend. Instant updates.
  */
-type TaskStore = TaskState & TaskActions;
-
 export const useTaskStore = create<TaskStore>((set, get) => ({
-  // Initial state
   tasks: [],
-  isLoading: false,
-  error: null,
 
-  // Actions
-  loadTasks: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const tasks = await taskLocalRepository.getTasks();
-      set({ tasks, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to load tasks',
-        isLoading: false,
-      });
-    }
+  addTask: (input) => {
+    const now = new Date().toISOString();
+    const newTask: Task = {
+      id: generateId(),
+      title: input.title,
+      description: input.description,
+      completed: false,
+      priority: input.priority,
+      dueDate: input.dueDate,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    set((state) => ({
+      tasks: [newTask, ...state.tasks],
+    }));
+
+    return newTask;
   },
 
-  createTask: async (input) => {
-    set({ isLoading: true, error: null });
-    try {
-      const newTask = await taskLocalRepository.createTask(input);
-      set((state) => ({
-        tasks: [...state.tasks, newTask],
-        isLoading: false,
-      }));
-      return newTask;
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to create task',
-        isLoading: false,
-      });
-      throw error;
-    }
+  toggleTask: (id) => {
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              completed: !task.completed,
+              updatedAt: new Date().toISOString(),
+            }
+          : task,
+      ),
+    }));
   },
 
-  updateTask: async (id, input) => {
-    set({ isLoading: true, error: null });
-    try {
-      const updatedTask = await taskLocalRepository.updateTask(id, input);
-      set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task.id === id ? updatedTask : task
-        ),
-        isLoading: false,
-      }));
-      return updatedTask;
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to update task',
-        isLoading: false,
-      });
-      throw error;
-    }
+  deleteTask: (id) => {
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task.id !== id),
+    }));
   },
 
-  deleteTask: async (id) => {
-    set({ isLoading: true, error: null });
-    try {
-      await taskLocalRepository.deleteTask(id);
-      set((state) => ({
-        tasks: state.tasks.filter((task) => task.id !== id),
-        isLoading: false,
-      }));
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to delete task',
-        isLoading: false,
-      });
-      throw error;
-    }
+  updateTask: (id, input) => {
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === id
+          ? { ...task, ...input, updatedAt: new Date().toISOString() }
+          : task,
+      ),
+    }));
   },
-
-  toggleTask: async (id) => {
-    set({ isLoading: true, error: null });
-    try {
-      const updatedTask = await taskLocalRepository.toggleTask(id);
-      set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task.id === id ? updatedTask : task
-        ),
-        isLoading: false,
-      }));
-      return updatedTask;
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to toggle task',
-        isLoading: false,
-      });
-      throw error;
-    }
-  },
-
-  setError: (error) => set({ error }),
 }));

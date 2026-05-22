@@ -1,14 +1,14 @@
-import { Card } from '@/components/ui/Card';
-import { Text } from '@/components/ui/Text';
-import { Colors, Spacing } from '@/theme/tokens';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Task, TaskPriority } from '../types/task';
+import { Card } from "@/src/components/ui/Card";
+import { Text } from "@/src/components/ui/Text";
+import { Colors, Spacing } from "@/src/theme/tokens";
+import React from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Task, TaskPriority } from "../types/task";
 
 interface TaskRowProps {
   task: Task;
   onToggle?: (id: string) => void;
+  onDelete?: (id: string) => void;
   onPress?: (task: Task) => void;
 }
 
@@ -24,29 +24,39 @@ const priorityTextColors: Record<TaskPriority, string> = {
   low: Colors.info,
 };
 
-export const TaskRow = React.memo<TaskRowProps>(({ task, onToggle, onPress }) => {
-  const handlePress = React.useCallback(() => {
-    onPress?.(task);
-  }, [onPress, task]);
+export const TaskRow = React.memo<TaskRowProps>(
+  ({ task, onToggle, onDelete, onPress }) => {
+    const handlePress = React.useCallback(() => {
+      onPress?.(task);
+    }, [onPress, task]);
 
-  const handleToggle = React.useCallback(() => {
-    onToggle?.(task.id);
-  }, [onToggle, task.id]);
+    const handleToggle = React.useCallback(() => {
+      onToggle?.(task.id);
+    }, [onToggle, task.id]);
 
-  return (
-    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
-      <Card variant="elevated" padding="lg" style={styles.container}>
+    const handleDelete = React.useCallback(() => {
+      onDelete?.(task.id);
+    }, [onDelete, task.id]);
+
+    return (
+      <Card variant="elevated" padding="lg">
         <View style={styles.header}>
           <View style={styles.leftContent}>
             <TouchableOpacity
               onPress={handleToggle}
               style={styles.checkbox}
               activeOpacity={0.7}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: task.completed }}
+              accessibilityLabel={`Mark ${task.title} as ${task.completed ? "incomplete" : "complete"}`}
             >
-              <View style={[styles.checkboxBox, task.completed && styles.checkboxChecked]}>
-                {task.completed && (
-                  <Text style={styles.checkmark}>✓</Text>
-                )}
+              <View
+                style={[
+                  styles.checkboxBox,
+                  task.completed && styles.checkboxChecked,
+                ]}
+              >
+                {task.completed && <Text style={styles.checkmark}>✓</Text>}
               </View>
             </TouchableOpacity>
             <View style={styles.textContainer}>
@@ -68,57 +78,79 @@ export const TaskRow = React.memo<TaskRowProps>(({ task, onToggle, onPress }) =>
               )}
             </View>
           </View>
-          <View
-            style={[
-              styles.priorityBadge,
-              { backgroundColor: priorityColors[task.priority] }
-            ]}
-          >
-            <Text
-              variant="small"
-              style={[styles.priorityText, { color: priorityTextColors[task.priority] }]}
+          <View style={styles.rightContent}>
+            <View
+              style={[
+                styles.priorityBadge,
+                { backgroundColor: priorityColors[task.priority] },
+              ]}
             >
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </Text>
+              <Text
+                variant="small"
+                style={[
+                  styles.priorityText,
+                  { color: priorityTextColors[task.priority] },
+                ]}
+              >
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </Text>
+            </View>
+            {onDelete && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.deleteButton}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Delete ${task.title}`}
+              >
+                <Text style={styles.deleteText}>✕</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         {task.dueDate && (
-          <Text variant="caption" color={Colors.textTertiary} style={styles.dueDate}>
+          <Text
+            variant="caption"
+            color={Colors.textTertiary}
+            style={styles.dueDate}
+          >
             Due: {new Date(task.dueDate).toLocaleDateString()}
           </Text>
         )}
       </Card>
-    </TouchableOpacity>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.task.id === nextProps.task.id &&
-    prevProps.task.title === nextProps.task.title &&
-    prevProps.task.description === nextProps.task.description &&
-    prevProps.task.completed === nextProps.task.completed &&
-    prevProps.task.priority === nextProps.task.priority &&
-    prevProps.task.dueDate === nextProps.task.dueDate
-  );
-});
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.task.id === nextProps.task.id &&
+      prevProps.task.title === nextProps.task.title &&
+      prevProps.task.description === nextProps.task.description &&
+      prevProps.task.completed === nextProps.task.completed &&
+      prevProps.task.priority === nextProps.task.priority &&
+      prevProps.task.dueDate === nextProps.task.dueDate
+    );
+  },
+);
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
   leftContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     flex: 1,
     gap: Spacing.md,
   },
+  rightContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
   checkbox: {
     marginTop: 2,
-    marginRight: Spacing.sm,
   },
   checkboxBox: {
     width: 24,
@@ -127,18 +159,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.border,
     backgroundColor: Colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkboxChecked: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
   checkmark: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: -2,
+    color: Colors.textInverse,
+    fontSize: 14,
+    fontWeight: "bold",
   },
   textContainer: {
     flex: 1,
@@ -147,7 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   completedTitle: {
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
     color: Colors.textTertiary,
   },
   description: {
@@ -157,13 +188,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     borderRadius: 8,
-    marginLeft: Spacing.sm,
   },
   priorityText: {
-    fontWeight: '600',
+    fontWeight: "600",
+  },
+  deleteButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.dangerSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteText: {
+    color: Colors.danger,
+    fontSize: 14,
+    fontWeight: "600",
   },
   dueDate: {
     marginTop: Spacing.sm,
-    marginLeft: Spacing['4xl'],
+    marginLeft: 36,
   },
 });

@@ -78,7 +78,13 @@ export const Colors = {
   borderDark: colors.border,
   overlay: colors.overlay,
   overlayLight: "rgba(0, 0, 0, 0.4)",
+  gradientStart: colors.accent.primary,
+  gradientEnd: colors.accent.soft,
 } as const;
 
+// Dark theme alias (app uses dark theme by default)
+export const DarkColors = Colors;
+
 export type ColorKey = keyof typeof Colors;
+export type DarkColorKey = ColorKey;
 export type ColorsType = typeof colors;
