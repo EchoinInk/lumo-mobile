@@ -7,13 +7,15 @@ const originalResolveRequest = config.resolver.resolveRequest;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName.startsWith("@/src/")) {
-    const realModuleName = moduleName.replace("@/src/", "./src/");
-    return context.resolveRequest(context, realModuleName, platform);
+    const realModuleName = moduleName.replace("@/src/", "");
+    const absolutePath = path.resolve(__dirname, "src", realModuleName);
+    return context.resolveRequest(context, absolutePath, platform);
   }
 
   if (moduleName.startsWith("@/")) {
-    const realModuleName = moduleName.replace("@/", "./src/");
-    return context.resolveRequest(context, realModuleName, platform);
+    const realModuleName = moduleName.replace("@/", "");
+    const absolutePath = path.resolve(__dirname, "src", realModuleName);
+    return context.resolveRequest(context, absolutePath, platform);
   }
 
   if (originalResolveRequest) {
