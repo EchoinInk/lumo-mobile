@@ -99,7 +99,7 @@ export default function MoreScreen() {
                 key={itemIndex}
                 title={item.title}
                 icon={item.icon}
-                onPress={() => router.push(item.route)}
+                onPress={() => router.push(item.route as any)}
               />
             ))}
           </View>

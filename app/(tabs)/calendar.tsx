@@ -1,6 +1,6 @@
-import { EmptyState } from "@/src/components/ui/EmptyState";
-import { Screen } from "@/src/components/ui/Screen";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Screen } from "@/components/ui/Screen";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export default function CalendarScreen() {
   return (
