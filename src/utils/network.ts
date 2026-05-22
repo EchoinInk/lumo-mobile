@@ -6,9 +6,9 @@
  */
 
 import NetInfo, {
-  NetInfoState,
-  NetInfoSubscription,
-} from '@react-native-community/netinfo';
+    NetInfoState,
+    NetInfoSubscription,
+} from "@react-native-community/netinfo";
 
 type NetworkListener = (isOnline: boolean) => void;
 
@@ -24,7 +24,9 @@ export function startNetworkMonitoring(): void {
   if (subscription) return;
 
   subscription = NetInfo.addEventListener((state: NetInfoState) => {
-    const isOnline = !!(state.isConnected && state.isInternetReachable !== false);
+    const isOnline = !!(
+      state.isConnected && state.isInternetReachable !== false
+    );
 
     if (isOnline !== currentState) {
       currentState = isOnline;
@@ -76,6 +78,12 @@ export function onConnectivityChange(listener: NetworkListener): () => void {
     listeners.delete(listener);
   };
 }
+
+/**
+ * Subscribe to connectivity changes.
+ * Alias for onConnectivityChange — matches standard naming convention.
+ */
+export const subscribeToNetwork = onConnectivityChange;
 
 /**
  * Wait until the device is online.

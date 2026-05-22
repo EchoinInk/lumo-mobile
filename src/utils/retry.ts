@@ -33,7 +33,7 @@ export function calculateBackoff(
   attempt: number,
   baseDelay: number,
   maxDelay: number,
-  jitter: boolean
+  jitter: boolean,
 ): number {
   const exponentialDelay = baseDelay * Math.pow(2, attempt);
   const clampedDelay = Math.min(exponentialDelay, maxDelay);
@@ -55,7 +55,7 @@ export function calculateBackoff(
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  options?: Partial<RetryOptions>
+  options?: Partial<RetryOptions>,
 ): Promise<T> {
   const config = { ...DEFAULT_OPTIONS, ...options };
   let lastError: unknown;
@@ -71,7 +71,7 @@ export async function withRetry<T>(
           attempt,
           config.baseDelay,
           config.maxDelay,
-          config.jitter
+          config.jitter,
         );
         config.onRetry(attempt + 1, error);
         await sleep(delay);
@@ -88,3 +88,15 @@ export async function withRetry<T>(
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Alias for withRetry — matches standard naming convention.
+ * Retry an operation with exponential backoff.
+ *
+ * @example
+ * const result = await retryWithBackoff(() => apiCall(), {
+ *   maxAttempts: 3,
+ *   baseDelay: 1000,
+ * });
+ */
+export const retryWithBackoff = withRetry;

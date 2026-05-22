@@ -1,18 +1,28 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createPersistStorage } from './createPersistStorage';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createPersistStorage } from "./createPersistStorage";
 
 export interface Habit {
   id: string;
   title: string;
   description?: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency: "daily" | "weekly" | "monthly";
   targetDays: number[];
   completedDates: string[];
   color?: string;
   icon?: string;
   createdAt: string;
   updatedAt: string;
+  /** Soft delete timestamp for sync — null if not deleted */
+  deletedAt?: string | null;
+  /** Sync status: pending = local changes not synced, synced = confirmed on server */
+  syncStatus?: "pending" | "synced" | "failed";
+  /** Monotonically increasing version for conflict detection */
+  version?: number;
+  /** ISO timestamp of last successful sync for this entity */
+  lastSyncedAt?: string;
+  /** True when entity has unsynced local changes */
+  pendingSync?: boolean;
 }
 
 type HabitState = {
@@ -22,7 +32,20 @@ type HabitState = {
 };
 
 type HabitActions = {
-  addHabit: (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt' | 'completedDates'>) => void;
+  addHabit: (
+    habit: Omit<
+      Habit,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "completedDates"
+      | "deletedAt"
+      | "syncStatus"
+      | "version"
+      | "lastSyncedAt"
+      | "pendingSync"
+    >,
+  ) => void;
   updateHabit: (id: string, updates: Partial<Habit>) => void;
   deleteHabit: (id: string) => void;
   toggleHabitCompletion: (id: string, date: string) => void;
@@ -50,6 +73,8 @@ export const useHabitStore = create<HabitStore>()(
               completedDates: [],
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
+              version: 1,
+              pendingSync: true,
             },
           ],
         })),
@@ -58,8 +83,14 @@ export const useHabitStore = create<HabitStore>()(
         set((state) => ({
           habits: state.habits.map((habit) =>
             habit.id === id
-              ? { ...habit, ...updates, updatedAt: new Date().toISOString() }
-              : habit
+              ? {
+                  ...habit,
+                  ...updates,
+                  updatedAt: new Date().toISOString(),
+                  version: (habit.version ?? 0) + 1,
+                  pendingSync: true,
+                }
+              : habit,
           ),
         })),
 
@@ -78,8 +109,10 @@ export const useHabitStore = create<HabitStore>()(
                     ? habit.completedDates.filter((d) => d !== date)
                     : [...habit.completedDates, date],
                   updatedAt: new Date().toISOString(),
+                  version: (habit.version ?? 0) + 1,
+                  pendingSync: true,
                 }
-              : habit
+              : habit,
           ),
         })),
 
@@ -90,8 +123,8 @@ export const useHabitStore = create<HabitStore>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'habit-storage',
-      storage: createJSONStorage(() => createPersistStorage('habits')),
-    }
-  )
+      name: "habit-storage",
+      storage: createJSONStorage(() => createPersistStorage("habits")),
+    },
+  ),
 );

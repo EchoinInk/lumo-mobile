@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface Meal {
   id: string;
@@ -8,10 +8,20 @@ export interface Meal {
   protein?: number;
   carbs?: number;
   fat?: number;
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  mealType: "breakfast" | "lunch" | "dinner" | "snack";
   date: string;
   createdAt: string;
   updatedAt: string;
+  /** Soft delete timestamp for sync — null if not deleted */
+  deletedAt?: string | null;
+  /** Sync status: pending = local changes not synced, synced = confirmed on server, failed = sync failed */
+  syncStatus?: "pending" | "synced" | "failed";
+  /** Monotonically increasing version for conflict detection */
+  version?: number;
+  /** ISO timestamp of last successful sync for this entity */
+  lastSyncedAt?: string;
+  /** True when entity has unsynced local changes */
+  pendingSync?: boolean;
 }
 
 type MealState = {
@@ -21,7 +31,19 @@ type MealState = {
 };
 
 type MealActions = {
-  addMeal: (meal: Omit<Meal, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addMeal: (
+    meal: Omit<
+      Meal,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "deletedAt"
+      | "syncStatus"
+      | "version"
+      | "lastSyncedAt"
+      | "pendingSync"
+    >,
+  ) => void;
   updateMeal: (id: string, updates: Partial<Meal>) => void;
   deleteMeal: (id: string) => void;
   setMeals: (meals: Meal[]) => void;
@@ -45,6 +67,8 @@ export const useMealStore = create<MealStore>((set) => ({
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          version: 1,
+          pendingSync: true,
         },
       ],
     })),
@@ -53,8 +77,14 @@ export const useMealStore = create<MealStore>((set) => ({
     set((state) => ({
       meals: state.meals.map((meal) =>
         meal.id === id
-          ? { ...meal, ...updates, updatedAt: new Date().toISOString() }
-          : meal
+          ? {
+              ...meal,
+              ...updates,
+              updatedAt: new Date().toISOString(),
+              version: (meal.version ?? 0) + 1,
+              pendingSync: true,
+            }
+          : meal,
       ),
     })),
 
