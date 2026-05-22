@@ -1,20 +1,38 @@
 #!/bin/bash
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 Lumo Auto Commit"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "━━━━━━━━━━━━━━━━━━━━━━"
+echo "🚀 Lumo Mobile Auto Commit"
+echo "━━━━━━━━━━━━━━━━━━━━━━"
 
-set -e  # fail fast if anything breaks
+set -e
 
-echo "📦 Staging changes..."
-git add . && echo "✔ staged"
+# Always run from repo root
+cd "$(git rev-parse --show-toplevel)"
 
-echo "📝 Creating commit..."
-git commit -m "chore: update $(date '+%Y-%m-%d %H:%M:%S')" && echo "✔ committed"
+# Safety: ignore junk
+git add -A
 
-echo "⬆️ Pushing to remote..."
-git push && echo "✔ pushed"
+# Ignore empty commits
+if git diff --cached --quiet; then
+  echo "🟡 No changes to commit"
+  exit 0
+fi
 
-echo ""
-echo "✅ Complete"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+# Smart lightweight message
+FILES=$(git diff --cached --name-only | wc -l | tr -d ' ')
+
+if [ "$FILES" -eq 1 ]; then
+  FILE=$(git diff --cached --name-only | head -n 1)
+  MSG="chore(lumo): update $FILE"
+else
+  MSG="chore(lumo): update $FILES files"
+fi
+
+echo "📝 $MSG"
+
+git commit -m "$MSG"
+
+echo "⬆️ pushing..."
+git push
+
+echo "✅ done"
