@@ -4,11 +4,16 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🚀 Lumo Auto Commit"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-git add .
+set -e  # fail fast if anything breaks
 
-git commit -m "chore: update $(date '+%Y-%m-%d %H:%M:%S')"
+echo "📦 Staging changes..."
+git add . && echo "✔ staged"
 
-git push
+echo "📝 Creating commit..."
+git commit -m "chore: update $(date '+%Y-%m-%d %H:%M:%S')" && echo "✔ committed"
+
+echo "⬆️ Pushing to remote..."
+git push && echo "✔ pushed"
 
 echo ""
 echo "✅ Complete"
