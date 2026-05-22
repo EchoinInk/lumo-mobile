@@ -1,38 +1,74 @@
 #!/bin/bash
 
 echo "━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 Lumo Mobile Auto Commit"
+echo "🧠 Lumo Commit Intelligence"
 echo "━━━━━━━━━━━━━━━━━━━━━━"
 
 set -e
 
-# Always run from repo root
 cd "$(git rev-parse --show-toplevel)"
 
-# Safety: ignore junk
+# -----------------------------
+# 1. Stage everything
+# -----------------------------
 git add -A
 
-# Ignore empty commits
+# -----------------------------
+# 2. Safety check: empty commit
+# -----------------------------
 if git diff --cached --quiet; then
-  echo "🟡 No changes to commit"
+  echo "🟡 No meaningful changes"
   exit 0
 fi
 
-# Smart lightweight message
-FILES=$(git diff --cached --name-only | wc -l | tr -d ' ')
+# -----------------------------
+# 3. Detect change metrics
+# -----------------------------
+FILES_CHANGED=$(git diff --cached --name-only | wc -l | tr -d ' ')
+LINES_CHANGED=$(git diff --cached | grep -E "^\+|^\-" | wc -l | tr -d ' ')
 
-if [ "$FILES" -eq 1 ]; then
-  FILE=$(git diff --cached --name-only | head -n 1)
-  MSG="chore(lumo): update $FILE"
-else
-  MSG="chore(lumo): update $FILES files"
+CHANGED_FILES=$(git diff --cached --name-only)
+
+# -----------------------------
+# 4. Noise filtering (ignore junk-heavy commits)
+# -----------------------------
+NOISE_PATTERNS="package-lock.json|yarn.lock|.log|.expo|metro|tsbuildinfo"
+
+if echo "$CHANGED_FILES" | grep -E "$NOISE_PATTERNS" > /dev/null; then
+  echo "🟡 Skipping noise-only changes"
+  exit 0
 fi
 
-echo "📝 $MSG"
+# -----------------------------
+# 5. Smart commit message engine
+# -----------------------------
+PRIMARY_FILE=$(echo "$CHANGED_FILES" | head -n 1)
+
+if [ "$FILES_CHANGED" -eq 1 ]; then
+  MSG="chore(lumo): update $(basename "$PRIMARY_FILE")"
+
+elif [ "$FILES_CHANGED" -le 3 ]; then
+  MSG="chore(lumo): refine UI + logic ($FILES_CHANGED files)"
+
+elif [ "$FILES_CHANGED" -le 10 ]; then
+  MSG="feat(lumo): update components and screens ($FILES_CHANGED files)"
+
+else
+  MSG="chore(lumo): large refactor ($FILES_CHANGED files)"
+fi
+
+# -----------------------------
+# 6. Commit
+# -----------------------------
+echo "📝 Commit:"
+echo "$MSG"
 
 git commit -m "$MSG"
 
+# -----------------------------
+# 7. Push safely
+# -----------------------------
 echo "⬆️ pushing..."
 git push
 
-echo "✅ done"
+echo "✅ intelligent commit complete"
