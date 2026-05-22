@@ -5,14 +5,14 @@ import { Text } from "@/src/components/ui/Text";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import {
-    CreditCard,
-    Dumbbell,
-    Home,
-    Info,
-    Scale,
-    Settings,
-    Utensils,
-    Wallet,
+  CreditCard,
+  Dumbbell,
+  Home,
+  Info,
+  Scale,
+  Settings,
+  Utensils,
+  Wallet,
 } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
@@ -23,12 +23,12 @@ export default function MoreScreen() {
       items: [
         {
           title: "Budget",
-          icon: <Wallet size={20} color={Colors.textPrimary} />,
+          icon: (Wallet as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/budget",
         },
         {
           title: "Payments",
-          icon: <CreditCard size={20} color={Colors.textPrimary} />,
+          icon: (CreditCard as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/payments",
         },
       ],
@@ -38,12 +38,12 @@ export default function MoreScreen() {
       items: [
         {
           title: "Meals",
-          icon: <Utensils size={20} color={Colors.textPrimary} />,
+          icon: (Utensils as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/meals",
         },
         {
           title: "Cleaning",
-          icon: <Home size={20} color={Colors.textPrimary} />,
+          icon: (Home as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/cleaning",
         },
       ],
@@ -53,12 +53,12 @@ export default function MoreScreen() {
       items: [
         {
           title: "Habits",
-          icon: <Dumbbell size={20} color={Colors.textPrimary} />,
+          icon: (Dumbbell as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/habits",
         },
         {
           title: "Weight",
-          icon: <Scale size={20} color={Colors.textPrimary} />,
+          icon: (Scale as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/weight",
         },
       ],
@@ -68,12 +68,12 @@ export default function MoreScreen() {
       items: [
         {
           title: "Settings",
-          icon: <Settings size={20} color={Colors.textPrimary} />,
+          icon: (Settings as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/settings",
         },
         {
           title: "About",
-          icon: <Info size={20} color={Colors.textPrimary} />,
+          icon: (Info as any)({ size: 20, color: Colors.textPrimary }),
           route: "/more/about",
         },
       ],

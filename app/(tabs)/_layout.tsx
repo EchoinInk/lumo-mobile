@@ -36,11 +36,11 @@ export default function TabsLayout() {
           title: "Dashboard",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <LayoutGrid
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
+              {(LayoutGrid as any)({
+                size: 24,
+                color: focused ? Colors.primary : Colors.textSecondary,
+                strokeWidth: 2,
+              })}
             </TabBarIcon>
           ),
         }}
@@ -51,11 +51,11 @@ export default function TabsLayout() {
           title: "Tasks",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <CheckSquare
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
+              {(CheckSquare as any)({
+                size: 24,
+                color: focused ? Colors.primary : Colors.textSecondary,
+                strokeWidth: 2,
+              })}
             </TabBarIcon>
           ),
         }}
@@ -66,11 +66,11 @@ export default function TabsLayout() {
           title: "Calendar",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <CalendarDays
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
+              {(CalendarDays as any)({
+                size: 24,
+                color: focused ? Colors.primary : Colors.textSecondary,
+                strokeWidth: 2,
+              })}
             </TabBarIcon>
           ),
         }}
@@ -81,11 +81,11 @@ export default function TabsLayout() {
           title: "Health",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <HeartPulse
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
+              {(HeartPulse as any)({
+                size: 24,
+                color: focused ? Colors.primary : Colors.textSecondary,
+                strokeWidth: 2,
+              })}
             </TabBarIcon>
           ),
         }}
@@ -96,11 +96,11 @@ export default function TabsLayout() {
           title: "More",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
-              <Menu
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
+              {(Menu as any)({
+                size: 24,
+                color: focused ? Colors.primary : Colors.textSecondary,
+                strokeWidth: 2,
+              })}
             </TabBarIcon>
           ),
         }}
