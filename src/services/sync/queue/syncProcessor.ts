@@ -26,6 +26,7 @@ import { getPendingItems, removeItem } from "../../storage/syncQueue";
 import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
 import { supabaseSyncAdapter } from "../adapters/supabase/sync.adapter";
 import { isRetryableError } from "../adapters/supabase/sync.retry";
+import { MAX_SYNC_RETRIES } from "../config";
 import { archiveDeadLetter } from "../deadLetter";
 import { canRetryAttempt, getRetryDelay } from "../retry/retryPolicy";
 import { canProcess, checkInvariants } from "../types";
@@ -275,7 +276,9 @@ export function getPendingSyncCount(): number {
  */
 export function getDeadLetterCount(): number {
   return getPendingItems().filter(
-    (item) => item.status === "failed" && item.retryCount >= MAX_RETRY_COUNT,
+    (item) =>
+      item.status === "dead_letter" ||
+      (item.status === "failed" && item.retryCount >= MAX_SYNC_RETRIES),
   ).length;
 }
 
