@@ -31,29 +31,33 @@ export function mapQueueItemToEvent(item: SyncQueueItem): SyncEvent {
     operation: item.operation,
     entityId: item.entityId,
     payload: item.payload,
+    idempotencyKey: item.idempotencyKey,
   };
 }
 
 /**
- * Generate an idempotency key for a queue item.
- * Used for deduplication.
+ * Get the idempotency key for a queue item.
  *
- * Format: `${entity}:${operation}:${entityId}`
+ * Uses the item's pre-stamped idempotencyKey (set at creation time).
+ * This is the canonical dedup key — stable across replays.
  *
  * @param item - Queue item
  * @returns Idempotency key string
  */
 export function generateEventKey(item: SyncQueueItem): string {
-  return `${item.entity}:${item.operation}:${item.entityId}`;
+  return item.idempotencyKey;
 }
 
 /**
  * Generate idempotency key from SyncEvent.
- * Alternative for event-based deduplication.
+ * Used by the dedup layer for event-based checking.
  *
  * @param event - Sync event
  * @returns Idempotency key string
  */
 export function generateEventKeyFromEvent(event: SyncEvent): string {
-  return `${event.entity}:${event.operation}:${event.entityId}`;
+  return (
+    event.idempotencyKey ??
+    `${event.entity}:${event.operation}:${event.entityId}`
+  );
 }
