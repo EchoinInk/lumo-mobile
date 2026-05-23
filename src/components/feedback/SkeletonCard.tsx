@@ -1,15 +1,20 @@
 /**
  * SkeletonCard Component
- * 
+ *
  * Calm skeleton placeholder for cards.
  * Soft shimmer, no flashing, layout-preserving.
  */
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+} from "react-native-reanimated";
 
 interface SkeletonCardProps {
   style?: any;
@@ -22,7 +27,6 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
   lines = 3,
   testID,
 }) => {
-  const { isDark } = useTheme();
   const opacity = useSharedValue(0.5);
 
   React.useEffect(() => {
@@ -32,7 +36,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
         easing: Easing.inOut(Easing.ease),
       }),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -43,14 +47,17 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
   });
 
   return (
-    <Animated.View style={[styles.container, style, animatedStyle]} testID={testID}>
-      <View style={[styles.title, { backgroundColor: isDark ? Colors.borderDark : Colors.border }]} />
+    <Animated.View
+      style={[styles.container, style, animatedStyle]}
+      testID={testID}
+    >
+      <View style={[styles.title, { backgroundColor: Colors.border }]} />
       {Array.from({ length: lines }).map((_, index) => (
         <View
           key={index}
           style={[
             styles.line,
-            { backgroundColor: isDark ? Colors.borderDark : Colors.border },
+            { backgroundColor: Colors.border },
             index === lines - 1 && styles.lastLine,
           ]}
         />
@@ -66,18 +73,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
   },
   title: {
-    width: '60%',
+    width: "60%",
     height: 20,
     borderRadius: 4,
     marginBottom: 12,
   },
   line: {
-    width: '100%',
+    width: "100%",
     height: 16,
     borderRadius: 4,
     marginBottom: 8,
   },
   lastLine: {
-    width: '80%',
+    width: "80%",
   },
 });

@@ -1,16 +1,15 @@
 /**
  * PreferenceSelector Component
- * 
+ *
  * Selector for planning preferences during onboarding.
  * Single-select interface with clear visual feedback.
  */
 
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import { ScalePress } from '@/components/animated/ScalePress';
-import { selectionHaptic } from '@/animations/haptics';
+import { selectionHaptic } from "@/animations/haptics";
+import { ScalePress } from "@/components/animated/ScalePress";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface PreferenceOption {
   id: string;
@@ -29,8 +28,6 @@ export const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({
   selectedId,
   onSelect,
 }) => {
-  const { isDark } = useTheme();
-
   return (
     <View style={styles.container}>
       {options.map((option) => {
@@ -51,14 +48,8 @@ export const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({
                 {
                   backgroundColor: isSelected
                     ? Colors.primarySoft
-                    : isDark
-                    ? Colors.card
                     : Colors.card,
-                  borderColor: isSelected
-                    ? Colors.primary
-                    : isDark
-                    ? Colors.borderDark
-                    : Colors.border,
+                  borderColor: isSelected ? Colors.primary : Colors.border,
                 },
               ]}
             >
@@ -67,12 +58,10 @@ export const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({
                   style={[
                     styles.radioButton,
                     {
-                      borderColor: isSelected
+                      borderColor: isSelected ? Colors.primary : Colors.border,
+                      backgroundColor: isSelected
                         ? Colors.primary
-                        : isDark
-                        ? Colors.borderDark
-                        : Colors.border,
-                      backgroundColor: isSelected ? Colors.primary : 'transparent',
+                        : "transparent",
                     },
                   ]}
                 >
@@ -83,8 +72,8 @@ export const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({
                     style={[
                       styles.label,
                       {
-                        color: isDark ? Colors.textPrimary : Colors.textPrimary,
-                        fontWeight: isSelected ? '600' : '400',
+                        color: Colors.textPrimary,
+                        fontWeight: isSelected ? "600" : "400",
                       },
                     ]}
                   >
@@ -94,7 +83,9 @@ export const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({
                     <Text
                       style={[
                         styles.description,
-                        { color: isDark ? Colors.textSecondary : Colors.textSecondary },
+                        {
+                          color: Colors.textSecondary,
+                        },
                       ]}
                     >
                       {option.description}
@@ -121,8 +112,8 @@ const styles = StyleSheet.create({
     minHeight: 72,
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioButton: {
     width: 24,
@@ -130,14 +121,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     marginRight: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   radioButtonInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   textContainer: {
     flex: 1,

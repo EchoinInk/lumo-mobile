@@ -19,11 +19,15 @@ export interface Task {
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
-  /** @deprecated Sync metadata - unused in local-only mode */
+  /** Soft delete timestamp for sync — null if not deleted */
+  deletedAt?: string | null;
+  /** Sync status: pending = local changes not synced, synced = confirmed on server, failed = sync failed */
+  syncStatus?: "pending" | "synced" | "failed";
+  /** Monotonically increasing version for conflict detection */
   version?: number;
-  /** @deprecated Sync metadata - unused in local-only mode */
+  /** ISO timestamp of last successful sync for this entity */
   lastSyncedAt?: string;
-  /** @deprecated Sync metadata - unused in local-only mode */
+  /** True when entity has unsynced local changes */
   pendingSync?: boolean;
 }
 

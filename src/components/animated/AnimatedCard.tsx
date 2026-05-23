@@ -1,25 +1,19 @@
 /**
  * AnimatedCard Component
- * 
+ *
  * A card component with gentle entrance and elevation animations.
  * Subtle depth animation on press/hover.
  */
 
-import React, { useState } from 'react';
-import {
-  View,
-  ViewStyle,
-  StyleSheet,
-  GestureResponderEvent,
-} from 'react-native';
+import { softFadeIn } from "@/animations/transitions";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { GestureResponderEvent, StyleSheet, ViewStyle } from "react-native";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import { softFadeIn } from '@/animations/transitions';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 
 interface AnimatedCardProps {
   children: React.ReactNode;
@@ -36,7 +30,6 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
   onPress,
   testID,
 }) => {
-  const { isDark } = useTheme();
   const isPressed = useSharedValue(false);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -66,8 +59,8 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
   const cardStyle = [
     styles.card,
     {
-      backgroundColor: isDark ? Colors.card : Colors.card,
-      shadowColor: isDark ? '#000' : '#000',
+      backgroundColor: Colors.card,
+      shadowColor: "#000",
     },
     animatedStyle,
     style,

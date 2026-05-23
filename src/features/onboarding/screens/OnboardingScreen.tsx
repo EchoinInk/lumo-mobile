@@ -1,27 +1,25 @@
 /**
  * OnboardingScreen Component
- * 
+ *
  * Main onboarding screen orchestrating the flow.
  * Thin screen that delegates to components.
  */
 
-import { FadeIn } from '@/components/animated/FadeIn';
-import { FocusSelectionCard } from '@/components/onboarding/FocusSelectionCard';
-import { OnboardingContainer } from '@/components/onboarding/OnboardingContainer';
-import { OnboardingProgress } from '@/components/onboarding/OnboardingProgress';
-import { PreferenceSelector } from '@/components/onboarding/PreferenceSelector';
-import { WelcomeHero } from '@/components/onboarding/WelcomeHero';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import { ONBOARDING_STEPS } from '@/types/onboarding';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useOnboardingFlow } from '../hooks/useOnboardingFlow';
+import { FadeIn } from "@/components/animated/FadeIn";
+import { FocusSelectionCard } from "@/components/onboarding/FocusSelectionCard";
+import { OnboardingContainer } from "@/components/onboarding/OnboardingContainer";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
+import { PreferenceSelector } from "@/components/onboarding/PreferenceSelector";
+import { WelcomeHero } from "@/components/onboarding/WelcomeHero";
+import { Colors } from "@/theme/colors";
+import { ONBOARDING_STEPS } from "@/types/onboarding";
+import { useRouter } from "expo-router";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useOnboardingFlow } from "../hooks/useOnboardingFlow";
 
 export const OnboardingScreen: React.FC = () => {
   const router = useRouter();
-  const { isDark } = useTheme();
   const {
     currentStep,
     struggleAreas,
@@ -43,7 +41,7 @@ export const OnboardingScreen: React.FC = () => {
 
   const renderStepContent = () => {
     const step = ONBOARDING_STEPS[currentStep - 1];
-    
+
     if (!step) return null;
 
     switch (step.id) {
@@ -138,7 +136,7 @@ export const OnboardingScreen: React.FC = () => {
     if (currentStep === 3) {
       // Complete onboarding
       setFocusAreas(focusAreas);
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     } else {
       // Move to next step is handled by PreferenceSelector
     }
@@ -148,7 +146,7 @@ export const OnboardingScreen: React.FC = () => {
     <OnboardingContainer step={currentStep} totalSteps={3}>
       <OnboardingProgress currentStep={currentStep} totalSteps={3} />
       {renderStepContent()}
-      
+
       <View style={styles.footer}>
         {currentStep > 1 && (
           <TouchableOpacity
@@ -160,7 +158,7 @@ export const OnboardingScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
         )}
-        
+
         {currentStep === 1 && (
           <TouchableOpacity
             style={[styles.button, styles.primaryButton]}
@@ -170,7 +168,7 @@ export const OnboardingScreen: React.FC = () => {
             <Text style={styles.primaryButtonText}>Continue</Text>
           </TouchableOpacity>
         )}
-        
+
         {currentStep === 3 && (
           <TouchableOpacity
             style={[styles.button, styles.primaryButton]}
@@ -187,12 +185,12 @@ export const OnboardingScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   optionsContainer: {
-    width: '100%',
+    width: "100%",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 32,
     gap: 12,
   },
@@ -211,13 +209,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   primaryButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     color: Colors.textPrimary,
   },
 });

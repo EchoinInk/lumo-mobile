@@ -1,15 +1,14 @@
 /**
  * ErrorState Component
- * 
+ *
  * Calm, reassuring error state component.
  * No technical jargon, no alarming language.
  */
 
-import { getErrorMessage } from '@/constants/feedbackMessages';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getErrorMessage } from "@/constants/feedbackMessages";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ErrorStateProps {
   errorKey?: string;
@@ -21,33 +20,22 @@ interface ErrorStateProps {
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
-  errorKey = 'unknown',
+  errorKey = "unknown",
   title,
   description,
   onRetry,
   actionLabel,
   testID,
 }) => {
-  const { isDark } = useTheme();
   const message = getErrorMessage(errorKey);
 
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.content}>
-        <Text
-          style={[
-            styles.title,
-            { color: isDark ? Colors.textPrimary : Colors.textPrimary },
-          ]}
-        >
+        <Text style={[styles.title, { color: Colors.textPrimary }]}>
           {title || message.title}
         </Text>
-        <Text
-          style={[
-            styles.description,
-            { color: isDark ? Colors.textSecondary : Colors.textSecondary },
-          ]}
-        >
+        <Text style={[styles.description, { color: Colors.textSecondary }]}>
           {description || message.description}
         </Text>
         {onRetry && (
@@ -70,23 +58,23 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
     maxWidth: 300,
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
   },
@@ -95,11 +83,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     minHeight: 44,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.textPrimary,
   },
 });

@@ -1,15 +1,14 @@
 /**
  * OfflineView Component
- * 
+ *
  * Calm offline state indicator.
  * Non-alarming, reassuring offline UX.
  */
 
-import { getOfflineMessage } from '@/constants/feedbackMessages';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { getOfflineMessage } from "@/constants/feedbackMessages";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface OfflineViewProps {
   offlineKey?: string;
@@ -19,32 +18,21 @@ interface OfflineViewProps {
 }
 
 export const OfflineView: React.FC<OfflineViewProps> = ({
-  offlineKey = 'default',
+  offlineKey = "default",
   title,
   description,
   testID,
 }) => {
-  const { isDark } = useTheme();
   const message = getOfflineMessage(offlineKey);
 
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.content}>
         <View style={[styles.indicator, { backgroundColor: Colors.warning }]} />
-        <Text
-          style={[
-            styles.title,
-            { color: isDark ? Colors.textPrimary : Colors.textPrimary },
-          ]}
-        >
+        <Text style={[styles.title, { color: Colors.textPrimary }]}>
           {title || message.title}
         </Text>
-        <Text
-          style={[
-            styles.description,
-            { color: isDark ? Colors.textSecondary : Colors.textSecondary },
-          ]}
-        >
+        <Text style={[styles.description, { color: Colors.textSecondary }]}>
           {description || message.description}
         </Text>
       </View>
@@ -55,12 +43,12 @@ export const OfflineView: React.FC<OfflineViewProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
     maxWidth: 300,
   },
   indicator: {
@@ -71,13 +59,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
 });

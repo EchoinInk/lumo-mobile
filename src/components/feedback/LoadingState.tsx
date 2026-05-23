@@ -1,15 +1,14 @@
 /**
  * LoadingState Component
- * 
+ *
  * Calm loading state with skeleton support.
  * No flashing, no layout jumps.
  */
 
-import { getLoadingMessage } from '@/constants/feedbackMessages';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { getLoadingMessage } from "@/constants/feedbackMessages";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 interface LoadingStateProps {
   loadingKey?: string;
@@ -18,23 +17,17 @@ interface LoadingStateProps {
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
-  loadingKey = 'default',
+  loadingKey = "default",
   message,
   testID,
 }) => {
-  const { isDark } = useTheme();
   const loadingMessage = message || getLoadingMessage(loadingKey);
 
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.content}>
         <ActivityIndicator color={Colors.primary} size="large" />
-        <Text
-          style={[
-            styles.message,
-            { color: isDark ? Colors.textSecondary : Colors.textSecondary },
-          ]}
-        >
+        <Text style={[styles.message, { color: Colors.textSecondary }]}>
           {loadingMessage}
         </Text>
       </View>
@@ -45,12 +38,12 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   message: {
     fontSize: 14,

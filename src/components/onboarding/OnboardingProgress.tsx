@@ -1,14 +1,13 @@
 /**
  * OnboardingProgress Component
- * 
+ *
  * Progress indicator for onboarding steps.
  * Subtle, calm visual feedback without pressure.
  */
 
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface OnboardingProgressProps {
   currentStep: number;
@@ -19,10 +18,6 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
   currentStep,
   totalSteps,
 }) => {
-  const { isDark } = useTheme();
-
-  const progress = currentStep / totalSteps;
-
   return (
     <View style={styles.container}>
       <View style={styles.dotsContainer}>
@@ -38,20 +33,15 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
                 isActive && styles.dotActive,
                 isCompleted && styles.dotCompleted,
                 {
-                  backgroundColor: isActive
-                    ? Colors.primary
-                    : isCompleted
-                    ? Colors.primary
-                    : isDark
-                    ? Colors.borderDark
-                    : Colors.border,
+                  backgroundColor:
+                    isActive || isCompleted ? Colors.primary : Colors.border,
                 },
               ]}
             />
           );
         })}
       </View>
-      <Text style={[styles.stepText, { color: isDark ? Colors.textSecondary : Colors.textSecondary }]}>
+      <Text style={[styles.stepText, { color: Colors.textSecondary }]}>
         Step {currentStep} of {totalSteps}
       </Text>
     </View>
@@ -60,12 +50,12 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 8,
   },
@@ -82,6 +72,6 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

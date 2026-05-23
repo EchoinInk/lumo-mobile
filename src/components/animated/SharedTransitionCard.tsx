@@ -1,15 +1,14 @@
 /**
  * SharedTransitionCard Component
- * 
+ *
  * A card component with shared element transition support.
  * For smooth navigation between screens with card continuity.
  */
 
-import React from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
-import Animated, { SharedTransition, withTiming } from 'react-native-reanimated';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, ViewStyle } from "react-native";
+import Animated, { SharedTransition } from "react-native-reanimated";
 
 interface SharedTransitionCardProps {
   children: React.ReactNode;
@@ -24,11 +23,9 @@ export const SharedTransitionCard: React.FC<SharedTransitionCardProps> = ({
   sharedTransitionTag,
   testID,
 }) => {
-  const { isDark } = useTheme();
-
   const sharedTransition = SharedTransition.custom((values) => {
-    'worklet';
-    
+    "worklet";
+
     return {
       duration: 300,
       easing: (t: number) => {
@@ -41,8 +38,8 @@ export const SharedTransitionCard: React.FC<SharedTransitionCardProps> = ({
   const cardStyle = [
     styles.card,
     {
-      backgroundColor: isDark ? Colors.card : Colors.card,
-      shadowColor: isDark ? '#000' : '#000',
+      backgroundColor: Colors.card,
+      shadowColor: "#000",
     },
     style,
   ];

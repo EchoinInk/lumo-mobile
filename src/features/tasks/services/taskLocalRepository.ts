@@ -1,191 +1,237 @@
-import { deleteKey, getString, setString } from '@/services/storage/mmkv';
-import { StorageKeys } from '@/services/storage/storageKeys';
-import { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
-import { ITaskRepository } from './taskRepository.types';
+import { deleteKey, getString, setString } from "@/services/storage/mmkv";
+import { StorageKeys } from "@/services/storage/storageKeys";
+import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
+import { ITaskRepository } from "./taskRepository.types";
 
 /**
  * Task Local Repository
- * 
+ *
  * MMKV-backed local implementation of the task repository.
- * Handles all task data persistence with clean async API surface.
- * 
+ * Handles all task data persistence with a clean async API surface.
+ *
  * Responsibilities:
  * - Read/write tasks from MMKV storage
  * - Serialize/deserialize task data
  * - Generate IDs and timestamps
  * - Isolate persistence logic from UI
+ *
+ * Error contract:
+ * - No raw JS exceptions escape this class
+ * - Storage errors are caught and re-thrown as normalised Error instances
+ * - Not-found errors use a consistent message format: "Task <id> not found"
  */
 export class TaskLocalRepository implements ITaskRepository {
   private readonly STORAGE_KEY = StorageKeys.TASKS;
 
+  // ── Private helpers ──────────────────────────────────────────────────────
+
   /**
-   * Get all tasks from storage
+   * Load all tasks from MMKV.
+   * Returns an empty array on missing key or parse failure — never throws.
    */
-  async getTasks(): Promise<Task[]> {
+  private loadTasks(): Task[] {
     try {
-      const data = getString(this.STORAGE_KEY);
-      if (!data) {
-        return [];
-      }
-      const tasks = JSON.parse(data) as Task[];
-      return tasks;
-    } catch (error) {
-      console.error('Error loading tasks from storage:', error);
+      const raw = getString(this.STORAGE_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw) as Task[];
+    } catch (err) {
+      console.error("[TaskLocalRepository] Failed to parse stored tasks:", err);
       return [];
     }
   }
 
   /**
-   * Generic getAll implementation for IRepository contract
+   * Persist the full task list to MMKV.
+   * Throws a normalised Error on write failure (callers decide how to surface it).
    */
+  private persistTasks(tasks: Task[]): void {
+    try {
+      setString(this.STORAGE_KEY, JSON.stringify(tasks));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `[TaskLocalRepository] Failed to persist tasks: ${message}`,
+      );
+    }
+  }
+
+  /** Return the current ISO timestamp. */
+  private now(): string {
+    return new Date().toISOString();
+  }
+
+  /** Generate a collision-resistant ID. */
+  private generateId(): string {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.randomUUID === "function"
+    ) {
+      return crypto.randomUUID();
+    }
+    return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 11)}`;
+  }
+
+  // ── ITaskRepository ──────────────────────────────────────────────────────
+
+  /**
+   * Get all tasks from storage.
+   */
+  async getTasks(): Promise<Task[]> {
+    return this.loadTasks();
+  }
+
+  /** IRepository.getAll — alias for getTasks. */
   async getAll(): Promise<Task[]> {
     return this.getTasks();
   }
 
   /**
-   * Get a task by ID
+   * Get a task by ID. Returns null when not found.
    */
   async getById(id: string): Promise<Task | null> {
-    const tasks = await this.getTasks();
-    return tasks.find((task) => task.id === id) || null;
+    const tasks = this.loadTasks();
+    return tasks.find((t) => t.id === id) ?? null;
   }
 
   /**
-   * Create a new task
+   * Create a new task and persist it.
    */
   async createTask(input: CreateTaskInput): Promise<Task> {
-    const tasks = await this.getTasks();
-    
+    const tasks = this.loadTasks();
+    const now = this.now();
+
     const newTask: Task = {
       ...input,
-      id: crypto.randomUUID(),
+      id: this.generateId(),
       completed: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      syncStatus: "pending",
       version: 1,
       pendingSync: true,
     };
 
-    const updatedTasks = [...tasks, newTask];
-    await this.saveTasks(updatedTasks);
-
+    this.persistTasks([...tasks, newTask]);
     return newTask;
   }
 
-  /**
-   * Generic create implementation for IRepository contract
-   */
-  async create(input: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>): Promise<Task> {
+  /** IRepository.create — delegates to createTask. */
+  async create(
+    input: Omit<
+      Task,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "version"
+      | "lastSyncedAt"
+      | "pendingSync"
+    >,
+  ): Promise<Task> {
     return this.createTask(input as CreateTaskInput);
   }
 
   /**
-   * Update an existing task
+   * Update an existing task by ID.
+   * Throws a normalised Error when the task is not found.
    */
   async updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
-    const tasks = await this.getTasks();
-    const taskIndex = tasks.findIndex((task) => task.id === id);
+    const tasks = this.loadTasks();
+    const index = tasks.findIndex((t) => t.id === id);
 
-    if (taskIndex === -1) {
-      throw new Error(`Task with id ${id} not found`);
+    if (index === -1) {
+      throw new Error(`[TaskLocalRepository] Task ${id} not found`);
     }
 
-    const current = tasks[taskIndex];
-    const updatedTask: Task = {
+    const current = tasks[index];
+    const updated: Task = {
       ...current,
       ...input,
-      updatedAt: new Date().toISOString(),
+      updatedAt: this.now(),
+      syncStatus: "pending",
       version: (current.version ?? 0) + 1,
       pendingSync: true,
     };
 
-    tasks[taskIndex] = updatedTask;
-    await this.saveTasks(tasks);
+    const next = [...tasks];
+    next[index] = updated;
+    this.persistTasks(next);
 
-    return updatedTask;
+    return updated;
   }
 
-  /**
-   * Generic update implementation for IRepository contract
-   */
+  /** IRepository.update — delegates to updateTask. */
   async update(id: string, input: Partial<Task>): Promise<Task> {
-    return this.updateTask(id, input);
+    return this.updateTask(id, input as UpdateTaskInput);
   }
 
   /**
-   * Delete a task
+   * Delete a task by ID.
+   * Silently succeeds when the task does not exist (idempotent).
    */
   async deleteTask(id: string): Promise<void> {
-    const tasks = await this.getTasks();
-    const filteredTasks = tasks.filter((task) => task.id !== id);
-    await this.saveTasks(filteredTasks);
+    const tasks = this.loadTasks();
+    const filtered = tasks.filter((t) => t.id !== id);
+    this.persistTasks(filtered);
   }
 
-  /**
-   * Generic delete implementation for IRepository contract
-   */
+  /** IRepository.delete — delegates to deleteTask. */
   async delete(id: string): Promise<void> {
     return this.deleteTask(id);
   }
 
   /**
-   * Toggle task completion status
+   * Toggle task completion status.
+   * Throws a normalised Error when the task is not found.
    */
   async toggleTask(id: string): Promise<Task> {
-    const tasks = await this.getTasks();
-    const taskIndex = tasks.findIndex((task) => task.id === id);
+    const tasks = this.loadTasks();
+    const index = tasks.findIndex((t) => t.id === id);
 
-    if (taskIndex === -1) {
-      throw new Error(`Task with id ${id} not found`);
+    if (index === -1) {
+      throw new Error(`[TaskLocalRepository] Task ${id} not found`);
     }
 
-    const current = tasks[taskIndex];
-    const updatedTask: Task = {
+    const current = tasks[index];
+    const updated: Task = {
       ...current,
       completed: !current.completed,
-      updatedAt: new Date().toISOString(),
+      updatedAt: this.now(),
+      syncStatus: "pending",
       version: (current.version ?? 0) + 1,
       pendingSync: true,
     };
 
-    tasks[taskIndex] = updatedTask;
-    await this.saveTasks(tasks);
+    const next = [...tasks];
+    next[index] = updated;
+    this.persistTasks(next);
 
-    return updatedTask;
+    return updated;
   }
 
   /**
-   * Save tasks to storage (private helper)
-   */
-  private async saveTasks(tasks: Task[]): Promise<void> {
-    try {
-      setString(this.STORAGE_KEY, JSON.stringify(tasks));
-    } catch (error) {
-      console.error('Error saving tasks to storage:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Mark an entity as successfully synced.
-   * Clears pendingSync and stamps lastSyncedAt.
-   * Called by sync processor after remote confirmation.
+   * Mark a task as successfully synced.
+   * Clears pendingSync, sets syncStatus to 'synced', and stamps lastSyncedAt.
+   * Called by the sync processor after remote confirmation.
+   * Silently succeeds when the task does not exist.
    */
   async markSynced(id: string): Promise<void> {
-    const tasks = await this.getTasks();
-    const taskIndex = tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) return;
+    const tasks = this.loadTasks();
+    const index = tasks.findIndex((t) => t.id === id);
+    if (index === -1) return;
 
-    tasks[taskIndex] = {
-      ...tasks[taskIndex],
+    const next = [...tasks];
+    next[index] = {
+      ...next[index],
       pendingSync: false,
-      lastSyncedAt: new Date().toISOString(),
+      syncStatus: "synced",
+      lastSyncedAt: this.now(),
     };
-    await this.saveTasks(tasks);
+    this.persistTasks(next);
   }
 
   /**
-   * Clear all tasks from storage (useful for testing or reset)
+   * Clear all tasks from storage.
+   * Useful for testing or user-initiated data reset.
    */
   async clearAll(): Promise<void> {
     deleteKey(this.STORAGE_KEY);

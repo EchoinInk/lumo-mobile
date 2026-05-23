@@ -1,16 +1,15 @@
 /**
  * FocusSelectionCard Component
- * 
+ *
  * Card for selecting focus areas during onboarding.
  * Calm, spacious selection interface with soft feedback.
  */
 
-import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
-import { ScalePress } from '@/components/animated/ScalePress';
-import { selectionHaptic } from '@/animations/haptics';
+import { selectionHaptic } from "@/animations/haptics";
+import { ScalePress } from "@/components/animated/ScalePress";
+import { Colors } from "@/theme/colors";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface FocusSelectionCardProps {
   id: string;
@@ -29,8 +28,6 @@ export const FocusSelectionCard: React.FC<FocusSelectionCardProps> = ({
   onSelect,
   multiSelect = false,
 }) => {
-  const { isDark } = useTheme();
-
   const handlePress = () => {
     selectionHaptic();
     onSelect(id);
@@ -42,16 +39,8 @@ export const FocusSelectionCard: React.FC<FocusSelectionCardProps> = ({
         style={[
           styles.card,
           {
-            backgroundColor: selected
-              ? Colors.primarySoft
-              : isDark
-              ? Colors.card
-              : Colors.card,
-            borderColor: selected
-              ? Colors.primary
-              : isDark
-              ? Colors.borderDark
-              : Colors.border,
+            backgroundColor: selected ? Colors.primarySoft : Colors.card,
+            borderColor: selected ? Colors.primary : Colors.border,
           },
         ]}
       >
@@ -61,12 +50,8 @@ export const FocusSelectionCard: React.FC<FocusSelectionCardProps> = ({
               style={[
                 styles.label,
                 {
-                  color: selected
-                    ? Colors.textPrimary
-                    : isDark
-                    ? Colors.textPrimary
-                    : Colors.textPrimary,
-                  fontWeight: selected ? '600' : '400',
+                  color: Colors.textPrimary,
+                  fontWeight: selected ? "600" : "400",
                 },
               ]}
             >
@@ -76,7 +61,9 @@ export const FocusSelectionCard: React.FC<FocusSelectionCardProps> = ({
               <Text
                 style={[
                   styles.description,
-                  { color: isDark ? Colors.textSecondary : Colors.textSecondary },
+                  {
+                    color: Colors.textSecondary,
+                  },
                 ]}
               >
                 {description}
@@ -87,7 +74,10 @@ export const FocusSelectionCard: React.FC<FocusSelectionCardProps> = ({
             <View
               style={[
                 styles.checkmark,
-                { backgroundColor: Colors.primary, borderColor: Colors.primary },
+                {
+                  backgroundColor: Colors.primary,
+                  borderColor: Colors.primary,
+                },
               ]}
             >
               <Text style={styles.checkmarkText}>✓</Text>
@@ -108,9 +98,9 @@ const styles = StyleSheet.create({
     minHeight: 72,
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   textContainer: {
     flex: 1,
@@ -128,13 +118,13 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: 12,
   },
   checkmarkText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
