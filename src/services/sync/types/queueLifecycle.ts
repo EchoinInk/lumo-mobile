@@ -27,11 +27,11 @@
  *   failed → dead_letter (must go through processing)
  */
 
-import type { SyncQueueItem } from '../../storage/queue.types';
+import type { QueueItemStatus, SyncQueueItem } from "../../storage/queue.types";
 
 // ── Canonical States ─────────────────────────────────────────────────────────
 
-export type QueueItemState = 'pending' | 'processing' | 'failed' | 'dead_letter' | 'completed';
+export type QueueItemState = QueueItemStatus;
 
 // ── State Transitions ───────────────────────────────────────────────────────
 
@@ -46,29 +46,29 @@ export interface StateTransition {
  */
 export const VALID_TRANSITIONS: StateTransition[] = [
   {
-    from: 'pending',
-    to: 'processing',
-    guard: (item) => item.status === 'pending',
+    from: "pending",
+    to: "processing",
+    guard: (item) => item.status === "pending",
   },
   {
-    from: 'processing',
-    to: 'completed',
-    guard: (item) => item.status === 'processing',
+    from: "processing",
+    to: "completed",
+    guard: (item) => item.status === "processing",
   },
   {
-    from: 'processing',
-    to: 'failed',
-    guard: (item) => item.status === 'processing' && item.retryCount < 5,
+    from: "processing",
+    to: "failed",
+    guard: (item) => item.status === "processing" && item.retryCount < 5,
   },
   {
-    from: 'processing',
-    to: 'dead_letter',
-    guard: (item) => item.status === 'processing' && item.retryCount >= 5,
+    from: "processing",
+    to: "dead_letter",
+    guard: (item) => item.status === "processing" && item.retryCount >= 5,
   },
   {
-    from: 'failed',
-    to: 'processing',
-    guard: (item) => item.status === 'failed' && item.retryCount < 5,
+    from: "failed",
+    to: "processing",
+    guard: (item) => item.status === "failed" && item.retryCount < 5,
   },
 ];
 
@@ -77,7 +77,10 @@ export const VALID_TRANSITIONS: StateTransition[] = [
 /**
  * Terminal states that cannot transition to any other state.
  */
-export const TERMINAL_STATES: Set<QueueItemState> = new Set(['completed', 'dead_letter']);
+export const TERMINAL_STATES: Set<QueueItemState> = new Set([
+  "completed",
+  "dead_letter",
+]);
 
 /**
  * Check if a state is terminal.
@@ -91,7 +94,10 @@ export function isTerminalState(state: QueueItemState): boolean {
 /**
  * Check if a state transition is valid.
  */
-export function isValidTransition(from: QueueItemState, to: QueueItemState): boolean {
+export function isValidTransition(
+  from: QueueItemState,
+  to: QueueItemState,
+): boolean {
   // Terminal states cannot transition
   if (isTerminalState(from)) {
     return false;
@@ -99,7 +105,7 @@ export function isValidTransition(from: QueueItemState, to: QueueItemState): boo
 
   // Check if transition is in valid list
   return VALID_TRANSITIONS.some(
-    (transition) => transition.from === from && transition.to === to
+    (transition) => transition.from === from && transition.to === to,
   );
 }
 
@@ -108,7 +114,7 @@ export function isValidTransition(from: QueueItemState, to: QueueItemState): boo
  */
 export function validateTransition(
   item: SyncQueueItem,
-  to: QueueItemState
+  to: QueueItemState,
 ): { valid: boolean; reason?: string } {
   const from = item.status;
 
@@ -122,7 +128,7 @@ export function validateTransition(
 
   // Check transition-specific guard
   const transition = VALID_TRANSITIONS.find(
-    (t) => t.from === from && t.to === to
+    (t) => t.from === from && t.to === to,
   );
 
   if (transition && !transition.guard(item)) {
@@ -141,28 +147,34 @@ export function validateTransition(
  * Check if an item can be processed.
  */
 export function canProcess(item: SyncQueueItem): boolean {
-  return item.status === 'pending' || (item.status === 'failed' && item.retryCount < 5);
+  return (
+    item.status === "pending" ||
+    (item.status === "failed" && item.retryCount < 5)
+  );
 }
 
 /**
  * Check if an item can be retried.
  */
 export function canRetry(item: SyncQueueItem): boolean {
-  return item.status === 'failed' && item.retryCount < 5;
+  return item.status === "failed" && item.retryCount < 5;
 }
 
 /**
  * Check if an item should be moved to dead letter.
  */
 export function shouldDeadLetter(item: SyncQueueItem): boolean {
-  return item.status === 'failed' && item.retryCount >= 5;
+  return item.status === "failed" && item.retryCount >= 5;
 }
 
 /**
  * Check if an item is orphaned (stuck in processing state).
  */
-export function isOrphaned(item: SyncQueueItem, maxProcessingAgeMs: number = 300000): boolean {
-  if (item.status !== 'processing') return false;
+export function isOrphaned(
+  item: SyncQueueItem,
+  maxProcessingAgeMs: number = 300000,
+): boolean {
+  if (item.status !== "processing") return false;
 
   const processingAge = Date.now() - new Date(item.timestamp).getTime();
   return processingAge > maxProcessingAgeMs;
@@ -171,11 +183,11 @@ export function isOrphaned(item: SyncQueueItem, maxProcessingAgeMs: number = 300
 // ── Lifecycle Events ───────────────────────────────────────────────────────
 
 export type LifecycleEvent =
-  | 'state_changed'
-  | 'retry_attempted'
-  | 'dead_lettered'
-  | 'completed'
-  | 'orphaned_recovered';
+  | "state_changed"
+  | "retry_attempted"
+  | "dead_lettered"
+  | "completed"
+  | "orphaned_recovered";
 
 export interface LifecycleTransition {
   itemId: string;
@@ -194,7 +206,7 @@ export function createLifecycleTransition(
   event: LifecycleEvent,
   from: QueueItemState,
   to: QueueItemState,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): LifecycleTransition {
   return {
     itemId,
@@ -211,32 +223,35 @@ export function createLifecycleTransition(
 /**
  * Check if a queue item violates invariants.
  */
-export function checkInvariants(item: SyncQueueItem): { valid: boolean; violations: string[] } {
+export function checkInvariants(item: SyncQueueItem): {
+  valid: boolean;
+  violations: string[];
+} {
   const violations: string[] = [];
 
   // Check 1: retryCount must be non-negative
   if (item.retryCount < 0) {
-    violations.push('retryCount cannot be negative');
+    violations.push("retryCount cannot be negative");
   }
 
   // Check 2: failed items must have retryCount > 0
-  if (item.status === 'failed' && item.retryCount === 0) {
-    violations.push('failed items must have retryCount > 0');
+  if (item.status === "failed" && item.retryCount === 0) {
+    violations.push("failed items must have retryCount > 0");
   }
 
   // Check 3: dead_letter items must have retryCount >= 5
-  if (item.status === 'dead_letter' && item.retryCount < 5) {
-    violations.push('dead_letter items must have retryCount >= 5');
+  if (item.status === "dead_letter" && item.retryCount < 5) {
+    violations.push("dead_letter items must have retryCount >= 5");
   }
 
   // Check 4: completed items must have error = null
-  if (item.status === 'completed' && item.error !== null) {
-    violations.push('completed items must have error = null');
+  if (item.status === "completed" && item.error !== null) {
+    violations.push("completed items must have error = null");
   }
 
   // Check 5: processing items must have valid timestamp
-  if (item.status === 'processing' && !item.timestamp) {
-    violations.push('processing items must have timestamp');
+  if (item.status === "processing" && !item.timestamp) {
+    violations.push("processing items must have timestamp");
   }
 
   return {
