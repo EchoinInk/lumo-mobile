@@ -9038,3 +9038,11 @@ FILES:
 .lumo/commit-log.txt
 src/store/useAuthStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-24 05:42:53
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+src/store/useAccessibilityStore.ts
+src/store/useHabitStore.ts
+src/store/useSyncStore.ts
+
