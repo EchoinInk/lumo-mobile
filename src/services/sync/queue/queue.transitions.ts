@@ -20,21 +20,20 @@
  *   conflict → processing     (manual or automatic resolution retry)
  */
 
-import type { QueueItemStatus } from "../../storage/queue.types";
-import { getQueueItems, updateItemStatus } from "../../storage/syncQueue";
+import type { QueueItemStatus, SyncQueueItem } from "../../storage/queue.types";
+import { getQueueItems, patchQueueItem } from "../../storage/syncQueue";
 import { MAX_SYNC_RETRIES } from "../config";
 import { validateTransition } from "../types";
 
 // ── Internal helper ───────────────────────────────────────────────────────
 
 /**
- * Apply a validated state transition.
- * Uses updateItemStatus for the actual MMKV write after validation.
+ * Validate and apply a state transition with a metadata patch atomically.
  */
 function applyTransition(
   itemId: string,
   to: QueueItemStatus,
-  errorMessage?: string,
+  patch: Partial<Omit<SyncQueueItem, "id" | "idempotencyKey">>,
 ): void {
   const queue = getQueueItems();
   const item = queue.find((i) => i.id === itemId);
@@ -54,7 +53,7 @@ function applyTransition(
     );
   }
 
-  updateItemStatus(itemId, to, errorMessage);
+  patchQueueItem(itemId, { ...patch, status: to });
 }
 
 // ── Public Transitions ────────────────────────────────────────────────────
@@ -72,10 +71,7 @@ export function markQueueItemProcessing(itemId: string): void {
  * Stamps syncedAt, clears error.
  */
 export function markQueueItemSynced(itemId: string): void {
-  applyTransition(itemId, "synced", {
-    syncedAt: Date.now(),
-    error: null,
-  });
+  applyTransition(itemId, "synced", { syncedAt: Date.now(), error: null });
 }
 
 /**
@@ -87,7 +83,7 @@ export function markQueueItemFailed(
   itemId: string,
   errorMessage: string,
 ): void {
-  const queue = loadQueue();
+  const queue = getQueueItems();
   const item = queue.find((i) => i.id === itemId);
   if (!item) {
     console.warn(
@@ -97,18 +93,19 @@ export function markQueueItemFailed(
   }
 
   const newRetryCount = item.retryCount + 1;
+  const now = Date.now();
 
   if (newRetryCount >= MAX_SYNC_RETRIES) {
     applyTransition(itemId, "dead_letter", {
       retryCount: newRetryCount,
       error: errorMessage,
-      lastAttemptAt: Date.now(),
+      lastAttemptAt: now,
     });
   } else {
     applyTransition(itemId, "failed", {
       retryCount: newRetryCount,
       error: errorMessage,
-      lastAttemptAt: Date.now(),
+      lastAttemptAt: now,
     });
   }
 }
