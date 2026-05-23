@@ -8,9 +8,8 @@
  * Do not use in production code.
  */
 
-import type { SyncEntity, SyncOperation } from '../../storage/queue.types';
-import { createQueueItem } from '../../storage/syncQueue';
-import { clearQueue } from '../../storage/syncQueue';
+import type { SyncEntity, SyncOperation } from "../../storage/queue.types";
+import { clearQueue } from "../../storage/syncQueue";
 
 // ── Test Data Generation ───────────────────────────────────────────────────
 
@@ -25,7 +24,7 @@ function generateEntityId(): string {
  * Generate a random entity type.
  */
 function randomEntity(): SyncEntity {
-  const entities: SyncEntity[] = ['task', 'habit', 'meal', 'budget', 'workout'];
+  const entities: SyncEntity[] = ["task", "habit", "meal", "budget", "workout"];
   return entities[Math.floor(Math.random() * entities.length)];
 }
 
@@ -33,7 +32,7 @@ function randomEntity(): SyncEntity {
  * Generate a random operation type.
  */
 function randomOperation(): SyncOperation {
-  const operations: SyncOperation[] = ['create', 'update', 'delete'];
+  const operations: SyncOperation[] = ["create", "update", "delete"];
   return operations[Math.floor(Math.random() * operations.length)];
 }
 
@@ -43,7 +42,7 @@ function randomOperation(): SyncOperation {
 function randomPayload(): Record<string, unknown> {
   return {
     title: `Test item ${Math.random().toString(36).substring(2, 8)}`,
-    priority: Math.random() > 0.5 ? 'high' : 'low',
+    priority: Math.random() > 0.5 ? "high" : "low",
     value: Math.floor(Math.random() * 100),
   };
 }
@@ -63,25 +62,24 @@ export function generateFakeQueue(
     entity?: SyncEntity;
     operation?: SyncOperation;
     includePayload?: boolean;
-  } = {}
+  } = {},
 ): string[] {
   const itemIds: string[] = [];
 
   for (let i = 0; i < count; i++) {
     const entity = options.entity ?? randomEntity();
     const operation = options.operation ?? randomOperation();
-    const payload = options.includePayload !== false ? randomPayload() : undefined;
+    const payload =
+      options.includePayload !== false ? randomPayload() : undefined;
 
-    const result = createQueueItem({
+    const item = recordQueueItem({
       entity,
       operation,
       entityId: generateEntityId(),
       payload,
     });
 
-    if (result.success && result.item) {
-      itemIds.push(result.item.id);
-    }
+    itemIds.push(item.id);
   }
 
   console.log(`[StressTest] Generated ${itemIds.length} fake queue items`);
@@ -105,7 +103,10 @@ export function generateMixedQueue(count: number): string[] {
  * @param entity - Entity type to use
  * @returns Array of generated item IDs
  */
-export function generateSingleEntityQueue(count: number, entity: SyncEntity): string[] {
+export function generateSingleEntityQueue(
+  count: number,
+  entity: SyncEntity,
+): string[] {
   return generateFakeQueue(count, { entity, includePayload: true });
 }
 
@@ -170,7 +171,7 @@ export function simulateFailedQueue(count: number = 100): string[] {
  * WARNING: This will delete ALL queue items.
  */
 export function clearTestQueue(): void {
-  console.log('[StressTest] Clearing test queue');
+  console.log("[StressTest] Clearing test queue");
   clearQueue();
 }
 
@@ -178,7 +179,7 @@ export function clearTestQueue(): void {
  * Reset queue to clean state for testing.
  */
 export function resetTestQueue(): void {
-  console.log('[StressTest] Resetting queue to clean state');
+  console.log("[StressTest] Resetting queue to clean state");
   clearQueue();
 }
 
@@ -197,16 +198,18 @@ export interface StressTestResult {
   errors: string[];
 }
 
-export function runStressTest(options: {
-  itemCount?: number;
-  scenario?: 'large' | 'mixed' | 'dead_letter' | 'failed';
-} = {}): StressTestResult {
+export function runStressTest(
+  options: {
+    itemCount?: number;
+    scenario?: "large" | "mixed" | "dead_letter" | "failed";
+  } = {},
+): StressTestResult {
   const startTime = Date.now();
   const errors: string[] = [];
   let totalItems = 0;
 
   const itemCount = options.itemCount ?? 1000;
-  const scenario = options.scenario ?? 'mixed';
+  const scenario = options.scenario ?? "mixed";
 
   try {
     // Clear existing queue
@@ -214,21 +217,23 @@ export function runStressTest(options: {
 
     // Generate test data based on scenario
     switch (scenario) {
-      case 'large':
+      case "large":
         totalItems = simulateLargeQueue(itemCount).length;
         break;
-      case 'mixed':
+      case "mixed":
         totalItems = generateMixedQueue(itemCount).length;
         break;
-      case 'dead_letter':
+      case "dead_letter":
         totalItems = simulateDeadLetterQueue(itemCount).length;
         break;
-      case 'failed':
+      case "failed":
         totalItems = simulateFailedQueue(itemCount).length;
         break;
     }
 
-    console.log(`[StressTest] Scenario '${scenario}' completed: ${totalItems} items generated`);
+    console.log(
+      `[StressTest] Scenario '${scenario}' completed: ${totalItems} items generated`,
+    );
   } catch (error) {
     errors.push(error instanceof Error ? error.message : String(error));
   }
@@ -249,14 +254,20 @@ export function runStressTest(options: {
  * @param sizes - Array of queue sizes to test
  * @returns Array of test results
  */
-export function runScalabilityTest(sizes: number[] = [100, 500, 1000, 5000]): StressTestResult[] {
-  console.log(`[StressTest] Running scalability test with sizes: ${sizes.join(', ')}`);
+export function runScalabilityTest(
+  sizes: number[] = [100, 500, 1000, 5000],
+): StressTestResult[] {
+  console.log(
+    `[StressTest] Running scalability test with sizes: ${sizes.join(", ")}`,
+  );
   const results: StressTestResult[] = [];
 
   for (const size of sizes) {
-    const result = runStressTest({ itemCount: size, scenario: 'large' });
+    const result = runStressTest({ itemCount: size, scenario: "large" });
     results.push(result);
-    console.log(`[StressTest] Size ${size}: ${result.duration}ms, ${result.totalItems} items`);
+    console.log(
+      `[StressTest] Size ${size}: ${result.duration}ms, ${result.totalItems} items`,
+    );
   }
 
   return results;
