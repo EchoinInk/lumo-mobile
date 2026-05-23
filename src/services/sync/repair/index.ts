@@ -17,14 +17,17 @@
  */
 
 import {
+  clearQueue,
   getQueueItems,
   removeItem,
   updateItemStatus,
-  clearQueue,
-} from '../../storage/syncQueue';
-import { validateQueueItem, isCorruptedItem } from '../queue/queue.validation';
-import { isOrphaned, checkInvariants, canProcess } from '../types';
-import { logSyncEvent, logRecoveryAction } from '../monitor/syncLogger';
+} from "../../storage/syncQueue";
+import { logRecoveryAction, logSyncEvent } from "../monitor/syncLogger";
+import {
+  isCorruptedItem,
+  safeValidateQueueItem,
+} from "../queue/queue.validation";
+import { checkInvariants, isOrphaned } from "../types";
 
 // ── Repair Result Types ─────────────────────────────────────────────────────
 
@@ -71,15 +74,21 @@ export function repairQueue(): RepairResult {
       if (!invariantCheck.valid) {
         result.itemsRemoved++;
         removeItem(item.id);
-        result.violations.push(`Invariant violation: ${invariantCheck.violations.join(', ')}`);
+        result.violations.push(
+          `Invariant violation: ${invariantCheck.violations.join(", ")}`,
+        );
         continue;
       }
 
       // Recover orphaned processing items
       if (isOrphaned(item)) {
         result.itemsRecovered++;
-        updateItemStatus(item.id, 'pending', 'Recovered from orphaned processing state');
-        logRecoveryAction('Orphaned item recovered', { itemId: item.id });
+        updateItemStatus(
+          item.id,
+          "pending",
+          "Recovered from orphaned processing state",
+        );
+        logRecoveryAction("Orphaned item recovered", { itemId: item.id });
         continue;
       }
 
@@ -93,10 +102,22 @@ export function repairQueue(): RepairResult {
       }
     }
 
-    logSyncEvent('Repair', undefined, undefined, 'COMPLETE', `Queue repair: ${result.itemsRepaired} repaired, ${result.itemsRemoved} removed, ${result.itemsRecovered} recovered`);
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "COMPLETE",
+      `Queue repair: ${result.itemsRepaired} repaired, ${result.itemsRemoved} removed, ${result.itemsRecovered} recovered`,
+    );
   } catch (error) {
     result.success = false;
-    logSyncEvent('Repair', undefined, undefined, 'ERROR', 'Queue repair failed');
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "ERROR",
+      "Queue repair failed",
+    );
   }
 
   return result;
@@ -128,7 +149,7 @@ export function repairDeadLetters(maxAgeMs: number = 3600000): RepairResult {
 
     for (const item of items) {
       // Only process dead letter items
-      if (item.status !== 'failed' || item.retryCount < 5) {
+      if (item.status !== "failed" || item.retryCount < 5) {
         continue;
       }
 
@@ -140,21 +161,41 @@ export function repairDeadLetters(maxAgeMs: number = 3600000): RepairResult {
       }
 
       // Check if error is transient (network-related)
-      const isTransientError = item.error?.toLowerCase().includes('network') ||
-                               item.error?.toLowerCase().includes('timeout') ||
-                               item.error?.toLowerCase().includes('connection');
+      const isTransientError =
+        item.error?.toLowerCase().includes("network") ||
+        item.error?.toLowerCase().includes("timeout") ||
+        item.error?.toLowerCase().includes("connection");
 
       if (isTransientError) {
         result.itemsRecovered++;
-        updateItemStatus(item.id, 'pending', 'Recovered from dead letter (transient error)');
-        logRecoveryAction('Dead letter recovered', { itemId: item.id, error: item.error });
+        updateItemStatus(
+          item.id,
+          "pending",
+          "Recovered from dead letter (transient error)",
+        );
+        logRecoveryAction("Dead letter recovered", {
+          itemId: item.id,
+          error: item.error,
+        });
       }
     }
 
-    logSyncEvent('Repair', undefined, undefined, 'DEAD_LETTER_COMPLETE', `Dead letter repair: ${result.itemsRecovered} recovered`);
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "DEAD_LETTER_COMPLETE",
+      `Dead letter repair: ${result.itemsRecovered} recovered`,
+    );
   } catch (error) {
     result.success = false;
-    logSyncEvent('Repair', undefined, undefined, 'ERROR', 'Dead letter repair failed');
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "ERROR",
+      "Dead letter repair failed",
+    );
   }
 
   return result;
@@ -170,7 +211,9 @@ export function repairDeadLetters(maxAgeMs: number = 3600000): RepairResult {
  * @param maxProcessingAgeMs - Maximum age in ms before considering orphaned (default: 5 minutes)
  * @returns Repair result summary
  */
-export function recoverOrphanedItems(maxProcessingAgeMs: number = 300000): RepairResult {
+export function recoverOrphanedItems(
+  maxProcessingAgeMs: number = 300000,
+): RepairResult {
   const result: RepairResult = {
     success: true,
     itemsRepaired: 0,
@@ -185,15 +228,34 @@ export function recoverOrphanedItems(maxProcessingAgeMs: number = 300000): Repai
     for (const item of items) {
       if (isOrphaned(item, maxProcessingAgeMs)) {
         result.itemsRecovered++;
-        updateItemStatus(item.id, 'pending', 'Recovered from orphaned processing state');
-        logRecoveryAction('Orphaned item recovered', { itemId: item.id, age: maxProcessingAgeMs });
+        updateItemStatus(
+          item.id,
+          "pending",
+          "Recovered from orphaned processing state",
+        );
+        logRecoveryAction("Orphaned item recovered", {
+          itemId: item.id,
+          age: maxProcessingAgeMs,
+        });
       }
     }
 
-    logSyncEvent('Repair', undefined, undefined, 'ORPHAN_COMPLETE', `Orphan recovery: ${result.itemsRecovered} recovered`);
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "ORPHAN_COMPLETE",
+      `Orphan recovery: ${result.itemsRecovered} recovered`,
+    );
   } catch (error) {
     result.success = false;
-    logSyncEvent('Repair', undefined, undefined, 'ERROR', 'Orphan recovery failed');
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "ERROR",
+      "Orphan recovery failed",
+    );
   }
 
   return result;
@@ -206,7 +268,10 @@ export function recoverOrphanedItems(maxProcessingAgeMs: number = 300000): Repai
  *
  * @returns Validation result with violations
  */
-export function validateQueueIntegrity(): { valid: boolean; violations: string[] } {
+export function validateQueueIntegrity(): {
+  valid: boolean;
+  violations: string[];
+} {
   const violations: string[] = [];
 
   try {
@@ -221,13 +286,17 @@ export function validateQueueIntegrity(): { valid: boolean; violations: string[]
       // Check invariants
       const invariantCheck = checkInvariants(item);
       if (!invariantCheck.valid) {
-        violations.push(`Invariant violation for ${item.id}: ${invariantCheck.violations.join(', ')}`);
+        violations.push(
+          `Invariant violation for ${item.id}: ${invariantCheck.violations.join(", ")}`,
+        );
       }
 
       // Check validation
-      const validation = validateQueueItem(item);
+      const validation = safeValidateQueueItem(item);
       if (!validation.valid) {
-        violations.push(`Validation failed for ${item.id}: ${validation.reason}`);
+        violations.push(
+          `Validation failed for ${item.id}: ${validation.error}`,
+        );
       }
 
       // Check for orphaned items
@@ -236,7 +305,7 @@ export function validateQueueIntegrity(): { valid: boolean; violations: string[]
       }
     }
   } catch (error) {
-    violations.push('Validation failed with error');
+    violations.push("Validation failed with error");
   }
 
   return {
@@ -258,17 +327,29 @@ export function validateQueueIntegrity(): { valid: boolean; violations: string[]
  */
 export function emergencyQueueReset(confirm: boolean): boolean {
   if (!confirm) {
-    console.warn('[Repair] Emergency queue reset cancelled (confirm not true)');
+    console.warn("[Repair] Emergency queue reset cancelled (confirm not true)");
     return false;
   }
 
   try {
     clearQueue();
-    logSyncEvent('Repair', undefined, undefined, 'EMERGENCY_RESET', 'Queue completely reset');
-    console.warn('[Repair] Emergency queue reset executed');
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "EMERGENCY_RESET",
+      "Queue completely reset",
+    );
+    console.warn("[Repair] Emergency queue reset executed");
     return true;
   } catch (error) {
-    logSyncEvent('Repair', undefined, undefined, 'ERROR', 'Emergency queue reset failed');
+    logSyncEvent(
+      "Repair",
+      undefined,
+      undefined,
+      "ERROR",
+      "Emergency queue reset failed",
+    );
     return false;
   }
 }
