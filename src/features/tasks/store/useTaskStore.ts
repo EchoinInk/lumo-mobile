@@ -1,5 +1,6 @@
-import { dispatch } from "@/services/sync/syncDispatcher";
-import { syncEvents } from "@/services/sync/syncEventBuilders";
+// TODO: Re-enable sync integration when sync event builders are migrated
+// import { dispatch } from "@/services/sync/syncDispatcher";
+// import { syncEvents } from "@/services/sync/syncEventBuilders";
 import { create } from "zustand";
 import { mockTasks } from "../mock/mockTasks";
 import { taskLocalRepository } from "../services/taskLocalRepository";
@@ -118,13 +119,13 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .createTask(input)
       .then((persistedTask) => {
-        // Create and dispatch sync event after successful persistence
-        dispatch(
-          syncEvents.task.created(persistedTask.id, {
-            title: persistedTask.title,
-            priority: persistedTask.priority,
-          }),
-        );
+        // TODO: Re-enable sync event dispatching when sync event builders are migrated
+        // dispatch(
+        //   syncEvents.task.created(persistedTask.id, {
+        //     title: persistedTask.title,
+        //     priority: persistedTask.priority,
+        //   }),
+        // );
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist new task:", err);
@@ -155,10 +156,10 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .toggleTask(id)
       .then((persistedTask) => {
-        // Create and dispatch sync event after successful persistence
-        dispatch(
-          syncEvents.task.toggled(persistedTask.id, persistedTask.completed),
-        );
+        // TODO: Re-enable sync event dispatching when sync event builders are migrated
+        // dispatch(
+        //   syncEvents.task.toggled(persistedTask.id, persistedTask.completed),
+        // );
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task toggle:", err);
@@ -188,8 +189,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .deleteTask(id)
       .then(() => {
-        // Create and dispatch sync event after successful persistence
-        dispatch(syncEvents.task.deleted(id, now));
+        // TODO: Re-enable sync event dispatching when sync event builders are migrated
+        // dispatch(syncEvents.task.deleted(id, now));
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task deletion:", err);
@@ -218,8 +219,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .updateTask(id, input)
       .then((persistedTask) => {
-        // Create and dispatch sync event after successful persistence
-        dispatch(syncEvents.task.updated(persistedTask.id, input));
+        // TODO: Re-enable sync event dispatching when sync event builders are migrated
+        // dispatch(syncEvents.task.updated(persistedTask.id, input));
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task update:", err);

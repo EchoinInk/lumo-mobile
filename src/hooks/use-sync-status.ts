@@ -5,18 +5,21 @@
  * Lightweight — no heavy subscriptions.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { getPendingCount, hasPendingOperations } from '@/services/sync';
-import { isSyncProcessing } from '@/services/sync/syncProcessor';
-import { isOnline, onConnectivityChange } from '@/utils/network';
+import {
+    getPendingCount,
+    hasPendingOperations,
+} from "@/services/storage/syncQueue";
+import { isOnline, subscribeToNetworkChanges } from "@/services/sync/network";
+import { isSyncQueueProcessing } from "@/services/sync/queue/syncProcessor";
+import { useCallback, useEffect, useState } from "react";
 
 export function useSyncStatus() {
   const [online, setOnline] = useState(isOnline());
   const [pendingCount, setPendingCount] = useState(getPendingCount());
 
   useEffect(() => {
-    const unsub = onConnectivityChange((isConnected) => {
-      setOnline(isConnected);
+    const unsub = subscribeToNetworkChanges((state) => {
+      setOnline(state === "online");
       // Refresh pending count when connectivity changes
       setPendingCount(getPendingCount());
     });
@@ -31,8 +34,8 @@ export function useSyncStatus() {
   return {
     isOnline: online,
     pendingCount,
-    hasPending: pendingCount > 0,
-    isSyncing: isSyncProcessing(),
+    hasPending: hasPendingOperations(),
+    isSyncing: isSyncQueueProcessing(),
     refresh,
   };
 }

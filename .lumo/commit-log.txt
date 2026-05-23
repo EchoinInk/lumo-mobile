@@ -1390,3 +1390,10 @@ src/services/sync/adapters/supabase/sync.writer.ts
 src/services/sync/queue/queue.dedup.ts
 src/services/sync/queue/queue.mapper.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 22:00:12
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/features/tasks/services/taskSyncRepository.ts
+
