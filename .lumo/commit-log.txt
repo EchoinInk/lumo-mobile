@@ -8597,3 +8597,9 @@ COMMIT: chore(lumo): update commit-log.txt
 FILES:
 .lumo/commit-log.txt
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-24 05:27:52
+COMMIT: chore(lumo): update queue.types.ts
+FILES:
+src/services/storage/queue.types.ts
+
