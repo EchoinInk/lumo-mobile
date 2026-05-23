@@ -20,37 +20,41 @@
  *   conflict → processing     (manual or automatic resolution retry)
  */
 
-import { loadQueue, persistQueue } from './queueStorage';
-import { validateTransition } from '../types';
-import type { QueueItemStatus, SyncQueueItem } from '../../storage/queue.types';
-import { MAX_SYNC_RETRIES } from '../config';
+import type { QueueItemStatus } from "../../storage/queue.types";
+import { getQueueItems, updateItemStatus } from "../../storage/syncQueue";
+import { MAX_SYNC_RETRIES } from "../config";
+import { validateTransition } from "../types";
 
 // ── Internal helper ───────────────────────────────────────────────────────
 
+/**
+ * Apply a validated state transition.
+ * Uses updateItemStatus for the actual MMKV write after validation.
+ */
 function applyTransition(
   itemId: string,
   to: QueueItemStatus,
-  patch: Partial<Omit<SyncQueueItem, 'id' | 'idempotencyKey' | 'entity' | 'operation' | 'entityId' | 'timestamp' | 'payload' | 'userId'>>,
+  errorMessage?: string,
 ): void {
-  const queue = loadQueue();
-  const index = queue.findIndex((item) => item.id === itemId);
+  const queue = getQueueItems();
+  const item = queue.find((i) => i.id === itemId);
 
-  if (index === -1) {
-    console.warn(`[QueueTransitions] Item ${itemId} not found — transition to ${to} skipped`);
+  if (!item) {
+    console.warn(
+      `[QueueTransitions] Item ${itemId} not found — transition to ${to} skipped`,
+    );
     return;
   }
 
-  const item = queue[index];
   const validation = validateTransition(item, to);
 
   if (!validation.valid) {
     throw new Error(
-      `[QueueTransitions] Invalid transition for ${itemId}: ${validation.reason}`,
+      `[QueueTransitions] Invalid transition for ${itemId} (${item.status} → ${to}): ${validation.reason}`,
     );
   }
 
-  queue[index] = { ...item, status: to, ...patch };
-  persistQueue(queue);
+  updateItemStatus(itemId, to, errorMessage);
 }
 
 // ── Public Transitions ────────────────────────────────────────────────────
@@ -60,7 +64,7 @@ function applyTransition(
  * Stamps lastAttemptAt with current time.
  */
 export function markQueueItemProcessing(itemId: string): void {
-  applyTransition(itemId, 'processing', { lastAttemptAt: Date.now() });
+  applyTransition(itemId, "processing", { lastAttemptAt: Date.now() });
 }
 
 /**
@@ -68,7 +72,7 @@ export function markQueueItemProcessing(itemId: string): void {
  * Stamps syncedAt, clears error.
  */
 export function markQueueItemSynced(itemId: string): void {
-  applyTransition(itemId, 'synced', {
+  applyTransition(itemId, "synced", {
     syncedAt: Date.now(),
     error: null,
   });
@@ -79,24 +83,29 @@ export function markQueueItemSynced(itemId: string): void {
  * Increments retryCount. If retryCount reaches MAX_SYNC_RETRIES,
  * automatically transitions to dead_letter instead.
  */
-export function markQueueItemFailed(itemId: string, errorMessage: string): void {
+export function markQueueItemFailed(
+  itemId: string,
+  errorMessage: string,
+): void {
   const queue = loadQueue();
   const item = queue.find((i) => i.id === itemId);
   if (!item) {
-    console.warn(`[QueueTransitions] Item ${itemId} not found — markFailed skipped`);
+    console.warn(
+      `[QueueTransitions] Item ${itemId} not found — markFailed skipped`,
+    );
     return;
   }
 
   const newRetryCount = item.retryCount + 1;
 
   if (newRetryCount >= MAX_SYNC_RETRIES) {
-    applyTransition(itemId, 'dead_letter', {
+    applyTransition(itemId, "dead_letter", {
       retryCount: newRetryCount,
       error: errorMessage,
       lastAttemptAt: Date.now(),
     });
   } else {
-    applyTransition(itemId, 'failed', {
+    applyTransition(itemId, "failed", {
       retryCount: newRetryCount,
       error: errorMessage,
       lastAttemptAt: Date.now(),
@@ -108,8 +117,11 @@ export function markQueueItemFailed(itemId: string, errorMessage: string): void 
  * Mark an item as having a server-side conflict.
  * Does NOT increment retryCount — conflict is not a retry failure.
  */
-export function markQueueItemConflict(itemId: string, errorMessage: string): void {
-  applyTransition(itemId, 'conflict', {
+export function markQueueItemConflict(
+  itemId: string,
+  errorMessage: string,
+): void {
+  applyTransition(itemId, "conflict", {
     error: errorMessage,
     lastAttemptAt: Date.now(),
   });
@@ -120,7 +132,7 @@ export function markQueueItemConflict(itemId: string, errorMessage: string): voi
  * Use only when max retries are confirmed exceeded or for non-retryable errors.
  */
 export function markQueueItemDeadLetter(itemId: string, reason: string): void {
-  applyTransition(itemId, 'dead_letter', {
+  applyTransition(itemId, "dead_letter", {
     error: reason,
     lastAttemptAt: Date.now(),
   });
