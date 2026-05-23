@@ -193,3 +193,40 @@ export type { SyncSnapshot } from "./monitor/createSyncSnapshot";
 export { syncStressTest } from "./testing";
 
 export type { StressTestResult } from "./testing";
+
+// Phase 11.3 — Replay safety + conflict foundation
+
+// Idempotency key factory
+export { createIdempotencyKey } from "./utils/createIdempotencyKey";
+
+// Sync operation envelope type
+export type { SyncOperationEnvelope } from "./types/syncOperation";
+
+// Centralized queue state transitions
+export {
+    markQueueItemConflict,
+    markQueueItemDeadLetter,
+    markQueueItemFailed,
+    markQueueItemProcessing,
+    markQueueItemSynced
+} from "./queue/queue.transitions";
+
+// Retry policy
+export {
+    canRetryAttempt,
+    getRetryDelay,
+    isExhausted
+} from "./retry/retryPolicy";
+
+// Dead letter store
+export {
+    archiveDeadLetter,
+    clearDeadLetters,
+    getDeadLetterCount,
+    getDeadLetters,
+    getDeadLettersByEntity,
+    getDeadLettersByUser,
+    removeDeadLetter
+} from "./deadLetter";
+
+export type { DeadLetterEntry } from "./deadLetter";
