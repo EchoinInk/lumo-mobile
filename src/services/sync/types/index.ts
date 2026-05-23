@@ -4,7 +4,7 @@
  * Shared types for sync system operations.
  */
 
-import type { SyncEntity, SyncOperation } from '../../storage/queue.types';
+import type { SyncEntity, SyncOperation } from "../../storage/queue.types";
 
 /**
  * Sync Event
@@ -22,3 +22,6 @@ export interface SyncEvent {
   /** Operation payload (entity-specific) */
   payload?: unknown;
 }
+
+// Re-export queue lifecycle types and functions
+export * from "./queueLifecycle";
