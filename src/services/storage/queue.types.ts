@@ -32,72 +32,72 @@ export type QueueItemStatus =
  */
 interface BaseQueueItem {
   /** Unique queue entry ID */
-  readonly id: string;
+  id: string;
 
   /** Entity type being synced */
-  readonly entity: SyncEntity;
+  entity: SyncEntity;
 
   /** CRUD operation type */
-  readonly operation: SyncOperation;
+  operation: SyncOperation;
 
   /** ID of the entity being operated on */
-  readonly entityId: string;
+  entityId: string;
 
   /** ISO timestamp when entry was created */
-  readonly timestamp: string;
+  timestamp: string;
 
   /** Operation payload (entity-specific) */
-  readonly payload?: unknown;
+  payload?: unknown;
 }
 
 /**
  * Pending queue item - waiting to be processed.
  */
 export interface PendingQueueItem extends BaseQueueItem {
-  readonly status: "pending";
-  readonly retryCount: 0;
-  readonly error: null;
+  status: "pending";
+  retryCount: 0;
+  error: null;
 }
 
 /**
  * Processing queue item - currently being processed.
  */
 export interface ProcessingQueueItem extends BaseQueueItem {
-  readonly status: "processing";
-  readonly retryCount: number;
-  readonly error: null;
+  status: "processing";
+  retryCount: number;
+  error: null;
 }
 
 /**
  * Failed queue item - failed processing, may retry.
  */
 export interface FailedQueueItem extends BaseQueueItem {
-  readonly status: "failed";
-  readonly retryCount: number;
-  readonly error: string;
+  status: "failed";
+  retryCount: number;
+  error: string;
 }
 
 /**
  * Dead letter queue item - failed after max retries, no further attempts.
  */
 export interface DeadLetterQueueItem extends BaseQueueItem {
-  readonly status: "dead_letter";
-  readonly retryCount: number;
-  readonly error: string;
+  status: "dead_letter";
+  retryCount: number;
+  error: string;
 }
 
 /**
  * Completed queue item - successfully processed, will be removed.
  */
 export interface CompletedQueueItem extends BaseQueueItem {
-  readonly status: "completed";
-  readonly retryCount: number;
-  readonly error: null;
+  status: "completed";
+  retryCount: number;
+  error: null;
 }
 
 /**
  * Discriminated union of all queue item states.
- * Makes illegal states unrepresentable.
+ * Supports state transitions while maintaining type safety.
  */
 export type SyncQueueItem =
   | PendingQueueItem

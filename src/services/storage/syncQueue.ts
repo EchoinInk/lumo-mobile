@@ -11,14 +11,14 @@
  * Future phase: actual sync execution with Supabase
  */
 
-import { getString, setString } from './mmkv';
+import { getString, setString } from "./mmkv";
 import {
-  CreateQueueItemInput,
-  QueueItemStatus,
-  SyncQueueItem,
-  SYNC_QUEUE_STORAGE_KEY,
-  MAX_RETRY_COUNT,
-} from './queue.types';
+    CreateQueueItemInput,
+    MAX_RETRY_COUNT,
+    QueueItemStatus,
+    SYNC_QUEUE_STORAGE_KEY,
+    SyncQueueItem,
+} from "./queue.types";
 
 // ── Private helpers ────────────────────────────────────────────────────────
 
@@ -40,7 +40,7 @@ function loadQueue(): SyncQueueItem[] {
     if (!raw) return [];
     return JSON.parse(raw) as SyncQueueItem[];
   } catch (err) {
-    console.error('[SyncQueue] Failed to load queue:', err);
+    console.error("[SyncQueue] Failed to load queue:", err);
     return [];
   }
 }
@@ -52,7 +52,7 @@ function persistQueue(items: SyncQueueItem[]): void {
   try {
     setString(SYNC_QUEUE_STORAGE_KEY, JSON.stringify(items));
   } catch (err) {
-    console.error('[SyncQueue] Failed to persist queue:', err);
+    console.error("[SyncQueue] Failed to persist queue:", err);
   }
 }
 
@@ -82,9 +82,9 @@ export function recordQueueItem(input: CreateQueueItemInput): SyncQueueItem {
     timestamp: now(),
     payload: input.payload,
     retryCount: 0,
-    status: 'pending',
+    status: "pending",
     error: null,
-  };
+  } as SyncQueueItem;
 
   const queue = loadQueue();
   queue.push(item);
@@ -104,7 +104,9 @@ export function getQueueItems(): SyncQueueItem[] {
 /**
  * Get queue items filtered by status.
  */
-export function getQueueItemsByStatus(status: QueueItemStatus): SyncQueueItem[] {
+export function getQueueItemsByStatus(
+  status: QueueItemStatus,
+): SyncQueueItem[] {
   return loadQueue().filter((item) => item.status === status);
 }
 
@@ -114,7 +116,7 @@ export function getQueueItemsByStatus(status: QueueItemStatus): SyncQueueItem[] 
  */
 export function getPendingItems(): SyncQueueItem[] {
   return loadQueue().filter(
-    (item) => item.status === 'pending' && item.retryCount < MAX_RETRY_COUNT
+    (item) => item.status === "pending" && item.retryCount < MAX_RETRY_COUNT,
   );
 }
 
@@ -123,7 +125,7 @@ export function getPendingItems(): SyncQueueItem[] {
  */
 export function getFailedItems(): SyncQueueItem[] {
   return loadQueue().filter(
-    (item) => item.status === 'failed' || item.retryCount >= MAX_RETRY_COUNT
+    (item) => item.status === "failed" || item.retryCount >= MAX_RETRY_COUNT,
   );
 }
 
@@ -134,7 +136,7 @@ export function getFailedItems(): SyncQueueItem[] {
 export function updateItemStatus(
   itemId: string,
   status: QueueItemStatus,
-  error?: string
+  error?: string,
 ): void {
   const queue = loadQueue().map((item) => {
     if (item.id !== itemId) return item;
@@ -157,7 +159,7 @@ export function incrementRetry(itemId: string, errorMessage: string): void {
 
     const newRetryCount = item.retryCount + 1;
     const newStatus: QueueItemStatus =
-      newRetryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending';
+      newRetryCount >= MAX_RETRY_COUNT ? "failed" : "pending";
 
     return {
       ...item,
