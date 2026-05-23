@@ -132,6 +132,9 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );
