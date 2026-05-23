@@ -111,6 +111,25 @@ function sleep(ms: number): Promise<void> {
  * @returns true if successful, false if failed
  */
 async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
+  // INVARIANT: Check item validity before processing
+  const invariantCheck = checkInvariants(item);
+  if (!invariantCheck.valid) {
+    console.error(
+      `[SyncProcessor] Item invariant violations: ${invariantCheck.violations.join(", ")}`,
+    );
+    // Remove malformed items
+    removeItem(item.id);
+    return false;
+  }
+
+  // LIFECYCLE: Check if item can be processed
+  if (!canProcess(item)) {
+    console.warn(
+      `[SyncProcessor] Item cannot be processed (status: ${item.status}, retryCount: ${item.retryCount})`,
+    );
+    return false;
+  }
+
   // DEDUP: Skip if already processed
   if (isEventProcessed(item)) {
     console.log(
@@ -126,6 +145,13 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
     console.error(
       `[SyncProcessor] Max retries exceeded for ${item.entity}:${item.operation} (${item.entityId}) — moved to dead letter`,
     );
+    // LIFECYCLE: Validate transition to dead_letter
+    const transition = validateTransition(item, "dead_letter");
+    if (!transition.valid) {
+      console.error(
+        `[SyncProcessor] Invalid transition to dead_letter: ${transition.reason}`,
+      );
+    }
     // Mark as failed (dead letter) — do NOT remove from queue
     updateItemStatus(item.id, "failed", "Max retries exceeded");
     return false;
@@ -154,6 +180,13 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
         `[SyncProcessor] Non-retryable error for ${item.entity}:${item.operation}:`,
         message,
       );
+      // LIFECYCLE: Validate transition to failed
+      const transition = validateTransition(item, "failed");
+      if (!transition.valid) {
+        console.error(
+          `[SyncProcessor] Invalid transition to failed: ${transition.reason}`,
+        );
+      }
       // Mark as failed with reason — do NOT remove from queue
       updateItemStatus(item.id, "failed", message);
       return false;
