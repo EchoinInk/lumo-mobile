@@ -9,7 +9,7 @@
  */
 
 import type { SyncEntity, SyncOperation } from "../../storage/queue.types";
-import { clearQueue } from "../../storage/syncQueue";
+import { clearQueue, recordQueueItem } from "../../storage/syncQueue";
 
 // ── Test Data Generation ───────────────────────────────────────────────────
 
@@ -134,19 +134,17 @@ export function simulateDeadLetterQueue(count: number = 50): string[] {
   const itemIds: string[] = [];
 
   for (let i = 0; i < count; i++) {
-    const result = createQueueItem({
+    const item = recordQueueItem({
       entity: randomEntity(),
       operation: randomOperation(),
       entityId: generateEntityId(),
       payload: randomPayload(),
     });
 
-    if (result.success && result.item) {
-      itemIds.push(result.item.id);
-      // Manually set to failed with max retries
-      // Note: This requires direct storage manipulation
-      // For now, we just create the items
-    }
+    itemIds.push(item.id);
+    // Manually set to failed with max retries
+    // Note: This requires direct storage manipulation
+    // For now, we just create the items
   }
 
   return itemIds;
