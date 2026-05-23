@@ -105,7 +105,8 @@ export class TaskLocalRepository implements ITaskRepository {
   }
 
   /**
-   * Create a new task, persist it, and enqueue sync operation.
+   * Create a new task and persist it.
+   * Pure local persistence — no sync logic.
    */
   async createTask(input: CreateTaskInput): Promise<Task> {
     const tasks = this.loadTasks();
@@ -123,22 +124,6 @@ export class TaskLocalRepository implements ITaskRepository {
     };
 
     this.persistTasks([...tasks, newTask]);
-
-    // Enqueue sync operation (non-blocking, always succeeds)
-    try {
-      recordQueueItem({
-        entity: "task",
-        operation: "create",
-        entityId: newTask.id,
-        payload: { title: input.title, priority: input.priority },
-      });
-    } catch (err) {
-      console.error(
-        "[TaskLocalRepository] Failed to enqueue create operation:",
-        err,
-      );
-    }
-
     return newTask;
   }
 
