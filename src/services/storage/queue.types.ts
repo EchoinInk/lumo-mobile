@@ -12,7 +12,20 @@ export type SyncEntity = "task" | "habit" | "meal" | "budget" | "workout";
 
 export type SyncOperation = "create" | "update" | "delete";
 
-export type QueueItemStatus = "pending" | "failed" | "completed";
+/**
+ * Canonical queue item states.
+ * - pending: Item created, waiting to be processed
+ * - processing: Item is currently being processed (has lock)
+ * - failed: Item failed processing, may retry
+ * - dead_letter: Item failed after max retries, no further attempts
+ * - completed: Item successfully processed, will be removed
+ */
+export type QueueItemStatus =
+  | "pending"
+  | "processing"
+  | "failed"
+  | "dead_letter"
+  | "completed";
 
 /**
  * Single queue entry representing one sync operation.
