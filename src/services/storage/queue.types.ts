@@ -28,9 +28,10 @@ export type QueueItemStatus =
   | "completed";
 
 /**
- * Base queue item fields (common to all states).
+ * Mutable queue item for storage layer.
+ * Allows state transitions during processing.
  */
-interface BaseQueueItem {
+export interface SyncQueueItem {
   /** Unique queue entry ID */
   id: string;
 
@@ -48,58 +49,90 @@ interface BaseQueueItem {
 
   /** Operation payload (entity-specific) */
   payload?: unknown;
+
+  /** Number of retry attempts */
+  retryCount: number;
+
+  /** Current processing status */
+  status: QueueItemStatus;
+
+  /** Error message from last failed attempt */
+  error?: string | null;
+}
+
+/**
+ * Base queue item fields (common to all states).
+ */
+interface BaseQueueItem {
+  /** Unique queue entry ID */
+  readonly id: string;
+
+  /** Entity type being synced */
+  readonly entity: SyncEntity;
+
+  /** CRUD operation type */
+  readonly operation: SyncOperation;
+
+  /** ID of the entity being operated on */
+  readonly entityId: string;
+
+  /** ISO timestamp when entry was created */
+  readonly timestamp: string;
+
+  /** Operation payload (entity-specific) */
+  readonly payload?: unknown;
 }
 
 /**
  * Pending queue item - waiting to be processed.
  */
 export interface PendingQueueItem extends BaseQueueItem {
-  status: "pending";
-  retryCount: 0;
-  error: null;
+  readonly status: "pending";
+  readonly retryCount: 0;
+  readonly error: null;
 }
 
 /**
  * Processing queue item - currently being processed.
  */
 export interface ProcessingQueueItem extends BaseQueueItem {
-  status: "processing";
-  retryCount: number;
-  error: null;
+  readonly status: "processing";
+  readonly retryCount: number;
+  readonly error: null;
 }
 
 /**
  * Failed queue item - failed processing, may retry.
  */
 export interface FailedQueueItem extends BaseQueueItem {
-  status: "failed";
-  retryCount: number;
-  error: string;
+  readonly status: "failed";
+  readonly retryCount: number;
+  readonly error: string;
 }
 
 /**
  * Dead letter queue item - failed after max retries, no further attempts.
  */
 export interface DeadLetterQueueItem extends BaseQueueItem {
-  status: "dead_letter";
-  retryCount: number;
-  error: string;
+  readonly status: "dead_letter";
+  readonly retryCount: number;
+  readonly error: string;
 }
 
 /**
  * Completed queue item - successfully processed, will be removed.
  */
 export interface CompletedQueueItem extends BaseQueueItem {
-  status: "completed";
-  retryCount: number;
-  error: null;
+  readonly status: "completed";
+  readonly retryCount: number;
+  readonly error: null;
 }
 
 /**
- * Discriminated union of all queue item states.
- * Supports state transitions while maintaining type safety.
+ * Discriminated union of all queue item states for type guards.
+ * Used for validation and lifecycle checks, not storage.
  */
-export type SyncQueueItem =
+export type StrictQueueItem =
   | PendingQueueItem
   | ProcessingQueueItem
   | FailedQueueItem

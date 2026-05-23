@@ -84,7 +84,7 @@ export function recordQueueItem(input: CreateQueueItemInput): SyncQueueItem {
     retryCount: 0,
     status: "pending",
     error: null,
-  } as SyncQueueItem;
+  };
 
   const queue = loadQueue();
   queue.push(item);
