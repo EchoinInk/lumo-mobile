@@ -7,10 +7,10 @@
  * WARNING: Do not use these in production code.
  */
 
-import { clearQueue, getQueueItems } from '../../storage/syncQueue';
-import { logSyncEvent, logSyncError } from '../monitor/syncLogger';
-import { DEAD_LETTER_STORAGE_KEY, DEDUP_STORAGE_KEY } from '../config';
-import { getString, setString } from '../../storage/mmkv';
+import { setString } from "../../storage/mmkv";
+import { clearQueue, getQueueItems } from "../../storage/syncQueue";
+import { DEAD_LETTER_STORAGE_KEY, DEDUP_STORAGE_KEY } from "../config";
+import { logSyncError, logSyncEvent } from "../monitor/syncLogger";
 
 // ── Guard ───────────────────────────────────────────────────────────────────
 
@@ -31,16 +31,16 @@ function isDebugEnabled(): boolean {
  */
 export function resetQueue(): void {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] resetQueue is dev-only');
+    console.warn("[SyncDebug] resetQueue is dev-only");
     return;
   }
 
   try {
     clearQueue();
-    logSyncEvent('Debug', undefined, undefined, 'RESET', 'Queue cleared');
-    console.log('[SyncDebug] Queue has been reset');
+    logSyncEvent("Debug", undefined, undefined, "RESET", "Queue cleared");
+    console.log("[SyncDebug] Queue has been reset");
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
   }
 }
 
@@ -52,7 +52,7 @@ export function resetQueue(): void {
  */
 export function clearDeadLetters(): void {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] clearDeadLetters is dev-only');
+    console.warn("[SyncDebug] clearDeadLetters is dev-only");
     return;
   }
 
@@ -62,16 +62,22 @@ export function clearDeadLetters(): void {
 
     for (const item of items) {
       // Remove failed items with high retry count
-      if (item.status === 'failed' && item.retryCount >= 5) {
+      if (item.status === "failed" && item.retryCount >= 5) {
         clearQueue();
         cleared++;
       }
     }
 
-    logSyncEvent('Debug', undefined, undefined, 'CLEAR_DEAD_LETTERS', `Cleared ${cleared} dead-letter items`);
+    logSyncEvent(
+      "Debug",
+      undefined,
+      undefined,
+      "CLEAR_DEAD_LETTERS",
+      `Cleared ${cleared} dead-letter items`,
+    );
     console.log(`[SyncDebug] Cleared ${cleared} dead-letter items`);
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
   }
 }
 
@@ -89,7 +95,7 @@ export function inspectQueue(): {
   items: unknown[];
 } {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] inspectQueue is dev-only');
+    console.warn("[SyncDebug] inspectQueue is dev-only");
     return {
       total: 0,
       pending: 0,
@@ -101,10 +107,10 @@ export function inspectQueue(): {
 
   try {
     const items = getQueueItems();
-    const pending = items.filter((item) => item.status === 'pending').length;
-    const failed = items.filter((item) => item.status === 'failed').length;
+    const pending = items.filter((item) => item.status === "pending").length;
+    const failed = items.filter((item) => item.status === "failed").length;
     const deadLetter = items.filter(
-      (item) => item.status === 'failed' && item.retryCount >= 5
+      (item) => item.status === "failed" && item.retryCount >= 5,
     ).length;
 
     const summary = {
@@ -123,10 +129,10 @@ export function inspectQueue(): {
       })),
     };
 
-    console.log('[SyncDebug] Queue inspection:', summary);
+    console.log("[SyncDebug] Queue inspection:", summary);
     return summary;
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
     return {
       total: 0,
       pending: 0,
@@ -147,7 +153,7 @@ export function inspectQueue(): {
  */
 export function simulateFailure(): void {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] simulateFailure is dev-only');
+    console.warn("[SyncDebug] simulateFailure is dev-only");
     return;
   }
 
@@ -155,23 +161,31 @@ export function simulateFailure(): void {
     const items = getQueueItems();
     const malformedItem = {
       id: `debug_fail_${Date.now()}`,
-      entity: 'task' as const,
-      operation: 'create' as const,
-      entityId: 'debug_entity',
+      entity: "task" as const,
+      operation: "create" as const,
+      entityId: "debug_entity",
       timestamp: new Date().toISOString(),
       payload: { _debug: true },
       retryCount: 0,
-      status: 'pending' as const,
+      status: "pending" as const,
       error: null,
-    };
+    } as any;
 
     items.push(malformedItem);
-    setString('sync_queue_v1', JSON.stringify(items));
+    setString("sync_queue_v1", JSON.stringify(items));
 
-    logSyncEvent('Debug', undefined, undefined, 'SIMULATE_FAILURE', 'Added malformed item to queue');
-    console.log('[SyncDebug] Simulated failure - added malformed item to queue');
+    logSyncEvent(
+      "Debug",
+      undefined,
+      undefined,
+      "SIMULATE_FAILURE",
+      "Added malformed item to queue",
+    );
+    console.log(
+      "[SyncDebug] Simulated failure - added malformed item to queue",
+    );
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
   }
 }
 
@@ -183,16 +197,22 @@ export function simulateFailure(): void {
  */
 export function clearDedupCache(): void {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] clearDedupCache is dev-only');
+    console.warn("[SyncDebug] clearDedupCache is dev-only");
     return;
   }
 
   try {
     setString(DEDUP_STORAGE_KEY, JSON.stringify({}));
-    logSyncEvent('Debug', undefined, undefined, 'CLEAR_DEDUP', 'Dedup cache cleared');
-    console.log('[SyncDebug] Dedup cache has been cleared');
+    logSyncEvent(
+      "Debug",
+      undefined,
+      undefined,
+      "CLEAR_DEDUP",
+      "Dedup cache cleared",
+    );
+    console.log("[SyncDebug] Dedup cache has been cleared");
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
   }
 }
 
@@ -203,16 +223,22 @@ export function clearDedupCache(): void {
  */
 export function clearDeadLetterStorage(): void {
   if (!isDebugEnabled()) {
-    console.warn('[SyncDebug] clearDeadLetterStorage is dev-only');
+    console.warn("[SyncDebug] clearDeadLetterStorage is dev-only");
     return;
   }
 
   try {
     setString(DEAD_LETTER_STORAGE_KEY, JSON.stringify({}));
-    logSyncEvent('Debug', undefined, undefined, 'CLEAR_DEAD_LETTER_STORAGE', 'Dead letter storage cleared');
-    console.log('[SyncDebug] Dead letter storage has been cleared');
+    logSyncEvent(
+      "Debug",
+      undefined,
+      undefined,
+      "CLEAR_DEAD_LETTER_STORAGE",
+      "Dead letter storage cleared",
+    );
+    console.log("[SyncDebug] Dead letter storage has been cleared");
   } catch (error) {
-    logSyncError('Debug', undefined, undefined, error);
+    logSyncError("Debug", undefined, undefined, error);
   }
 }
 
