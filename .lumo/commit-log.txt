@@ -1621,3 +1621,10 @@ COMMIT: chore(lumo): update commit-log.txt
 FILES:
 .lumo/commit-log.txt
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 22:08:04
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/features/tasks/store/useTaskStore.ts
+
