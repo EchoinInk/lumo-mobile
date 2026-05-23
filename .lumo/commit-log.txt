@@ -1378,3 +1378,15 @@ FILES:
 .lumo/commit-log.txt
 src/services/sync/types/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:59:59
+COMMIT: feat(lumo): evolve components and logic (7 files)
+FILES:
+.lumo/commit-log.txt
+src/features/tasks/services/taskSyncRepository.ts
+src/services/init.ts
+src/services/sync/adapters/supabase/sync.adapter.ts
+src/services/sync/adapters/supabase/sync.writer.ts
+src/services/sync/queue/queue.dedup.ts
+src/services/sync/queue/queue.mapper.ts
+

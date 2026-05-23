@@ -13,7 +13,10 @@
  * Flow: Screen → Hook → taskSyncRepository → local + sync queue
  */
 
+import { hasPendingOperations } from "@/services/storage/syncQueue";
 import { isOnline } from "@/services/sync/network";
+import { createQueueItem } from "@/services/sync/queue/queue.factory";
+import { startBackgroundSync } from "@/services/sync/queue/syncProcessor";
 import type { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 import { taskLocalRepository } from "./taskLocalRepository";
 import type { ITaskRepository } from "./taskRepository.types";
@@ -44,12 +47,11 @@ class TaskSyncRepository implements ITaskRepository {
     const task = await taskLocalRepository.createTask(input);
 
     // 2. Enqueue sync operation with version for conflict detection
-    enqueue({
-      entityType: "task",
-      operationType: "create",
+    createQueueItem({
+      entity: "task",
+      operation: "create",
       entityId: task.id,
       payload: task as unknown as Record<string, unknown>,
-      entityVersion: task.version,
     });
 
     // 3. Attempt background sync (non-blocking)
@@ -80,12 +82,11 @@ class TaskSyncRepository implements ITaskRepository {
     const task = await taskLocalRepository.updateTask(id, input);
 
     // 2. Enqueue sync operation with version for conflict detection
-    enqueue({
-      entityType: "task",
-      operationType: "update",
+    createQueueItem({
+      entity: "task",
+      operation: "update",
       entityId: id,
       payload: input as unknown as Record<string, unknown>,
-      entityVersion: task.version,
     });
 
     // 3. Attempt background sync (non-blocking)
@@ -106,9 +107,9 @@ class TaskSyncRepository implements ITaskRepository {
     await taskLocalRepository.deleteTask(id);
 
     // 2. Enqueue sync operation
-    enqueue({
-      entityType: "task",
-      operationType: "delete",
+    createQueueItem({
+      entity: "task",
+      operation: "delete",
       entityId: id,
       payload: { id },
     });
@@ -144,12 +145,11 @@ class TaskSyncRepository implements ITaskRepository {
     const task = await taskLocalRepository.toggleTask(id);
 
     // 2. Enqueue sync operation with version for conflict detection
-    enqueue({
-      entityType: "task",
-      operationType: "update",
+    createQueueItem({
+      entity: "task",
+      operation: "update",
       entityId: id,
       payload: { completed: task.completed },
-      entityVersion: task.version,
     });
 
     // 3. Attempt background sync (non-blocking)
@@ -180,9 +180,7 @@ class TaskSyncRepository implements ITaskRepository {
   private triggerSync(): void {
     if (!isOnline()) return;
 
-    processQueue().catch((error) => {
-      console.warn("[TaskSync] Background sync attempt failed:", error);
-    });
+    startBackgroundSync();
   }
 }
 
