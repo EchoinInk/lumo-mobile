@@ -22,8 +22,8 @@
  * - No retry logic (handled by caller)
  */
 
-import type { SyncEvent } from '../syncEvent.types';
-import { supabase } from './supabase.client';
+import type { SyncEvent } from "../../types";
+import { supabase } from "./supabase.client";
 
 /**
  * Write a task sync event to Supabase.
@@ -33,21 +33,21 @@ import { supabase } from './supabase.client';
  */
 export async function writeTaskToSupabase(event: SyncEvent): Promise<void> {
   if (!supabase) {
-    throw new Error('[TaskWriter] Supabase client not initialized');
+    throw new Error("[TaskWriter] Supabase client not initialized");
   }
 
   const { operation, entityId, payload } = event;
 
   switch (operation) {
-    case 'create':
+    case "create":
       await createTask(entityId, payload);
       break;
 
-    case 'update':
+    case "update":
       await updateTask(entityId, payload);
       break;
 
-    case 'delete':
+    case "delete":
       await deleteTask(entityId, payload);
       break;
 
@@ -58,25 +58,22 @@ export async function writeTaskToSupabase(event: SyncEvent): Promise<void> {
 
 // ── Individual Operations ───────────────────────────────────────────────────
 
-async function createTask(
-  entityId: string,
-  payload: unknown
-): Promise<void> {
+async function createTask(entityId: string, payload: unknown): Promise<void> {
   const data = payload as {
     title: string;
-    priority?: 'low' | 'medium' | 'high';
+    priority?: "low" | "medium" | "high";
     description?: string;
     dueDate?: string;
   };
 
   const now = new Date().toISOString();
 
-  const { error } = await supabase!.from('tasks').upsert(
+  const { error } = await supabase!.from("tasks").upsert(
     {
       id: entityId,
       title: data.title,
       description: data.description ?? null,
-      priority: data.priority ?? 'medium',
+      priority: data.priority ?? "medium",
       completed: false,
       due_date: data.dueDate ?? null,
       deleted_at: null,
@@ -84,8 +81,8 @@ async function createTask(
       updated_at: now,
     },
     {
-      onConflict: 'id', // Upsert for idempotency
-    }
+      onConflict: "id", // Upsert for idempotency
+    },
   );
 
   if (error) {
@@ -93,13 +90,10 @@ async function createTask(
   }
 }
 
-async function updateTask(
-  entityId: string,
-  payload: unknown
-): Promise<void> {
+async function updateTask(entityId: string, payload: unknown): Promise<void> {
   const data = payload as {
     title?: string;
-    priority?: 'low' | 'medium' | 'high';
+    priority?: "low" | "medium" | "high";
     description?: string;
     dueDate?: string;
     completed?: boolean;
@@ -119,33 +113,30 @@ async function updateTask(
   if (data.completed !== undefined) updateData.completed = data.completed;
 
   const { error } = await supabase!
-    .from('tasks')
+    .from("tasks")
     .update(updateData)
-    .eq('id', entityId);
+    .eq("id", entityId);
 
   if (error) {
     throw new Error(`[TaskWriter] Update failed: ${error.message}`);
   }
 }
 
-async function deleteTask(
-  entityId: string,
-  payload: unknown
-): Promise<void> {
+async function deleteTask(entityId: string, payload: unknown): Promise<void> {
   const data = payload as { deletedAt?: string };
 
   // Soft delete: mark deleted_at timestamp
   const deletedAt = data.deletedAt ?? new Date().toISOString();
 
-  const { error } = await supabase!.from('tasks').upsert(
+  const { error } = await supabase!.from("tasks").upsert(
     {
       id: entityId,
       deleted_at: deletedAt,
       updated_at: deletedAt,
     },
     {
-      onConflict: 'id',
-    }
+      onConflict: "id",
+    },
   );
 
   if (error) {

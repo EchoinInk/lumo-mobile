@@ -13,8 +13,8 @@
  * - Pure data transformation
  */
 
-import type { SyncQueueItem } from '../../storage/queue.types';
-import type { SyncEvent } from '../syncEvent.types';
+import type { SyncQueueItem } from "../../storage/queue.types";
+import type { SyncEvent } from "../types";
 
 /**
  * Convert a SyncQueueItem to SyncEvent format.

@@ -19,12 +19,12 @@
  * - Safe replays after crash
  */
 
-import { getString, setString } from '../../storage/mmkv';
-import type { SyncQueueItem } from '../../storage/queue.types';
-import type { SyncEvent } from '../syncEvent.types';
-import { generateEventKey, generateEventKeyFromEvent } from './queue.mapper';
+import { getString, setString } from "../../storage/mmkv";
+import type { SyncQueueItem } from "../../storage/queue.types";
+import type { SyncEvent } from "../types";
+import { generateEventKey, generateEventKeyFromEvent } from "./queue.mapper";
 
-const PROCESSED_EVENTS_KEY = 'sync_processed_events_v1';
+const PROCESSED_EVENTS_KEY = "sync_processed_events_v1";
 const EVENT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 interface ProcessedEventEntry {
@@ -51,7 +51,7 @@ function loadProcessedEvents(): Map<string, number> {
 
     return new Map(valid.map((e) => [e.key, e.timestamp]));
   } catch {
-    console.error('[QueueDedup] Failed to load processed events, resetting');
+    console.error("[QueueDedup] Failed to load processed events, resetting");
     return new Map();
   }
 }
@@ -62,11 +62,11 @@ function loadProcessedEvents(): Map<string, number> {
 function saveProcessedEvents(events: Map<string, number>): void {
   try {
     const entries: ProcessedEventEntry[] = Array.from(events.entries()).map(
-      ([key, timestamp]) => ({ key, timestamp })
+      ([key, timestamp]) => ({ key, timestamp }),
     );
     setString(PROCESSED_EVENTS_KEY, JSON.stringify(entries));
   } catch (err) {
-    console.error('[QueueDedup] Failed to save processed events:', err);
+    console.error("[QueueDedup] Failed to save processed events:", err);
   }
 }
 
@@ -157,8 +157,8 @@ export function markSyncEventProcessed(event: SyncEvent): void {
  * Use with caution — may cause duplicate writes.
  */
 export function clearProcessedEvents(): void {
-  setString(PROCESSED_EVENTS_KEY, '');
-  console.log('[QueueDedup] Cleared all processed event history');
+  setString(PROCESSED_EVENTS_KEY, "");
+  console.log("[QueueDedup] Cleared all processed event history");
 }
 
 /**

@@ -13,9 +13,7 @@
  * Flow: Screen → Hook → taskSyncRepository → local + sync queue
  */
 
-import { enqueue, hasPendingOperations } from "@/services/sync";
-import { processQueue } from "@/services/sync/syncProcessor";
-import { isOnline } from "@/utils/network";
+import { isOnline } from "@/services/sync/network";
 import type { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 import { taskLocalRepository } from "./taskLocalRepository";
 import type { ITaskRepository } from "./taskRepository.types";

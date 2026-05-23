@@ -16,9 +16,9 @@
  * ONLY infrastructure routing.
  */
 
-import type { SyncEvent } from '../syncEvent.types';
-import { isSupabaseConfigured } from './supabase.client';
-import { writeTaskToSupabase } from './sync.writer';
+import type { SyncEvent } from "../../types";
+import { isSupabaseConfigured } from "./supabase.client";
+import { writeTaskToSupabase } from "./sync.writer";
 
 /**
  * Process a sync event through the Supabase adapter.
@@ -39,13 +39,13 @@ import { writeTaskToSupabase } from './sync.writer';
 export async function supabaseSyncAdapter(event: SyncEvent): Promise<void> {
   // Graceful degradation if Supabase is not configured
   if (!isSupabaseConfigured()) {
-    console.warn('[SupabaseAdapter] Supabase not configured, skipping sync');
-    throw new Error('Supabase not configured');
+    console.warn("[SupabaseAdapter] Supabase not configured, skipping sync");
+    throw new Error("Supabase not configured");
   }
 
   // Route by entity type only
   switch (event.entity) {
-    case 'task':
+    case "task":
       await writeTaskToSupabase(event);
       break;
 
