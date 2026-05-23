@@ -56,31 +56,6 @@ function releaseLock(): void {
   processingLockId = null;
 }
 
-// ── Retry Backoff with Jitter ──────────────────────────────────────────────
-
-/**
- * Calculate exponential backoff delay with jitter.
- *
- * attempt 1 → 1s + jitter
- * attempt 2 → 2s + jitter
- * attempt 3 → 4s + jitter
- * attempt 4 → 8s + jitter
- * attempt 5 → stop (dead letter)
- *
- * @param attempt - Current attempt number (0-indexed)
- * @returns Delay in milliseconds
- */
-function calculateBackoffDelay(attempt: number): number {
-  // Exponential: base * 2^attempt
-  const exponential = SYNC_RETRY_BASE_DELAY * Math.pow(2, attempt);
-  const capped = Math.min(exponential, SYNC_RETRY_MAX_DELAY);
-
-  // Add jitter: ±factor%
-  const jitter = capped * SYNC_RETRY_JITTER_FACTOR * (Math.random() * 2 - 1);
-
-  return Math.max(0, Math.floor(capped + jitter));
-}
-
 /**
  * Sleep for specified milliseconds.
  */
@@ -89,112 +64,98 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Process a single queue item with dedup and backoff.
+ * Process a single queue item deterministically.
  *
- * Phase 10.1: Enhanced with:
- * - Deduplication check (skip if already processed)
- * - Exponential backoff with jitter
- * - Dead letter handling (mark failed, don't delete)
+ * Flow:
+ *   1. Validate invariants
+ *   2. Check lifecycle (canProcess)
+ *   3. Check idempotency (skip if already synced)
+ *   4. Mark processing
+ *   5. Attempt sync
+ *   6. Transition state based on result
  *
- * @param item - Queue item to process
- * @param attempt - Current retry attempt (0-indexed)
- * @returns true if successful, false if failed
+ * @param item    - Queue item snapshot (read before lock)
+ * @param attempt - 0-indexed retry attempt number
+ * @returns true if the item was successfully synced or safely skipped
  */
 async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
-  // INVARIANT: Check item validity before processing
+  // 1. INVARIANT GUARD: reject malformed items
   const invariantCheck = checkInvariants(item);
   if (!invariantCheck.valid) {
     console.error(
-      `[SyncProcessor] Item invariant violations: ${invariantCheck.violations.join(", ")}`,
+      `[SyncProcessor] Invariant violations for ${item.id}: ${invariantCheck.violations.join(", ")}`,
     );
-    // Remove malformed items
+    archiveDeadLetter(
+      item,
+      `Invariant violation: ${invariantCheck.violations.join("; ")}`,
+    );
     removeItem(item.id);
     return false;
   }
 
-  // LIFECYCLE: Check if item can be processed
+  // 2. LIFECYCLE GUARD: skip items that cannot be processed
   if (!canProcess(item)) {
     console.warn(
-      `[SyncProcessor] Item cannot be processed (status: ${item.status}, retryCount: ${item.retryCount})`,
+      `[SyncProcessor] Cannot process item ${item.id} (status: ${item.status}, retries: ${item.retryCount})`,
     );
     return false;
   }
 
-  // DEDUP: Skip if already processed
+  // 3. IDEMPOTENCY GUARD: skip if already synced (replay protection)
   if (isEventProcessed(item)) {
     console.log(
-      `[SyncProcessor] Skipping already-processed event: ${item.entity}:${item.operation} (${item.entityId})`,
+      `[SyncProcessor] Duplicate replay skipped: ${item.idempotencyKey}`,
     );
-    // Remove from queue (it's a duplicate)
+    markQueueItemSynced(item.id);
     removeItem(item.id);
     return true;
   }
 
-  // Check if max retries exceeded (dead letter state)
-  if (attempt >= MAX_RETRY_COUNT) {
-    console.error(
-      `[SyncProcessor] Max retries exceeded for ${item.entity}:${item.operation} (${item.entityId}) — moved to dead letter`,
-    );
-    // LIFECYCLE: Validate transition to dead_letter
-    const transition = validateTransition(item, "dead_letter");
-    if (!transition.valid) {
-      console.error(
-        `[SyncProcessor] Invalid transition to dead_letter: ${transition.reason}`,
-      );
-    }
-    // Mark as failed (dead letter) — do NOT remove from queue
-    updateItemStatus(item.id, "failed", "Max retries exceeded");
+  // 4. RETRY EXHAUSTION: send straight to dead letter
+  if (!canRetryAttempt(attempt)) {
+    const reason = "Max retries exceeded";
+    console.error(`[SyncProcessor] Dead letter: ${item.id} — ${reason}`);
+    markQueueItemDeadLetter(item.id, reason);
+    archiveDeadLetter(item, reason);
     return false;
   }
 
-  try {
-    // Convert and dispatch to Supabase
-    const event = mapQueueItemToEvent(item);
+  // 5. MARK PROCESSING
+  markQueueItemProcessing(item.id);
 
-    // Direct call (retry logic is handled by this processor now)
+  try {
+    const event = mapQueueItemToEvent(item);
     await supabaseSyncAdapter(event);
 
-    // Success: mark as processed (dedup) and remove from queue
+    // SUCCESS
     markEventProcessed(item);
+    markQueueItemSynced(item.id);
     removeItem(item.id);
     console.log(
-      `[SyncProcessor] Synced ${item.entity}:${item.operation} (${item.entityId})`,
+      `[SyncProcessor] Synced: ${item.entity}:${item.operation} (${item.entityId})`,
     );
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    // Non-retryable error — mark as failed immediately (dead letter)
+    // NON-RETRYABLE: dead letter immediately
     if (!isRetryableError(error)) {
       console.error(
-        `[SyncProcessor] Non-retryable error for ${item.entity}:${item.operation}:`,
+        `[SyncProcessor] Non-retryable error for ${item.id}:`,
         message,
       );
-      // LIFECYCLE: Validate transition to failed
-      const transition = validateTransition(item, "failed");
-      if (!transition.valid) {
-        console.error(
-          `[SyncProcessor] Invalid transition to failed: ${transition.reason}`,
-        );
-      }
-      // Mark as failed with reason — do NOT remove from queue
-      updateItemStatus(item.id, "failed", message);
+      markQueueItemDeadLetter(item.id, message);
+      archiveDeadLetter(item, message);
       return false;
     }
 
-    // Retryable error: apply backoff and retry
-    const delay = calculateBackoffDelay(attempt);
+    // RETRYABLE: backoff and recurse
+    const delay = getRetryDelay(attempt);
     console.warn(
-      `[SyncProcessor] Retryable error for ${item.entity}:${item.operation}, retry ${attempt + 1}/${MAX_RETRY_COUNT} in ${delay}ms:`,
+      `[SyncProcessor] Retry ${attempt + 1} for ${item.id} in ${delay}ms: ${message}`,
     );
-
-    // Increment retry count in storage
-    incrementRetry(item.id, message);
-
-    // Wait before retry
+    markQueueItemFailed(item.id, message);
     await sleep(delay);
-
-    // Recursive retry
     return processItem(item, attempt + 1);
   }
 }
