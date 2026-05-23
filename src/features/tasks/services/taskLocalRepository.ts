@@ -1,6 +1,5 @@
 import { deleteKey, getString, setString } from "@/services/storage/mmkv";
 import { StorageKeys } from "@/services/storage/storageKeys";
-import { recordQueueItem } from "@/services/storage/syncQueue";
 import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 import { ITaskRepository } from "./taskRepository.types";
 
@@ -145,7 +144,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Update an existing task by ID.
    * Throws a normalised Error when the task is not found.
-   * Enqueues sync operation after local persistence.
+   * Pure local persistence — no sync logic.
    */
   async updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
     const tasks = this.loadTasks();
@@ -168,21 +167,6 @@ export class TaskLocalRepository implements ITaskRepository {
     const next = [...tasks];
     next[index] = updated;
     this.persistTasks(next);
-
-    // Enqueue sync operation (non-blocking, graceful failure)
-    try {
-      recordQueueItem({
-        entity: "task",
-        operation: "update",
-        entityId: id,
-        payload: input,
-      });
-    } catch (err) {
-      console.error(
-        "[TaskLocalRepository] Failed to enqueue update operation:",
-        err,
-      );
-    }
 
     return updated;
   }
