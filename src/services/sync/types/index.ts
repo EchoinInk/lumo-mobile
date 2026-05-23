@@ -21,6 +21,12 @@ export interface SyncEvent {
   entityId: string;
   /** Operation payload (entity-specific) */
   payload?: unknown;
+  /**
+   * Idempotency key from the originating queue item.
+   * Adapters should use this to prevent duplicate backend writes.
+   * Optional for backward compat with legacy events.
+   */
+  idempotencyKey?: string;
 }
 
 // Re-export queue lifecycle types and functions
