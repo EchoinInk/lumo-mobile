@@ -95,22 +95,18 @@ while true; do
     # -----------------------------
     # Push
     # -----------------------------
-    if git push origin main; then
+   # Sync with remote first
+if ! git pull --rebase origin main; then
+  echo "❌ Rebase failed — manual intervention needed"
+  continue
+fi
 
-      echo "✅ Push complete"
-
-      {
-        echo "━━━━━━━━━━━━━━━━━━━━━━"
-        echo "TIME: $TIMESTAMP"
-        echo "COMMIT: $MSG"
-        echo ""
-        echo "$REAL_FILES"
-        echo ""
-      } >> "$LOG_FILE"
-
-    else
-      echo "❌ Push failed"
-    fi
+# Push safely
+if git push origin main; then
+  echo "✅ Push complete"
+else
+  echo "❌ Push failed — retrying in next cycle"
+fi
   fi
 
   # Polling interval
