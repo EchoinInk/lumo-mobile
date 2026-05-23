@@ -35,6 +35,13 @@ export interface SyncQueueItem {
   /** Unique queue entry ID */
   id: string;
 
+  /**
+   * Owner of this queue item.
+   * Stamped at creation time. Never inferred at sync time.
+   * Null in anonymous/local-first mode — will be claimed on sign-in.
+   */
+  userId: string | null;
+
   /** Entity type being synced */
   entity: SyncEntity;
 
@@ -66,6 +73,9 @@ export interface SyncQueueItem {
 interface BaseQueueItem {
   /** Unique queue entry ID */
   readonly id: string;
+
+  /** Owner — stamped at creation time */
+  readonly userId: string | null;
 
   /** Entity type being synced */
   readonly entity: SyncEntity;
@@ -144,6 +154,11 @@ export type StrictQueueItem =
  * ID and timestamp are generated automatically.
  */
 export interface CreateQueueItemInput {
+  /**
+   * Owner of this operation.
+   * Pass the authenticated userId, or null for anonymous/local-first mode.
+   */
+  userId?: string | null;
   entity: SyncEntity;
   operation: SyncOperation;
   entityId: string;

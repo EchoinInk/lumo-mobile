@@ -76,6 +76,7 @@ function persistQueue(items: SyncQueueItem[]): void {
 export function recordQueueItem(input: CreateQueueItemInput): SyncQueueItem {
   const item: SyncQueueItem = {
     id: generateId(),
+    userId: input.userId ?? null,
     entity: input.entity,
     operation: input.operation,
     entityId: input.entityId,
