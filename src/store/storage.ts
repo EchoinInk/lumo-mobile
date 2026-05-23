@@ -1,10 +1,10 @@
-import { MMKV } from "react-native-mmkv";
+import { createMMKV } from "react-native-mmkv";
 
 const isServer = typeof window === "undefined";
 
 export const storage = isServer
   ? null
-  : new MMKV({
+  : createMMKV({
       id: "lumo-storage",
     });
 
@@ -29,5 +29,5 @@ export function removeItem(key: string): void {
     return;
   }
 
-  storage.delete(key);
+  storage.remove(key);
 }
