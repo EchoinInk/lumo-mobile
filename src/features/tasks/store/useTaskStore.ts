@@ -1,6 +1,3 @@
-// TODO: Re-enable sync integration when sync event builders are migrated
-// import { dispatch } from "@/services/sync/syncDispatcher";
-// import { syncEvents } from "@/services/sync/syncEventBuilders";
 import { create } from "zustand";
 import { mockTasks } from "../mock/mockTasks";
 import { taskLocalRepository } from "../services/taskLocalRepository";
@@ -34,16 +31,16 @@ type TaskStore = TaskState & TaskActions;
  * Local-first persisted Zustand store for task state management.
  * - UI updates instantly (never blocked)
  * - Persistence happens in background via taskLocalRepository
- * - Sync events created via Event Builders, dispatched via Dispatcher
+ * - Sync is handled by repository (canonical entrypoint)
  * - Hydrates from MMKV on initialization
  * - Seeds mock data if storage is empty
  * - Soft delete architecture (deletedAt timestamp)
  *
  * Architecture:
- *   UI → Store → Repository → Event Builders → Dispatcher → Queue
+ *   UI → Store → Repository → Queue → Processor → Adapter → Backend
  *
  * Canonical flow:
- *   dispatch(syncEvents.task.created(id, payload))
+ *   taskSyncRepository.createTask() handles local + sync
  */
 export const useTaskStore = create<TaskStore>((set, get) => ({
   // ── Initial State ────────────────────────────────────────────────────────
@@ -116,20 +113,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository
-      .createTask(input)
-      .then((persistedTask) => {
-        // TODO: Re-enable sync event dispatching when sync event builders are migrated
-        // dispatch(
-        //   syncEvents.task.created(persistedTask.id, {
-        //     title: persistedTask.title,
-        //     priority: persistedTask.priority,
-        //   }),
-        // );
-      })
-      .catch((err) => {
-        console.error("[TaskStore] Failed to persist new task:", err);
-      });
+    taskLocalRepository.createTask(input).catch((err) => {
+      console.error("[TaskStore] Failed to persist new task:", err);
+    });
 
     return newTask;
   },
@@ -153,17 +139,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository
-      .toggleTask(id)
-      .then((persistedTask) => {
-        // TODO: Re-enable sync event dispatching when sync event builders are migrated
-        // dispatch(
-        //   syncEvents.task.toggled(persistedTask.id, persistedTask.completed),
-        // );
-      })
-      .catch((err) => {
-        console.error("[TaskStore] Failed to persist task toggle:", err);
-      });
+    taskLocalRepository.toggleTask(id).catch((err) => {
+      console.error("[TaskStore] Failed to persist task toggle:", err);
+    });
   },
 
   deleteTask: (id) => {
@@ -186,15 +164,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist soft delete in background (non-blocking)
-    taskLocalRepository
-      .deleteTask(id)
-      .then(() => {
-        // TODO: Re-enable sync event dispatching when sync event builders are migrated
-        // dispatch(syncEvents.task.deleted(id, now));
-      })
-      .catch((err) => {
-        console.error("[TaskStore] Failed to persist task deletion:", err);
-      });
+    taskLocalRepository.deleteTask(id).catch((err) => {
+      console.error("[TaskStore] Failed to persist task deletion:", err);
+    });
   },
 
   updateTask: (id, input) => {
@@ -216,14 +188,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository
-      .updateTask(id, input)
-      .then((persistedTask) => {
-        // TODO: Re-enable sync event dispatching when sync event builders are migrated
-        // dispatch(syncEvents.task.updated(persistedTask.id, input));
-      })
-      .catch((err) => {
-        console.error("[TaskStore] Failed to persist task update:", err);
-      });
+    taskLocalRepository.updateTask(id, input).catch((err) => {
+      console.error("[TaskStore] Failed to persist task update:", err);
+    });
   },
 }));
