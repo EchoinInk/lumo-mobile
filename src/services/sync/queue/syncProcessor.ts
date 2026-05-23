@@ -26,9 +26,17 @@ import { getPendingItems, removeItem } from "../../storage/syncQueue";
 import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
 import { supabaseSyncAdapter } from "../adapters/supabase/sync.adapter";
 import { isRetryableError } from "../adapters/supabase/sync.retry";
+import { archiveDeadLetter } from "../deadLetter";
+import { canRetryAttempt, getRetryDelay } from "../retry/retryPolicy";
 import { canProcess, checkInvariants } from "../types";
 import { isEventProcessed, markEventProcessed } from "./queue.dedup";
 import { mapQueueItemToEvent } from "./queue.mapper";
+import {
+    markQueueItemDeadLetter,
+    markQueueItemFailed,
+    markQueueItemProcessing,
+    markQueueItemSynced,
+} from "./queue.transitions";
 
 // ── Processing Guard ─────────────────────────────────────────────────────────
 
@@ -212,16 +220,12 @@ export async function processSyncQueue(): Promise<SyncResult> {
     );
 
     for (const item of pendingItems) {
-      // Check if already in dead letter state (skip)
-      if (item.status === "failed" && item.retryCount >= MAX_RETRY_COUNT) {
+      // Dead letter items (exhausted retries) — counted but not retried
+      if (
+        item.status === "dead_letter" ||
+        (item.status === "failed" && item.retryCount >= MAX_SYNC_RETRIES)
+      ) {
         result.deadLetter++;
-        continue;
-      }
-
-      // Check if already processed (dedup)
-      if (isEventProcessed(item)) {
-        result.skipped++;
-        removeItem(item.id);
         continue;
       }
 
