@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🧠 Lumo Auto Commit Intelligence
+# 🧠 Lumo Auto Commit Intelligence (STABLE)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
@@ -36,80 +36,98 @@ NOISE_PATTERNS="package-lock.json|yarn.lock|\.log$|\.expo|metro|tsbuildinfo"
 # -----------------------------
 while true; do
 
-  # Check for changes
-  if ! git diff --quiet || ! git diff --cached --quiet; then
+  # ALWAYS resync repo root (prevents cron / context drift bugs)
+  cd "$(git rev-parse --show-toplevel)"
 
-    # Stage everything
-    git add -A
+  # -----------------------------
+  # 1. Stage EVERYTHING first
+  # -----------------------------
+  git add -A
 
-    # Double-check staged changes exist
-    if git diff --cached --quiet; then
-      sleep 5
-      continue
-    fi
+  # -----------------------------
+  # 2. Now check staged changes (CORRECT ORDER)
+  # -----------------------------
+  CHANGED_FILES=$(git diff --cached --name-only)
 
-    CHANGED_FILES=$(git diff --cached --name-only)
-
-    # Remove noise files
-    REAL_FILES=$(echo "$CHANGED_FILES" | grep -Ev "$NOISE_PATTERNS" || true)
-
-    # Skip if only noise exists
-    if [ -z "$REAL_FILES" ]; then
-      echo "🟡 Noise-only changes skipped"
-      sleep 5
-      continue
-    fi
-
-    FILES_CHANGED=$(echo "$REAL_FILES" | wc -l | tr -d ' ')
-    PRIMARY_FILE=$(echo "$REAL_FILES" | head -n 1)
-
-    # -----------------------------
-    # Intelligent commit messages
-    # -----------------------------
-    if [ "$FILES_CHANGED" -eq 1 ]; then
-      MSG="chore(lumo): update $(basename "$PRIMARY_FILE")"
-
-    elif [ "$FILES_CHANGED" -le 3 ]; then
-      MSG="chore(lumo): refine system ($FILES_CHANGED files)"
-
-    elif [ "$FILES_CHANGED" -le 10 ]; then
-      MSG="feat(lumo): evolve components and logic ($FILES_CHANGED files)"
-
-    else
-      MSG="refactor(lumo): large system evolution ($FILES_CHANGED files)"
-    fi
-
-    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📝 $MSG"
-    echo "⏰ $TIMESTAMP"
-    echo "━━━━━━━━━━━━━━━━━━━━━━"
-
-    # -----------------------------
-    # Commit
-    # -----------------------------
-    git commit -m "$MSG"
-
-    # -----------------------------
-    # Push
-    # -----------------------------
-   # Sync with remote first
-if ! git pull --rebase origin main; then
-  echo "❌ Rebase failed — manual intervention needed"
-  continue
-fi
-
-# Push safely
-if git push origin main; then
-  echo "✅ Push complete"
-else
-  echo "❌ Push failed — retrying in next cycle"
-fi
+  if [ -z "$CHANGED_FILES" ]; then
+    echo "🟡 No staged changes"
+    sleep 10
+    continue
   fi
 
-  # Polling interval
+  # -----------------------------
+  # 3. Filter noise
+  # -----------------------------
+  REAL_FILES=$(echo "$CHANGED_FILES" | grep -Ev "$NOISE_PATTERNS" || true)
+
+  if [ -z "$REAL_FILES" ]; then
+    echo "🟡 Noise-only changes skipped"
+    sleep 10
+    continue
+  fi
+
+  FILES_CHANGED=$(echo "$REAL_FILES" | wc -l | tr -d ' ')
+  PRIMARY_FILE=$(echo "$REAL_FILES" | head -n 1)
+
+  # -----------------------------
+  # 4. Commit message engine
+  # -----------------------------
+  if [ "$FILES_CHANGED" -eq 1 ]; then
+    MSG="chore(lumo): update $(basename "$PRIMARY_FILE")"
+
+  elif [ "$FILES_CHANGED" -le 3 ]; then
+    MSG="chore(lumo): refine system ($FILES_CHANGED files)"
+
+  elif [ "$FILES_CHANGED" -le 10 ]; then
+    MSG="feat(lumo): evolve components and logic ($FILES_CHANGED files)"
+
+  else
+    MSG="refactor(lumo): large system evolution ($FILES_CHANGED files)"
+  fi
+
+  TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━"
+  echo "📝 $MSG"
+  echo "⏰ $TIMESTAMP"
+  echo "━━━━━━━━━━━━━━━━━━━━━━"
+
+  # -----------------------------
+  # 5. Commit (only if safe)
+  # -----------------------------
+  git commit -m "$MSG"
+
+  # -----------------------------
+  # 6. Sync safely BEFORE push
+  # -----------------------------
+  if ! git pull --rebase origin main; then
+    echo "❌ Rebase failed — skipping cycle"
+    sleep 10
+    continue
+  fi
+
+  # -----------------------------
+  # 7. Push safely
+  # -----------------------------
+  if git push origin main; then
+    echo "✅ Push complete"
+  else
+    echo "❌ Push failed — will retry next cycle"
+  fi
+
+  # -----------------------------
+  # 8. Logging
+  # -----------------------------
+  {
+    echo "━━━━━━━━━━━━━━━━━━━━━━"
+    echo "TIME: $TIMESTAMP"
+    echo "COMMIT: $MSG"
+    echo "FILES:"
+    echo "$REAL_FILES"
+    echo ""
+  } >> "$LOG_FILE"
+
   sleep 10
 
 done
