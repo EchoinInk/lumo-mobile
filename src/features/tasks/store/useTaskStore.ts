@@ -1,4 +1,5 @@
 import { dispatch } from "@/services/sync/syncDispatcher";
+import { syncEvents } from "@/services/sync/syncEventBuilders";
 import { create } from "zustand";
 import { mockTasks } from "../mock/mockTasks";
 import { taskLocalRepository } from "../services/taskLocalRepository";
@@ -32,16 +33,16 @@ type TaskStore = TaskState & TaskActions;
  * Local-first persisted Zustand store for task state management.
  * - UI updates instantly (never blocked)
  * - Persistence happens in background via taskLocalRepository
- * - Sync events dispatched via Sync Dispatcher
+ * - Sync events created via Event Builders, dispatched via Dispatcher
  * - Hydrates from MMKV on initialization
  * - Seeds mock data if storage is empty
  * - Soft delete architecture (deletedAt timestamp)
  *
  * Architecture:
- *   UI → Store → Repository → Dispatcher → Queue
+ *   UI → Store → Repository → Event Builders → Dispatcher → Queue
  *
- * Canonical dispatch:
- *   dispatch({ entity, operation, entityId, payload })
+ * Canonical flow:
+ *   dispatch(syncEvents.task.created(id, payload))
  */
 export const useTaskStore = create<TaskStore>((set, get) => ({
   // ── Initial State ────────────────────────────────────────────────────────
@@ -117,16 +118,13 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .createTask(input)
       .then((persistedTask) => {
-        // Dispatch sync event after successful persistence
-        dispatch({
-          entity: "task",
-          operation: "create",
-          entityId: persistedTask.id,
-          payload: {
+        // Create and dispatch sync event after successful persistence
+        dispatch(
+          syncEvents.task.created(persistedTask.id, {
             title: persistedTask.title,
             priority: persistedTask.priority,
-          },
-        });
+          }),
+        );
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist new task:", err);
@@ -157,13 +155,10 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .toggleTask(id)
       .then((persistedTask) => {
-        // Dispatch sync event after successful persistence
-        dispatch({
-          entity: "task",
-          operation: "update",
-          entityId: persistedTask.id,
-          payload: { completed: persistedTask.completed },
-        });
+        // Create and dispatch sync event after successful persistence
+        dispatch(
+          syncEvents.task.toggled(persistedTask.id, persistedTask.completed),
+        );
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task toggle:", err);
@@ -193,13 +188,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .deleteTask(id)
       .then(() => {
-        // Dispatch sync event after successful persistence
-        dispatch({
-          entity: "task",
-          operation: "delete",
-          entityId: id,
-          payload: { deletedAt: now },
-        });
+        // Create and dispatch sync event after successful persistence
+        dispatch(syncEvents.task.deleted(id, now));
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task deletion:", err);
@@ -228,13 +218,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     taskLocalRepository
       .updateTask(id, input)
       .then((persistedTask) => {
-        // Dispatch sync event after successful persistence
-        dispatch({
-          entity: "task",
-          operation: "update",
-          entityId: persistedTask.id,
-          payload: input,
-        });
+        // Create and dispatch sync event after successful persistence
+        dispatch(syncEvents.task.updated(persistedTask.id, input));
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task update:", err);
