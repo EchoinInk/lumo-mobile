@@ -1,9 +1,4 @@
-import {
-    dispatchTaskCreated,
-    dispatchTaskDeleted,
-    dispatchTaskToggled,
-    dispatchTaskUpdated,
-} from "@/services/sync/syncDispatcher";
+import { dispatch } from "@/services/sync/syncDispatcher";
 import { create } from "zustand";
 import { mockTasks } from "../mock/mockTasks";
 import { taskLocalRepository } from "../services/taskLocalRepository";
@@ -43,9 +38,10 @@ type TaskStore = TaskState & TaskActions;
  * - Soft delete architecture (deletedAt timestamp)
  *
  * Architecture:
- *   UI → Store → Repository → MMKV
- *                  ↓
- *            Sync Dispatcher → Queue
+ *   UI → Store → Repository → Dispatcher → Queue
+ *
+ * Canonical dispatch:
+ *   dispatch({ entity, operation, entityId, payload })
  */
 export const useTaskStore = create<TaskStore>((set, get) => ({
   // ── Initial State ────────────────────────────────────────────────────────
@@ -122,9 +118,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       .createTask(input)
       .then((persistedTask) => {
         // Dispatch sync event after successful persistence
-        dispatchTaskCreated(persistedTask.id, {
-          title: persistedTask.title,
-          priority: persistedTask.priority,
+        dispatch({
+          entity: "task",
+          operation: "create",
+          entityId: persistedTask.id,
+          payload: {
+            title: persistedTask.title,
+            priority: persistedTask.priority,
+          },
         });
       })
       .catch((err) => {
@@ -157,7 +158,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       .toggleTask(id)
       .then((persistedTask) => {
         // Dispatch sync event after successful persistence
-        dispatchTaskToggled(persistedTask.id, persistedTask.completed);
+        dispatch({
+          entity: "task",
+          operation: "update",
+          entityId: persistedTask.id,
+          payload: { completed: persistedTask.completed },
+        });
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task toggle:", err);
@@ -188,7 +194,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       .deleteTask(id)
       .then(() => {
         // Dispatch sync event after successful persistence
-        dispatchTaskDeleted(id, now);
+        dispatch({
+          entity: "task",
+          operation: "delete",
+          entityId: id,
+          payload: { deletedAt: now },
+        });
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task deletion:", err);
@@ -218,7 +229,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       .updateTask(id, input)
       .then((persistedTask) => {
         // Dispatch sync event after successful persistence
-        dispatchTaskUpdated(persistedTask.id, input);
+        dispatch({
+          entity: "task",
+          operation: "update",
+          entityId: persistedTask.id,
+          payload: input,
+        });
       })
       .catch((err) => {
         console.error("[TaskStore] Failed to persist task update:", err);
