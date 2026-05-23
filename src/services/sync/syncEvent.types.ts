@@ -1,58 +1,35 @@
 /**
  * Sync Event Types
  *
- * Standardized event structure for sync operations.
- * Used by Sync Dispatcher to create consistent queue entries.
+ * Canonical event structure for the unified sync pipeline.
  *
  * Architecture:
- *   UI → Store → Repository → Sync Dispatcher → Sync Queue
+ *   UI → Store → Repository → Event Builder → Dispatcher → Queue
+ *
+ * Principle: Exactly ONE way to dispatch sync events.
  */
 
-export type SyncEntityType = 'task' | 'habit' | 'meal' | 'budget' | 'workout';
+/** Supported entity types */
+export type SyncEntity = "task" | "habit" | "meal" | "budget" | "workout";
 
-export type SyncOperationType = 'create' | 'update' | 'delete';
+/** Supported CRUD operations */
+export type SyncOperation = "create" | "update" | "delete";
 
 /**
- * Base sync event structure.
- * All entity-specific events extend this.
+ * Canonical sync event.
+ * Single unified structure for all sync operations.
  */
 export interface SyncEvent {
   /** Entity type being synced */
-  entity: SyncEntityType;
+  entity: SyncEntity;
 
   /** CRUD operation type */
-  operation: SyncOperationType;
+  operation: SyncOperation;
 
   /** ID of the entity */
   entityId: string;
 
   /** Operation payload (entity-specific data) */
-  payload?: unknown;
-}
-
-/**
- * Task-specific sync event.
- */
-export interface TaskSyncEvent extends SyncEvent {
-  entity: 'task';
-  payload?: {
-    title?: string;
-    description?: string;
-    priority?: 'low' | 'medium' | 'high';
-    completed?: boolean;
-    dueDate?: string;
-    deletedAt?: string;
-  };
-}
-
-/**
- * Factory input for creating sync events.
- * Used by repositories/store to request sync recording.
- */
-export interface CreateSyncEventInput {
-  entity: SyncEntityType;
-  operation: SyncOperationType;
-  entityId: string;
   payload?: unknown;
 }
 
