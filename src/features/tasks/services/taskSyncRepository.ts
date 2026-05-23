@@ -13,12 +13,12 @@
  * Flow: Screen → Hook → taskSyncRepository → local + sync queue
  */
 
-import { enqueue, hasPendingOperations } from '@/services/sync';
-import { processQueue } from '@/services/sync/syncProcessor';
-import { isOnline } from '@/utils/network';
-import type { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
-import { taskLocalRepository } from './taskLocalRepository';
-import type { ITaskRepository } from './taskRepository.types';
+import { enqueue, hasPendingOperations } from "@/services/sync";
+import { processQueue } from "@/services/sync/syncProcessor";
+import { isOnline } from "@/utils/network";
+import type { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
+import { taskLocalRepository } from "./taskLocalRepository";
+import type { ITaskRepository } from "./taskRepository.types";
 
 class TaskSyncRepository implements ITaskRepository {
   /**
@@ -47,8 +47,8 @@ class TaskSyncRepository implements ITaskRepository {
 
     // 2. Enqueue sync operation with version for conflict detection
     enqueue({
-      entityType: 'task',
-      operationType: 'create',
+      entityType: "task",
+      operationType: "create",
       entityId: task.id,
       payload: task as unknown as Record<string, unknown>,
       entityVersion: task.version,
@@ -60,7 +60,17 @@ class TaskSyncRepository implements ITaskRepository {
     return task;
   }
 
-  async create(input: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'lastSyncedAt' | 'pendingSync'>): Promise<Task> {
+  async create(
+    input: Omit<
+      Task,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "version"
+      | "lastSyncedAt"
+      | "pendingSync"
+    >,
+  ): Promise<Task> {
     return this.createTask(input as CreateTaskInput);
   }
 
@@ -73,8 +83,8 @@ class TaskSyncRepository implements ITaskRepository {
 
     // 2. Enqueue sync operation with version for conflict detection
     enqueue({
-      entityType: 'task',
-      operationType: 'update',
+      entityType: "task",
+      operationType: "update",
       entityId: id,
       payload: input as unknown as Record<string, unknown>,
       entityVersion: task.version,
@@ -91,16 +101,16 @@ class TaskSyncRepository implements ITaskRepository {
   }
 
   /**
-   * Delete a task optimistically.
+   * Soft delete a task optimistically.
    */
   async deleteTask(id: string): Promise<void> {
-    // 1. Update local cache instantly
+    // 1. Update local cache instantly (soft delete)
     await taskLocalRepository.deleteTask(id);
 
     // 2. Enqueue sync operation
     enqueue({
-      entityType: 'task',
-      operationType: 'delete',
+      entityType: "task",
+      operationType: "delete",
       entityId: id,
       payload: { id },
     });
@@ -114,6 +124,21 @@ class TaskSyncRepository implements ITaskRepository {
   }
 
   /**
+   * Hard delete a task (removes from storage).
+   * Use with caution - intended for admin/purge operations.
+   */
+  async hardDeleteTask(id: string): Promise<void> {
+    return taskLocalRepository.hardDeleteTask(id);
+  }
+
+  /**
+   * Get all tasks including soft-deleted ones.
+   */
+  async getAllTasksIncludingDeleted(): Promise<Task[]> {
+    return taskLocalRepository.getAllTasksIncludingDeleted();
+  }
+
+  /**
    * Toggle task completion optimistically.
    */
   async toggleTask(id: string): Promise<Task> {
@@ -122,8 +147,8 @@ class TaskSyncRepository implements ITaskRepository {
 
     // 2. Enqueue sync operation with version for conflict detection
     enqueue({
-      entityType: 'task',
-      operationType: 'update',
+      entityType: "task",
+      operationType: "update",
       entityId: id,
       payload: { completed: task.completed },
       entityVersion: task.version,
@@ -158,7 +183,7 @@ class TaskSyncRepository implements ITaskRepository {
     if (!isOnline()) return;
 
     processQueue().catch((error) => {
-      console.warn('[TaskSync] Background sync attempt failed:', error);
+      console.warn("[TaskSync] Background sync attempt failed:", error);
     });
   }
 }

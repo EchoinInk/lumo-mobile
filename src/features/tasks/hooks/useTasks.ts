@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { mockTasks } from "../mock/mockTasks";
 import { useTaskStore } from "../store/useTaskStore";
 import { CreateTaskInput, UpdateTaskInput } from "../types/task";
 
@@ -8,23 +7,25 @@ import { CreateTaskInput, UpdateTaskInput } from "../types/task";
  *
  * Thin hook abstraction for screens and components.
  * Connects the store to UI with derived selectors.
+ * Handles hydration lifecycle from local storage.
  */
 export function useTasks() {
-  const { tasks, addTask, toggleTask, deleteTask, updateTask } = useTaskStore();
+  const {
+    tasks,
+    hasHydrated,
+    hydrateTasks,
+    addTask,
+    toggleTask,
+    deleteTask,
+    updateTask,
+  } = useTaskStore();
 
-  // Seed mock data on first mount if store is empty
+  // Hydrate from local storage on first mount
   useEffect(() => {
-    if (tasks.length === 0) {
-      for (const task of mockTasks) {
-        addTask({
-          title: task.title,
-          description: task.description,
-          priority: task.priority,
-          dueDate: task.dueDate,
-        });
-      }
+    if (!hasHydrated) {
+      hydrateTasks();
     }
-  }, []);
+  }, [hasHydrated, hydrateTasks]);
 
   // Derived selectors
   const activeTasks = tasks.filter((task) => !task.completed);
@@ -38,6 +39,7 @@ export function useTasks() {
   return {
     // State
     tasks,
+    hasHydrated,
 
     // Derived data
     activeTasks,

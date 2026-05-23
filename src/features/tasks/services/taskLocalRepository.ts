@@ -74,15 +74,25 @@ export class TaskLocalRepository implements ITaskRepository {
   // ── ITaskRepository ──────────────────────────────────────────────────────
 
   /**
-   * Get all tasks from storage.
+   * Get all non-deleted tasks from storage.
+   * Filters out soft-deleted tasks (where deletedAt is set).
    */
   async getTasks(): Promise<Task[]> {
-    return this.loadTasks();
+    const tasks = this.loadTasks();
+    return tasks.filter((t) => !t.deletedAt);
   }
 
-  /** IRepository.getAll — alias for getTasks. */
+  /** IRepository.getAll — alias for getTasks (excludes soft-deleted). */
   async getAll(): Promise<Task[]> {
     return this.getTasks();
+  }
+
+  /**
+   * Get all tasks including soft-deleted ones.
+   * Used for sync operations and admin purposes.
+   */
+  async getAllTasksIncludingDeleted(): Promise<Task[]> {
+    return this.loadTasks();
   }
 
   /**
@@ -165,18 +175,41 @@ export class TaskLocalRepository implements ITaskRepository {
   }
 
   /**
-   * Delete a task by ID.
+   * Soft delete a task by ID.
+   * Sets deletedAt timestamp instead of removing from storage.
    * Silently succeeds when the task does not exist (idempotent).
    */
   async deleteTask(id: string): Promise<void> {
     const tasks = this.loadTasks();
-    const filtered = tasks.filter((t) => t.id !== id);
-    this.persistTasks(filtered);
+    const index = tasks.findIndex((t) => t.id === id);
+
+    if (index === -1) return;
+
+    const next = [...tasks];
+    next[index] = {
+      ...next[index],
+      deletedAt: this.now(),
+      updatedAt: this.now(),
+      syncStatus: "pending",
+      version: (next[index].version ?? 0) + 1,
+      pendingSync: true,
+    };
+    this.persistTasks(next);
   }
 
-  /** IRepository.delete — delegates to deleteTask. */
+  /** IRepository.delete — delegates to deleteTask (soft delete). */
   async delete(id: string): Promise<void> {
     return this.deleteTask(id);
+  }
+
+  /**
+   * Hard delete a task by ID.
+   * Actually removes from storage. Use with caution.
+   */
+  async hardDeleteTask(id: string): Promise<void> {
+    const tasks = this.loadTasks();
+    const filtered = tasks.filter((t) => t.id !== id);
+    this.persistTasks(filtered);
   }
 
   /**

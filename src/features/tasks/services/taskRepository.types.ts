@@ -1,9 +1,9 @@
-import { IRepository } from '@/services/repositories/IRepository';
-import { CreateTaskInput, Task, UpdateTaskInput } from '../types/task';
+import { IRepository } from "@/services/repositories/IRepository";
+import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 
 /**
  * Task Repository Interface
- * 
+ *
  * Domain-specific repository contract for task operations.
  * Extends the generic IRepository with task-specific methods.
  */
@@ -30,11 +30,24 @@ export interface ITaskRepository extends IRepository<Task> {
   updateTask(id: string, input: UpdateTaskInput): Promise<Task>;
 
   /**
-   * Delete a task
+   * Soft delete a task (sets deletedAt timestamp)
    * @param id - Task ID
    * @returns Promise resolving when deletion is complete
    */
   deleteTask(id: string): Promise<void>;
+
+  /**
+   * Hard delete a task (removes from storage)
+   * @param id - Task ID
+   * @returns Promise resolving when deletion is complete
+   */
+  hardDeleteTask(id: string): Promise<void>;
+
+  /**
+   * Get all tasks including soft-deleted ones
+   * @returns Promise resolving to array of all tasks
+   */
+  getAllTasksIncludingDeleted(): Promise<Task[]>;
 
   /**
    * Toggle task completion status

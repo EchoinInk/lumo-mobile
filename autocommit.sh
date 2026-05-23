@@ -1,74 +1,119 @@
 #!/bin/bash
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🧠 Lumo Auto Commit Intelligence
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+if [ -z "$REPO_ROOT" ]; then
+  echo "❌ Not inside a git repository"
+  exit 1
+fi
+
+cd "$REPO_ROOT"
+
+LOG_DIR=".lumo"
+LOG_FILE="$LOG_DIR/commit-log.txt"
+
+mkdir -p "$LOG_DIR"
+
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━"
-echo "🧠 Lumo Commit Intelligence"
+echo "🧠 Lumo Auto Commit Running"
+echo "📁 Repo: $REPO_ROOT"
+echo "📝 Logs: $LOG_FILE"
 echo "━━━━━━━━━━━━━━━━━━━━━━"
-
-set -e
-
-cd "$(git rev-parse --show-toplevel)"
+echo ""
 
 # -----------------------------
-# 1. Stage everything
+# Ignore junk-only changes
 # -----------------------------
-git add -A
-
-# -----------------------------
-# 2. Safety check: empty commit
-# -----------------------------
-if git diff --cached --quiet; then
-  echo "🟡 No meaningful changes"
-  exit 0
-fi
+NOISE_PATTERNS="package-lock.json|yarn.lock|\.log$|\.expo|metro|tsbuildinfo"
 
 # -----------------------------
-# 3. Detect change metrics
+# Main loop
 # -----------------------------
-FILES_CHANGED=$(git diff --cached --name-only | wc -l | tr -d ' ')
-LINES_CHANGED=$(git diff --cached | grep -E "^\+|^\-" | wc -l | tr -d ' ')
+while true; do
 
-CHANGED_FILES=$(git diff --cached --name-only)
+  # Check for changes
+  if ! git diff --quiet || ! git diff --cached --quiet; then
 
-# -----------------------------
-# 4. Noise filtering (ignore junk-heavy commits)
-# -----------------------------
-NOISE_PATTERNS="package-lock.json|yarn.lock|.log|.expo|metro|tsbuildinfo"
+    # Stage everything
+    git add -A
 
-if echo "$CHANGED_FILES" | grep -E "$NOISE_PATTERNS" > /dev/null; then
-  echo "🟡 Skipping noise-only changes"
-  exit 0
-fi
+    # Double-check staged changes exist
+    if git diff --cached --quiet; then
+      sleep 5
+      continue
+    fi
 
-# -----------------------------
-# 5. Smart commit message engine
-# -----------------------------
-PRIMARY_FILE=$(echo "$CHANGED_FILES" | head -n 1)
+    CHANGED_FILES=$(git diff --cached --name-only)
 
-if [ "$FILES_CHANGED" -eq 1 ]; then
-  MSG="chore(lumo): update $(basename "$PRIMARY_FILE")"
+    # Remove noise files
+    REAL_FILES=$(echo "$CHANGED_FILES" | grep -Ev "$NOISE_PATTERNS" || true)
 
-elif [ "$FILES_CHANGED" -le 3 ]; then
-  MSG="chore(lumo): refine UI + logic ($FILES_CHANGED files)"
+    # Skip if only noise exists
+    if [ -z "$REAL_FILES" ]; then
+      echo "🟡 Noise-only changes skipped"
+      sleep 5
+      continue
+    fi
 
-elif [ "$FILES_CHANGED" -le 10 ]; then
-  MSG="feat(lumo): update components and screens ($FILES_CHANGED files)"
+    FILES_CHANGED=$(echo "$REAL_FILES" | wc -l | tr -d ' ')
+    PRIMARY_FILE=$(echo "$REAL_FILES" | head -n 1)
 
-else
-  MSG="chore(lumo): large refactor ($FILES_CHANGED files)"
-fi
+    # -----------------------------
+    # Intelligent commit messages
+    # -----------------------------
+    if [ "$FILES_CHANGED" -eq 1 ]; then
+      MSG="chore(lumo): update $(basename "$PRIMARY_FILE")"
 
-# -----------------------------
-# 6. Commit
-# -----------------------------
-echo "📝 Commit:"
-echo "$MSG"
+    elif [ "$FILES_CHANGED" -le 3 ]; then
+      MSG="chore(lumo): refine system ($FILES_CHANGED files)"
 
-git commit -m "$MSG"
+    elif [ "$FILES_CHANGED" -le 10 ]; then
+      MSG="feat(lumo): evolve components and logic ($FILES_CHANGED files)"
 
-# -----------------------------
-# 7. Push safely
-# -----------------------------
-echo "⬆️ pushing..."
-git push
+    else
+      MSG="refactor(lumo): large system evolution ($FILES_CHANGED files)"
+    fi
 
-echo "✅ intelligent commit complete"
+    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📝 $MSG"
+    echo "⏰ $TIMESTAMP"
+    echo "━━━━━━━━━━━━━━━━━━━━━━"
+
+    # -----------------------------
+    # Commit
+    # -----------------------------
+    git commit -m "$MSG"
+
+    # -----------------------------
+    # Push
+    # -----------------------------
+    if git push origin main; then
+
+      echo "✅ Push complete"
+
+      {
+        echo "━━━━━━━━━━━━━━━━━━━━━━"
+        echo "TIME: $TIMESTAMP"
+        echo "COMMIT: $MSG"
+        echo ""
+        echo "$REAL_FILES"
+        echo ""
+      } >> "$LOG_FILE"
+
+    else
+      echo "❌ Push failed"
+    fi
+  fi
+
+  # Polling interval
+  sleep 10
+
+done
