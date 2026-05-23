@@ -1,13 +1,3 @@
-const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require("nativewind/metro");
-const path = require("path");
-
-const config = getDefaultConfig(__dirname);
-
-config.resolver.alias = {
-  "@": path.resolve(__dirname, "src"),
-};
-
-module.exports = withNativeWind(config, {
-  input: "./src/global.css",
-});
+meltmyheart@Alexandrias-MacBook lumo-mobile % rm -rf .expo .metro-cache node_modules package-lock.json
+rm: node_modules: Directory not empty
+meltmyheart@Alexandrias-MacBook lumo-mobile % 
