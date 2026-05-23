@@ -15,21 +15,19 @@
  * NOTE: For debugging only — no UI integration yet.
  */
 
-import { getQueueItems, getPendingItems } from '../../storage/syncQueue';
-import type { SyncQueueItem } from '../../storage/queue.types';
-import { getProcessedEventCount } from '../queue/queue.dedup';
+import { getPendingItems, getQueueItems } from "../../storage/syncQueue";
+import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
+import { getProcessedEventCount } from "../queue/queue.dedup";
 import {
-  getDeadLetterCount,
-  getPendingSyncCount,
-  isSyncQueueProcessing,
-} from '../queue/syncProcessor';
-import { isSupabaseConfigured } from '../supabase/supabase.client';
+    getDeadLetterCount,
+    isSyncQueueProcessing
+} from "../queue/syncProcessor";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface SyncHealth {
   /** Overall health status */
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'offline';
+  status: "healthy" | "degraded" | "unhealthy" | "offline";
 
   /** Queue metrics */
   queue: {
@@ -54,10 +52,13 @@ export interface SyncHealth {
   };
 
   /** Per-entity breakdown (for debugging) */
-  byEntity: Record<string, {
-    pending: number;
-    failed: number;
-  }>;
+  byEntity: Record<
+    string,
+    {
+      pending: number;
+      failed: number;
+    }
+  >;
 
   /** Human-readable summary */
   summary: string;
@@ -65,7 +66,7 @@ export interface SyncHealth {
 
 // ── Private: Storage ───────────────────────────────────────────────────────
 
-const LAST_SYNC_KEY = 'sync_health_last_sync_at';
+const LAST_SYNC_KEY = "sync_health_last_sync_at";
 
 function getLastSyncAt(): string | null {
   try {
@@ -111,30 +112,32 @@ export function getSyncHealth(): SyncHealth {
     if (!byEntity[item.entity]) {
       byEntity[item.entity] = { pending: 0, failed: 0 };
     }
-    if (item.status === 'pending') {
+    if (item.status === "pending") {
       byEntity[item.entity].pending++;
-    } else if (item.status === 'failed') {
+    } else if (item.status === "failed") {
       byEntity[item.entity].failed++;
     }
   }
 
   // Determine health status
-  let status: SyncHealth['status'];
+  let status: SyncHealth["status"];
   if (!isConfigured) {
-    status = 'offline';
+    status = "offline";
   } else if (deadLetter > 10) {
-    status = 'unhealthy';
+    status = "unhealthy";
   } else if (deadLetter > 0 || pendingItems.length > 50) {
-    status = 'degraded';
+    status = "degraded";
   } else {
-    status = 'healthy';
+    status = "healthy";
   }
 
   // Build summary
   const summaryParts: string[] = [];
   summaryParts.push(`Status: ${status}`);
-  summaryParts.push(`Queue: ${pendingItems.length} pending, ${deadLetter} dead-letter`);
-  summaryParts.push(`Processing: ${isProcessing ? 'active' : 'idle'}`);
+  summaryParts.push(
+    `Queue: ${pendingItems.length} pending, ${deadLetter} dead-letter`,
+  );
+  summaryParts.push(`Processing: ${isProcessing ? "active" : "idle"}`);
   if (oldestPendingAgeMs !== null) {
     const minutes = Math.floor(oldestPendingAgeMs / 60000);
     summaryParts.push(`Lag: ${minutes}m`);
@@ -145,7 +148,7 @@ export function getSyncHealth(): SyncHealth {
     queue: {
       total: allItems.length,
       pending: pendingItems.length,
-      failed: allItems.filter((i) => i.status === 'failed').length,
+      failed: allItems.filter((i) => i.status === "failed").length,
       deadLetter,
       oldestPendingAgeMs,
     },
@@ -159,7 +162,7 @@ export function getSyncHealth(): SyncHealth {
       processedEventsTracked: processedEvents,
     },
     byEntity,
-    summary: summaryParts.join(' | '),
+    summary: summaryParts.join(" | "),
   };
 }
 
@@ -169,22 +172,28 @@ export function getSyncHealth(): SyncHealth {
 export function logSyncHealth(): void {
   const health = getSyncHealth();
 
-  console.log('[SyncHealth] ──────────────────────────');
+  console.log("[SyncHealth] ──────────────────────────");
   console.log(`Status: ${health.status}`);
-  console.log(`Queue: ${health.queue.pending} pending, ${health.queue.deadLetter} dead-letter, ${health.queue.total} total`);
-  console.log(`Processing: ${health.sync.isProcessing ? 'ACTIVE' : 'idle'}`);
-  console.log(`Supabase: ${health.sync.isSupabaseConfigured ? 'configured' : 'NOT CONFIGURED'}`);
+  console.log(
+    `Queue: ${health.queue.pending} pending, ${health.queue.deadLetter} dead-letter, ${health.queue.total} total`,
+  );
+  console.log(`Processing: ${health.sync.isProcessing ? "ACTIVE" : "idle"}`);
+  console.log(
+    `Supabase: ${health.sync.isSupabaseConfigured ? "configured" : "NOT CONFIGURED"}`,
+  );
   console.log(`Dedup tracked: ${health.dedup.processedEventsTracked} events`);
 
   if (Object.keys(health.byEntity).length > 0) {
-    console.log('By entity:');
+    console.log("By entity:");
     for (const [entity, counts] of Object.entries(health.byEntity)) {
-      console.log(`  ${entity}: ${counts.pending} pending, ${counts.failed} failed`);
+      console.log(
+        `  ${entity}: ${counts.pending} pending, ${counts.failed} failed`,
+      );
     }
   }
 
   console.log(`Summary: ${health.summary}`);
-  console.log('[SyncHealth] ──────────────────────────');
+  console.log("[SyncHealth] ──────────────────────────");
 }
 
 /**
@@ -192,7 +201,7 @@ export function logSyncHealth(): void {
  */
 export function isSyncHealthy(): boolean {
   const health = getSyncHealth();
-  return health.status === 'healthy';
+  return health.status === "healthy";
 }
 
 /**
