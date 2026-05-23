@@ -1,20 +1,20 @@
 /**
  * Onboarding Store
- * 
+ *
  * Zustand store for managing onboarding state and progress.
  * Lightweight persistence with MMKV.
  */
 
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createPersistStorage } from './createPersistStorage';
 import type {
-  OnboardingData,
-  DashboardPersonalization,
-  StruggleArea,
-  PlanningPreference,
-  FocusArea,
-} from '@/types/onboarding';
+    DashboardPersonalization,
+    FocusArea,
+    OnboardingData,
+    PlanningPreference,
+    StruggleArea,
+} from "@/types/onboarding";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createPersistStorage } from "./createPersistStorage";
 
 type OnboardingState = {
   data: OnboardingData;
@@ -36,7 +36,7 @@ type OnboardingActions = {
 
 const defaultOnboardingData: OnboardingData = {
   struggleAreas: [],
-  planningPreference: 'minimal',
+  planningPreference: "minimal",
   focusAreas: [],
   completedAt: null,
   currentStep: 1,
@@ -48,8 +48,8 @@ const defaultPersonalization: DashboardPersonalization = {
   showMeals: false,
   showWellness: false,
   showFitness: false,
-  dashboardDensity: 'standard',
-  cardStyle: 'comfortable',
+  dashboardDensity: "standard",
+  cardStyle: "comfortable",
 };
 
 type OnboardingStore = OnboardingState & OnboardingActions;
@@ -105,8 +105,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'onboarding-storage',
-      storage: createJSONStorage(() => createPersistStorage('onboarding')),
-    }
-  )
+      name: "onboarding-storage",
+      storage: createJSONStorage(() => createPersistStorage()),
+    },
+  ),
 );

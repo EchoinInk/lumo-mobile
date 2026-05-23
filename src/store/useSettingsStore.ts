@@ -1,9 +1,9 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createPersistStorage } from './createPersistStorage';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createPersistStorage } from "./createPersistStorage";
 
 export interface AppSettings {
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   language: string;
   notificationsEnabled: boolean;
   soundEnabled: boolean;
@@ -25,8 +25,8 @@ type SettingsActions = {
 };
 
 const defaultSettings: AppSettings = {
-  theme: 'system',
-  language: 'en',
+  theme: "system",
+  language: "en",
   notificationsEnabled: true,
   soundEnabled: true,
   hapticFeedbackEnabled: true,
@@ -57,8 +57,8 @@ export const useSettingsStore = create<SettingsStore>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'settings-storage',
-      storage: createJSONStorage(() => createPersistStorage('settings')),
-    }
-  )
+      name: "settings-storage",
+      storage: createJSONStorage(() => createPersistStorage()),
+    },
+  ),
 );
