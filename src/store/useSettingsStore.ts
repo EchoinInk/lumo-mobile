@@ -15,6 +15,7 @@ type SettingsState = {
   settings: AppSettings;
   isLoading: boolean;
   error: string | null;
+  hasHydrated: boolean;
 };
 
 type SettingsActions = {
@@ -22,6 +23,7 @@ type SettingsActions = {
   resetSettings: () => void;
   setOnboardingCompleted: (completed: boolean) => void;
   setError: (error: string | null) => void;
+  setHasHydrated: (value: boolean) => void;
 };
 
 const defaultSettings: AppSettings = {
@@ -41,6 +43,7 @@ export const useSettingsStore = create<SettingsStore>()(
       settings: defaultSettings,
       isLoading: false,
       error: null,
+      hasHydrated: false,
 
       updateSettings: (updates) =>
         set((state) => ({
@@ -55,10 +58,15 @@ export const useSettingsStore = create<SettingsStore>()(
         })),
 
       setError: (error) => set({ error }),
+
+      setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {
       name: "settings-storage",
       storage: createJSONStorage(() => createPersistStorage()),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );
