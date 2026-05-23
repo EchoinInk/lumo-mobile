@@ -124,7 +124,7 @@ export const useHabitStore = create<HabitStore>()(
     }),
     {
       name: "habit-storage",
-      storage: createJSONStorage(() => createPersistStorage("habits")),
+      storage: createJSONStorage(() => createPersistStorage()),
     },
   ),
 );

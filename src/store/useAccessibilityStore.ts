@@ -1,14 +1,14 @@
 /**
  * Accessibility Store
- * 
+ *
  * Zustand store for managing accessibility preferences.
  * Centralizes motion, haptic, and visual accessibility settings.
  */
 
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createPersistStorage } from './createPersistStorage';
-import type { AccessibilityPreferences } from '@/types/accessibility';
+import type { AccessibilityPreferences } from "@/types/accessibility";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createPersistStorage } from "./createPersistStorage";
 
 type AccessibilityState = {
   preferences: AccessibilityPreferences;
@@ -18,9 +18,9 @@ type AccessibilityState = {
 
 type AccessibilityActions = {
   setReducedMotion: (enabled: boolean) => void;
-  setMotionIntensity: (intensity: 'none' | 'reduced' | 'normal') => void;
+  setMotionIntensity: (intensity: "none" | "reduced" | "normal") => void;
   setHapticFeedbackEnabled: (enabled: boolean) => void;
-  setHapticIntensity: (intensity: 'light' | 'normal' | 'strong') => void;
+  setHapticIntensity: (intensity: "light" | "normal" | "strong") => void;
   setHighContrast: (enabled: boolean) => void;
   setLargeText: (enabled: boolean) => void;
   updatePreferences: (updates: Partial<AccessibilityPreferences>) => void;
@@ -30,9 +30,9 @@ type AccessibilityActions = {
 
 const defaultPreferences: AccessibilityPreferences = {
   reducedMotion: false,
-  motionIntensity: 'normal',
+  motionIntensity: "normal",
   hapticFeedbackEnabled: true,
-  hapticIntensity: 'normal',
+  hapticIntensity: "normal",
   highContrast: false,
   largeText: false,
   preserveFocusAnimations: true,
@@ -90,8 +90,8 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'accessibility-storage',
-      storage: createJSONStorage(() => createPersistStorage('accessibility')),
-    }
-  )
+      name: "accessibility-storage",
+      storage: createJSONStorage(() => createPersistStorage()),
+    },
+  ),
 );

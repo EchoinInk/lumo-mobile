@@ -72,7 +72,7 @@ export const useSyncStore = create<SyncStore>()(
     }),
     {
       name: "sync-storage",
-      storage: createJSONStorage(() => createPersistStorage("sync")),
+      storage: createJSONStorage(() => createPersistStorage()),
     },
   ),
 );
