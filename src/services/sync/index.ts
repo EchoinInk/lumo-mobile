@@ -221,8 +221,8 @@ export {
 // Dead letter store
 export {
     archiveDeadLetter,
-    clearDeadLetters,
-    getDeadLetterCount,
+    clearDeadLetters as clearDeadLetterStore,
+    getDeadLetterCount as getDeadLetterStoreCount,
     getDeadLetters,
     getDeadLettersByEntity,
     getDeadLettersByUser,
