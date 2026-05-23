@@ -6834,3 +6834,10 @@ FILES:
 .lumo/commit-log.txt
 src/services/repositories/base/withUserScope.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-24 03:23:25
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/services/repositories/factory.ts
+
