@@ -37,6 +37,11 @@ import {
     SYNC_RETRY_JITTER_FACTOR,
     SYNC_RETRY_MAX_DELAY,
 } from "../config";
+import {
+    canProcess,
+    checkInvariants,
+    validateTransition
+} from "../types";
 import { isEventProcessed, markEventProcessed } from "./queue.dedup";
 import { mapQueueItemToEvent } from "./queue.mapper";
 
