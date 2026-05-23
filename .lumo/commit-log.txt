@@ -1101,3 +1101,11 @@ FILES:
 src/services/sync/debug/index.ts
 src/store/useSyncStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:51:06
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+.lumo/commit-log.txt
+app/_layout.tsx
+src/providers/SyncProvider.tsx
+

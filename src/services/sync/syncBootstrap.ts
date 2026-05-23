@@ -23,9 +23,10 @@
  * - Handles crashes gracefully
  */
 
-import { runQueueRecovery, isQueueHealthy } from './queue/queue.recovery';
-import { startBackgroundSync, forceReleaseLock } from './queue/syncProcessor';
-import { logSyncHealth } from './monitor/syncHealth';
+import { logSyncHealth } from "./monitor/syncHealth";
+import { logSyncError, logSyncEvent } from "./monitor/syncLogger";
+import { isQueueHealthy, runQueueRecovery } from "./queue/queue.recovery";
+import { forceReleaseLock, startBackgroundSync } from "./queue/syncProcessor";
 
 // ── State ───────────────────────────────────────────────────────────────────
 
@@ -39,46 +40,96 @@ let bootstrapPromise: Promise<void> | null = null;
  * Runs recovery and starts sync processor.
  */
 async function doBootstrap(): Promise<void> {
-  console.log('[SyncBootstrap] Starting sync system bootstrap...');
+  logSyncEvent(
+    "Bootstrap",
+    undefined,
+    undefined,
+    "START",
+    "Starting sync system bootstrap",
+  );
 
   try {
     // Step 1: Release any stuck locks (crash recovery)
-    console.log('[SyncBootstrap] Releasing any stuck processing locks...');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "RELEASE_LOCK",
+      "Releasing any stuck processing locks",
+    );
     forceReleaseLock();
 
     // Step 2: Run queue recovery
-    console.log('[SyncBootstrap] Running queue recovery...');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "RECOVERY",
+      "Running queue recovery",
+    );
     const recoveryResult = runQueueRecovery();
 
     if (recoveryResult.corruptedRemoved > 0) {
-      console.warn(
-        `[SyncBootstrap] Removed ${recoveryResult.corruptedRemoved} corrupted queue items`
+      logSyncEvent(
+        "Bootstrap",
+        undefined,
+        undefined,
+        "CORRUPTED_REMOVED",
+        `Removed ${recoveryResult.corruptedRemoved} corrupted queue items`,
       );
     }
 
     if (recoveryResult.failedReset > 0) {
-      console.log(
-        `[SyncBootstrap] Reset ${recoveryResult.failedReset} failed items for retry`
+      logSyncEvent(
+        "Bootstrap",
+        undefined,
+        undefined,
+        "FAILED_RESET",
+        `Reset ${recoveryResult.failedReset} failed items for retry`,
       );
     }
 
     // Step 3: Check queue health
     const isHealthy = isQueueHealthy();
     if (!isHealthy) {
-      console.warn('[SyncBootstrap] Queue health check indicates issues');
+      logSyncEvent(
+        "Bootstrap",
+        undefined,
+        undefined,
+        "WARNING",
+        "Queue health check indicates issues",
+      );
     }
 
     // Step 4: Log initial health state
-    console.log('[SyncBootstrap] Initial sync health:');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "HEALTH_CHECK",
+      "Logging initial sync health",
+    );
     logSyncHealth();
 
     // Step 5: Start background sync processing
-    console.log('[SyncBootstrap] Starting background sync processor...');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "START_PROCESSOR",
+      "Starting background sync processor",
+    );
     startBackgroundSync();
 
-    console.log('[SyncBootstrap] Bootstrap complete');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "COMPLETE",
+      "Bootstrap complete",
+    );
   } catch (error) {
-    console.error('[SyncBootstrap] Bootstrap failed:', error);
+    logSyncError("Bootstrap", undefined, undefined, error);
     // Don't throw — app should continue working locally
   }
 }
@@ -98,13 +149,25 @@ async function doBootstrap(): Promise<void> {
 export function bootstrapSync(): void {
   // Prevent multiple concurrent bootstraps
   if (bootstrapPromise) {
-    console.log('[SyncBootstrap] Bootstrap already in progress, skipping');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "SKIP",
+      "Bootstrap already in progress",
+    );
     return;
   }
 
   // Prevent multiple completed bootstraps
   if (isBootstrapped) {
-    console.log('[SyncBootstrap] Already bootstrapped, skipping');
+    logSyncEvent(
+      "Bootstrap",
+      undefined,
+      undefined,
+      "SKIP",
+      "Already bootstrapped",
+    );
     return;
   }
 
@@ -120,7 +183,13 @@ export function bootstrapSync(): void {
  * Use with caution — primarily for development/debugging.
  */
 export function forceRebootstrap(): void {
-  console.warn('[SyncBootstrap] Force rebootstrap requested');
+  logSyncEvent(
+    "Bootstrap",
+    undefined,
+    undefined,
+    "FORCE_REBOOT",
+    "Force rebootstrap requested",
+  );
   isBootstrapped = false;
   bootstrapPromise = null;
   bootstrapSync();
