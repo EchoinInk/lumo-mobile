@@ -29,9 +29,14 @@ import {
     removeItem,
     updateItemStatus,
 } from "../../storage/syncQueue";
-import { isSupabaseConfigured } from "../supabase/supabase.client";
-import { supabaseSyncAdapter } from "../supabase/sync.adapter";
-import { isRetryableError } from "../supabase/sync.retry";
+import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
+import { supabaseSyncAdapter } from "../adapters/supabase/sync.adapter";
+import { isRetryableError } from "../adapters/supabase/sync.retry";
+import {
+    SYNC_RETRY_BASE_DELAY,
+    SYNC_RETRY_JITTER_FACTOR,
+    SYNC_RETRY_MAX_DELAY,
+} from "../config";
 import { isEventProcessed, markEventProcessed } from "./queue.dedup";
 import { mapQueueItemToEvent } from "./queue.mapper";
 
@@ -63,12 +68,6 @@ function releaseLock(): void {
 
 // ── Retry Backoff with Jitter ──────────────────────────────────────────────
 
-const RETRY_CONFIG = {
-  baseDelayMs: 1000,
-  maxDelayMs: 30000,
-  jitterFactor: 0.3, // 30% random variation
-};
-
 /**
  * Calculate exponential backoff delay with jitter.
  *
@@ -83,11 +82,11 @@ const RETRY_CONFIG = {
  */
 function calculateBackoffDelay(attempt: number): number {
   // Exponential: base * 2^attempt
-  const exponential = RETRY_CONFIG.baseDelayMs * Math.pow(2, attempt);
-  const capped = Math.min(exponential, RETRY_CONFIG.maxDelayMs);
+  const exponential = SYNC_RETRY_BASE_DELAY * Math.pow(2, attempt);
+  const capped = Math.min(exponential, SYNC_RETRY_MAX_DELAY);
 
-  // Add jitter: ±30%
-  const jitter = capped * RETRY_CONFIG.jitterFactor * (Math.random() * 2 - 1);
+  // Add jitter: ±factor%
+  const jitter = capped * SYNC_RETRY_JITTER_FACTOR * (Math.random() * 2 - 1);
 
   return Math.max(0, Math.floor(capped + jitter));
 }
