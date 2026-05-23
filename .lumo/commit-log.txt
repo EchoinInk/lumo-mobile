@@ -1085,3 +1085,11 @@ src/services/sync/network/index.ts
 src/services/sync/network/network.types.ts
 src/services/sync/network/networkMonitor.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:50:42
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+.lumo/commit-log.txt
+src/services/sync/network/network.types.ts
+src/services/sync/network/networkMonitor.ts
+
