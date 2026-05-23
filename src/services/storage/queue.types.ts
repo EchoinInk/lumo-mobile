@@ -28,37 +28,83 @@ export type QueueItemStatus =
   | "completed";
 
 /**
- * Single queue entry representing one sync operation.
- * Persists to MMKV immediately on creation.
+ * Base queue item fields (common to all states).
  */
-export interface SyncQueueItem {
+interface BaseQueueItem {
   /** Unique queue entry ID */
-  id: string;
+  readonly id: string;
 
   /** Entity type being synced */
-  entity: SyncEntity;
+  readonly entity: SyncEntity;
 
   /** CRUD operation type */
-  operation: SyncOperation;
+  readonly operation: SyncOperation;
 
   /** ID of the entity being operated on */
-  entityId: string;
+  readonly entityId: string;
 
   /** ISO timestamp when entry was created */
-  timestamp: string;
+  readonly timestamp: string;
 
   /** Operation payload (entity-specific) */
-  payload?: unknown;
-
-  /** Number of retry attempts */
-  retryCount: number;
-
-  /** Current processing status */
-  status: QueueItemStatus;
-
-  /** Error message from last failed attempt */
-  error?: string | null;
+  readonly payload?: unknown;
 }
+
+/**
+ * Pending queue item - waiting to be processed.
+ */
+export interface PendingQueueItem extends BaseQueueItem {
+  readonly status: "pending";
+  readonly retryCount: 0;
+  readonly error: null;
+}
+
+/**
+ * Processing queue item - currently being processed.
+ */
+export interface ProcessingQueueItem extends BaseQueueItem {
+  readonly status: "processing";
+  readonly retryCount: number;
+  readonly error: null;
+}
+
+/**
+ * Failed queue item - failed processing, may retry.
+ */
+export interface FailedQueueItem extends BaseQueueItem {
+  readonly status: "failed";
+  readonly retryCount: number;
+  readonly error: string;
+}
+
+/**
+ * Dead letter queue item - failed after max retries, no further attempts.
+ */
+export interface DeadLetterQueueItem extends BaseQueueItem {
+  readonly status: "dead_letter";
+  readonly retryCount: number;
+  readonly error: string;
+}
+
+/**
+ * Completed queue item - successfully processed, will be removed.
+ */
+export interface CompletedQueueItem extends BaseQueueItem {
+  readonly status: "completed";
+  readonly retryCount: number;
+  readonly error: null;
+}
+
+/**
+ * Discriminated union of all queue item states.
+ * Makes illegal states unrepresentable.
+ */
+export type SyncQueueItem =
+  | PendingQueueItem
+  | ProcessingQueueItem
+  | FailedQueueItem
+  | DeadLetterQueueItem
+  | CompletedQueueItem;
 
 /**
  * Input for creating a new queue item.
