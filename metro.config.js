@@ -8,12 +8,13 @@ config.resolver.alias = {
   "@": path.resolve(__dirname, "src"),
 };
 
-// expo-glass-effect ships no .web.js files — stub it for web to prevent
-// Metro from crashing when bundling expo-router on web.
+// expo-glass-effect ships no .web.js files — redirect all imports to a stub
+// that satisfies expo-router's runtime calls (e.g. isLiquidGlassAvailable).
+const glassStub = path.resolve(__dirname, "src/stubs/expo-glass-effect.js");
 const originalResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (platform === "web" && moduleName.includes("expo-glass-effect")) {
-    return { type: "empty" };
+    return { type: "sourceFile", filePath: glassStub };
   }
   if (originalResolveRequest) {
     return originalResolveRequest(context, moduleName, platform);
