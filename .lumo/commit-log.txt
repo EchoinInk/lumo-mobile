@@ -1318,3 +1318,10 @@ FILES:
 .lumo/commit-log.txt
 src/providers/SyncProvider.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:58:08
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/services/sync/syncEventBuilders.ts
+
