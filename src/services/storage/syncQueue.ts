@@ -161,6 +161,22 @@ export function updateItemStatus(
 }
 
 /**
+ * Apply an arbitrary partial patch to a queue item.
+ * Used by queue.transitions.ts for replay metadata stamping.
+ * Does NOT validate the patch — callers are responsible for correctness.
+ */
+export function patchQueueItem(
+  itemId: string,
+  patch: Partial<Omit<SyncQueueItem, "id" | "idempotencyKey">>,
+): void {
+  const queue = loadQueue().map((item) => {
+    if (item.id !== itemId) return item;
+    return { ...item, ...patch };
+  });
+  persistQueue(queue);
+}
+
+/**
  * Increment retry count for an item.
  * Automatically marks as failed if max retries exceeded.
  */
