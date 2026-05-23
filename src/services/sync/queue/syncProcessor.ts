@@ -22,26 +22,11 @@
  */
 
 import type { SyncQueueItem } from "../../storage/queue.types";
-import { MAX_RETRY_COUNT } from "../../storage/queue.types";
-import {
-    getPendingItems,
-    incrementRetry,
-    removeItem,
-    updateItemStatus,
-} from "../../storage/syncQueue";
+import { getPendingItems, removeItem } from "../../storage/syncQueue";
 import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
 import { supabaseSyncAdapter } from "../adapters/supabase/sync.adapter";
 import { isRetryableError } from "../adapters/supabase/sync.retry";
-import {
-    SYNC_RETRY_BASE_DELAY,
-    SYNC_RETRY_JITTER_FACTOR,
-    SYNC_RETRY_MAX_DELAY,
-} from "../config";
-import {
-    canProcess,
-    checkInvariants,
-    validateTransition
-} from "../types";
+import { canProcess, checkInvariants } from "../types";
 import { isEventProcessed, markEventProcessed } from "./queue.dedup";
 import { mapQueueItemToEvent } from "./queue.mapper";
 
