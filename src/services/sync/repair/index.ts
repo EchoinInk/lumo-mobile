@@ -93,11 +93,11 @@ export function repairQueue(): RepairResult {
       }
 
       // Validate queue item structure
-      const validation = validateQueueItem(item);
+      const validation = safeValidateQueueItem(item);
       if (!validation.valid) {
         result.itemsRemoved++;
         removeItem(item.id);
-        result.violations.push(`Validation failed: ${validation.reason}`);
+        result.violations.push(`Validation failed: ${validation.error}`);
         continue;
       }
     }
