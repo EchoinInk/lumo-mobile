@@ -11,6 +11,7 @@
  * Future phase: actual sync execution with Supabase
  */
 
+import { createIdempotencyKey } from "../sync/utils/createIdempotencyKey";
 import { getString, setString } from "./mmkv";
 import {
     CreateQueueItemInput,
@@ -74,17 +75,26 @@ function persistQueue(items: SyncQueueItem[]): void {
  * });
  */
 export function recordQueueItem(input: CreateQueueItemInput): SyncQueueItem {
+  const createdAt = Date.now();
   const item: SyncQueueItem = {
     id: generateId(),
     userId: input.userId ?? null,
     entity: input.entity,
     operation: input.operation,
     entityId: input.entityId,
-    timestamp: now(),
+    timestamp: new Date(createdAt).toISOString(),
     payload: input.payload,
     retryCount: 0,
     status: "pending",
     error: null,
+    idempotencyKey: createIdempotencyKey(
+      input.entity,
+      input.entityId,
+      input.operation,
+      createdAt,
+    ),
+    lastAttemptAt: null,
+    syncedAt: null,
   };
 
   const queue = loadQueue();
