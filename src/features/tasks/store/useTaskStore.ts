@@ -1,3 +1,9 @@
+import {
+    dispatchTaskCreated,
+    dispatchTaskDeleted,
+    dispatchTaskToggled,
+    dispatchTaskUpdated,
+} from "@/services/sync/syncDispatcher";
 import { create } from "zustand";
 import { mockTasks } from "../mock/mockTasks";
 import { taskLocalRepository } from "../services/taskLocalRepository";
@@ -31,9 +37,15 @@ type TaskStore = TaskState & TaskActions;
  * Local-first persisted Zustand store for task state management.
  * - UI updates instantly (never blocked)
  * - Persistence happens in background via taskLocalRepository
+ * - Sync events dispatched via Sync Dispatcher
  * - Hydrates from MMKV on initialization
  * - Seeds mock data if storage is empty
  * - Soft delete architecture (deletedAt timestamp)
+ *
+ * Architecture:
+ *   UI → Store → Repository → MMKV
+ *                  ↓
+ *            Sync Dispatcher → Queue
  */
 export const useTaskStore = create<TaskStore>((set, get) => ({
   // ── Initial State ────────────────────────────────────────────────────────
@@ -106,9 +118,18 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository.createTask(input).catch((err) => {
-      console.error("[TaskStore] Failed to persist new task:", err);
-    });
+    taskLocalRepository
+      .createTask(input)
+      .then((persistedTask) => {
+        // Dispatch sync event after successful persistence
+        dispatchTaskCreated(persistedTask.id, {
+          title: persistedTask.title,
+          priority: persistedTask.priority,
+        });
+      })
+      .catch((err) => {
+        console.error("[TaskStore] Failed to persist new task:", err);
+      });
 
     return newTask;
   },
@@ -132,9 +153,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository.toggleTask(id).catch((err) => {
-      console.error("[TaskStore] Failed to persist task toggle:", err);
-    });
+    taskLocalRepository
+      .toggleTask(id)
+      .then((persistedTask) => {
+        // Dispatch sync event after successful persistence
+        dispatchTaskToggled(persistedTask.id, persistedTask.completed);
+      })
+      .catch((err) => {
+        console.error("[TaskStore] Failed to persist task toggle:", err);
+      });
   },
 
   deleteTask: (id) => {
@@ -157,9 +184,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist soft delete in background (non-blocking)
-    taskLocalRepository.deleteTask(id).catch((err) => {
-      console.error("[TaskStore] Failed to persist task deletion:", err);
-    });
+    taskLocalRepository
+      .deleteTask(id)
+      .then(() => {
+        // Dispatch sync event after successful persistence
+        dispatchTaskDeleted(id, now);
+      })
+      .catch((err) => {
+        console.error("[TaskStore] Failed to persist task deletion:", err);
+      });
   },
 
   updateTask: (id, input) => {
@@ -181,8 +214,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }));
 
     // Persist in background (non-blocking)
-    taskLocalRepository.updateTask(id, input).catch((err) => {
-      console.error("[TaskStore] Failed to persist task update:", err);
-    });
+    taskLocalRepository
+      .updateTask(id, input)
+      .then((persistedTask) => {
+        // Dispatch sync event after successful persistence
+        dispatchTaskUpdated(persistedTask.id, input);
+      })
+      .catch((err) => {
+        console.error("[TaskStore] Failed to persist task update:", err);
+      });
   },
 }));
