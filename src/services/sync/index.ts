@@ -154,3 +154,42 @@ export {
     startBackgroundSync
 } from "./queue/syncProcessor";
 
+// Queue lifecycle types and guards
+export {
+    canProcess,
+    canRetry,
+    checkInvariants,
+    createLifecycleTransition,
+    isOrphaned,
+    isTerminalState,
+    isValidQueueItem,
+    isValidTransition,
+    shouldDeadLetter,
+    validateTransition
+} from "./types";
+
+export type {
+    LifecycleEvent,
+    LifecycleTransition,
+    QueueItemState,
+    StateTransition
+} from "./types";
+
+// Queue repair utilities
+export { queueRepair } from "./repair";
+
+export type { RepairResult } from "./repair";
+
+// Sync diagnostics snapshot
+export {
+    createSyncSnapshot,
+    exportSnapshotAsBase64,
+    exportSnapshotAsJson
+} from "./monitor/createSyncSnapshot";
+
+export type { SyncSnapshot } from "./monitor/createSyncSnapshot";
+
+// Sync stress-test utilities (dev-only)
+export { syncStressTest } from "./testing";
+
+export type { StressTestResult } from "./testing";
