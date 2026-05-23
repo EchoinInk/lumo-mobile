@@ -14,6 +14,7 @@
  *   NetInfo → NetworkMonitor → SyncProcessor
  */
 
+import type { NetInfoState } from "@react-native-community/netinfo";
 import NetInfo from "@react-native-community/netinfo";
 import { logSyncError, logSyncEvent } from "../monitor/syncLogger";
 import { startBackgroundSync } from "../queue/syncProcessor";
@@ -31,9 +32,7 @@ let isInitialized = false;
 /**
  * Convert NetInfo state to our NetworkState.
  */
-function toNetworkState(
-  netInfoState: ReturnType<typeof NetInfo.fetch>,
-): NetworkState {
+function toNetworkState(netInfoState: NetInfoState): NetworkState {
   if (!netInfoState.isConnected) return "offline";
   if (netInfoState.isInternetReachable === false) return "offline";
   return "online";
@@ -42,9 +41,7 @@ function toNetworkState(
 /**
  * Convert NetInfo state to our NetworkStatus.
  */
-function toNetworkStatus(
-  netInfoState: ReturnType<typeof NetInfo.fetch>,
-): NetworkStatus {
+function toNetworkStatus(netInfoState: NetInfoState): NetworkStatus {
   return {
     isConnected: netInfoState.isConnected ?? false,
     type: netInfoState.type as any,
@@ -56,9 +53,7 @@ function toNetworkStatus(
 /**
  * Handle network state change.
  */
-function handleNetworkChange(
-  netInfoState: ReturnType<typeof NetInfo.fetch>,
-): void {
+function handleNetworkChange(netInfoState: NetInfoState): void {
   const previousState = currentState;
   const newState = toNetworkState(netInfoState);
   const newStatus = toNetworkStatus(netInfoState);

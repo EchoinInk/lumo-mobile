@@ -1075,3 +1075,13 @@ src/services/sync/monitor/syncLogger.ts
 src/services/sync/queue/queue.factory.ts
 src/services/sync/queue/queue.validation.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:50:29
+COMMIT: feat(lumo): evolve components and logic (5 files)
+FILES:
+.lumo/commit-log.txt
+src/services/sync/monitor/syncSelectors.ts
+src/services/sync/network/index.ts
+src/services/sync/network/network.types.ts
+src/services/sync/network/networkMonitor.ts
+

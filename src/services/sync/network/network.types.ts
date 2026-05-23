@@ -7,16 +7,12 @@
 /**
  * Network connectivity state.
  */
-export type NetworkState = 'online' | 'offline' | 'unknown';
+export type NetworkState = "online" | "offline" | "unknown";
 
 /**
  * Network connection type.
  */
-export type ConnectionType =
-  | 'none'
-  | 'wifi'
-  | 'cellular'
-  | 'unknown';
+export type ConnectionType = "none" | "wifi" | "cellular" | "unknown";
 
 /**
  * Network status information.
@@ -27,7 +23,7 @@ export interface NetworkStatus {
   /** Type of network connection */
   type: ConnectionType;
   /** Whether connection is expensive (cellular) */
-  isInternetReachable?: boolean;
+  isInternetReachable?: boolean | null;
   /** ISO timestamp of last status change */
   lastChangedAt: string;
 }
