@@ -1397,3 +1397,11 @@ FILES:
 .lumo/commit-log.txt
 src/features/tasks/services/taskSyncRepository.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 22:00:25
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+.lumo/commit-log.txt
+src/features/tasks/store/useTaskStore.ts
+src/hooks/use-sync-status.ts
+
