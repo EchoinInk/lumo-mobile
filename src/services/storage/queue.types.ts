@@ -8,11 +8,11 @@
  *   UI → Zustand → Repository → MMKV → Sync Queue
  */
 
-export type SyncEntity = 'task';
+export type SyncEntity = "task" | "habit" | "meal" | "budget" | "workout";
 
-export type SyncOperation = 'create' | 'update' | 'delete';
+export type SyncOperation = "create" | "update" | "delete";
 
-export type QueueItemStatus = 'pending' | 'failed' | 'completed';
+export type QueueItemStatus = "pending" | "failed" | "completed";
 
 /**
  * Single queue entry representing one sync operation.
@@ -71,4 +71,4 @@ export interface QueueOperationResult {
 export const MAX_RETRY_COUNT = 5;
 
 /** Storage key for queue persistence */
-export const SYNC_QUEUE_STORAGE_KEY = 'sync_queue_v1';
+export const SYNC_QUEUE_STORAGE_KEY = "sync_queue_v1";
