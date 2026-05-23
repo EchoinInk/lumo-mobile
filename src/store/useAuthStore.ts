@@ -65,6 +65,8 @@ interface AuthState {
 interface AuthActions {
   /** Called after session restore resolves (success or not) */
   setHydrated: () => void;
+  /** Called by onRehydrateStorage once persisted state is loaded */
+  setHasHydrated: (value: boolean) => void;
   /** Set authenticated user */
   setUser: (user: AuthUser) => void;
   /** Clear user and mark signed out */
@@ -99,6 +101,8 @@ export const useAuthStore = create<AuthStore>()(
       ...initialState,
 
       setHydrated: () => set({ hasHydrated: true }),
+
+      setHasHydrated: (value) => set({ hasHydrated: value }),
 
       setUser: (user) =>
         set({
