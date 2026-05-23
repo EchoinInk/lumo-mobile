@@ -46,15 +46,19 @@ class TaskSyncRepository implements ITaskRepository {
     // 1. Update local cache instantly
     const task = await taskLocalRepository.createTask(input);
 
-    // 2. Enqueue sync operation with version for conflict detection
+    // 2. Resolve user ownership (tolerates anonymous mode)
+    const { userId } = await createOptionalRepositoryContext();
+
+    // 3. Enqueue sync operation stamped with owner
     createQueueItem({
+      userId,
       entity: "task",
       operation: "create",
       entityId: task.id,
       payload: task as unknown as Record<string, unknown>,
     });
 
-    // 3. Attempt background sync (non-blocking)
+    // 4. Attempt background sync (non-blocking)
     this.triggerSync();
 
     return task;
@@ -81,15 +85,19 @@ class TaskSyncRepository implements ITaskRepository {
     // 1. Update local cache instantly
     const task = await taskLocalRepository.updateTask(id, input);
 
-    // 2. Enqueue sync operation with version for conflict detection
+    // 2. Resolve user ownership (tolerates anonymous mode)
+    const { userId } = await createOptionalRepositoryContext();
+
+    // 3. Enqueue sync operation stamped with owner
     createQueueItem({
+      userId,
       entity: "task",
       operation: "update",
       entityId: id,
       payload: input as unknown as Record<string, unknown>,
     });
 
-    // 3. Attempt background sync (non-blocking)
+    // 4. Attempt background sync (non-blocking)
     this.triggerSync();
 
     return task;
@@ -106,15 +114,19 @@ class TaskSyncRepository implements ITaskRepository {
     // 1. Update local cache instantly (soft delete)
     await taskLocalRepository.deleteTask(id);
 
-    // 2. Enqueue sync operation
+    // 2. Resolve user ownership (tolerates anonymous mode)
+    const { userId } = await createOptionalRepositoryContext();
+
+    // 3. Enqueue sync operation stamped with owner
     createQueueItem({
+      userId,
       entity: "task",
       operation: "delete",
       entityId: id,
       payload: { id },
     });
 
-    // 3. Attempt background sync (non-blocking)
+    // 4. Attempt background sync (non-blocking)
     this.triggerSync();
   }
 
@@ -144,15 +156,19 @@ class TaskSyncRepository implements ITaskRepository {
     // 1. Update local cache instantly
     const task = await taskLocalRepository.toggleTask(id);
 
-    // 2. Enqueue sync operation with version for conflict detection
+    // 2. Resolve user ownership (tolerates anonymous mode)
+    const { userId } = await createOptionalRepositoryContext();
+
+    // 3. Enqueue sync operation stamped with owner
     createQueueItem({
+      userId,
       entity: "task",
       operation: "update",
       entityId: id,
       payload: { completed: task.completed },
     });
 
-    // 3. Attempt background sync (non-blocking)
+    // 4. Attempt background sync (non-blocking)
     this.triggerSync();
 
     return task;
