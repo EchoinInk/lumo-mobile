@@ -1,49 +1,49 @@
 /**
  * Sync Dispatcher
  *
- * Centralized layer for creating sync events and enqueueing them.
- * Decouples repositories from sync queue implementation.
+ * Canonical entry point for the sync event pipeline.
  *
  * Architecture:
- *   UI → Store → Repository → Sync Dispatcher → Sync Queue → MMKV
+ *   UI → Store → Repository → Event Builder → Dispatcher → Queue → MMKV
  *
- * Responsibilities:
- * - Create standardized sync events
- * - Normalize event structure across entities
- * - Handle enqueue failures gracefully
- * - Provide type-safe dispatch methods
+ * Principle: Exactly ONE way to dispatch sync events.
  *
- * This phase: local-only event creation
- * Future phase: Supabase integration
+ * Usage:
+ *   dispatch({
+ *     entity: 'task',
+ *     operation: 'create',
+ *     entityId: task.id,
+ *     payload: { title: task.title }
+ *   });
  */
 
-import { recordQueueItem } from '../storage/syncQueue';
-import {
-  CreateSyncEventInput,
-  SyncDispatchResult,
-  SyncEntityType,
-  SyncOperationType,
-  TaskSyncEvent,
-} from './syncEvent.types';
-
-// ── Private helpers ────────────────────────────────────────────────────────
+import { recordQueueItem } from "../storage/syncQueue";
+import { SyncDispatchResult, SyncEvent } from "./syncEvent.types";
 
 /**
- * Normalize and enqueue a sync event.
- * All errors are caught and normalized.
+ * Dispatch a sync event to the queue.
+ *
+ * This is the SINGLE CANONICAL entry point for all sync operations.
+ * All sync events flow through this function.
+ *
+ * @param event - The sync event to dispatch
+ * @returns Dispatch result with queue item ID or error
+ *
+ * @example
+ * dispatch({
+ *   entity: 'task',
+ *   operation: 'create',
+ *   entityId: 'task-123',
+ *   payload: { title: 'My Task' }
+ * });
  */
-function enqueueEvent(
-  entity: SyncEntityType,
-  operation: SyncOperationType,
-  entityId: string,
-  payload?: unknown
-): SyncDispatchResult {
+export function dispatch(event: SyncEvent): SyncDispatchResult {
   try {
     const item = recordQueueItem({
-      entity,
-      operation,
-      entityId,
-      payload,
+      entity: event.entity,
+      operation: event.operation,
+      entityId: event.entityId,
+      payload: event.payload,
     });
 
     return {
@@ -52,7 +52,10 @@ function enqueueEvent(
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[SyncDispatcher] Failed to enqueue ${operation} for ${entity}:`, message);
+    console.error(
+      `[SyncDispatcher] Failed to enqueue ${event.operation} for ${event.entity}:`,
+      message,
+    );
 
     return {
       success: false,
@@ -61,115 +64,5 @@ function enqueueEvent(
   }
 }
 
-// ── Generic Dispatch ─────────────────────────────────────────────────────
-
-/**
- * Dispatch a sync event for any entity.
- * Generic low-level dispatch method.
- *
- * @param input - Sync event creation input
- * @returns Dispatch result with queue item ID or error
- *
- * @example
- * const result = dispatchSyncEvent({
- *   entity: 'task',
- *   operation: 'create',
- *   entityId: task.id,
- *   payload: { title: task.title }
- * });
- */
-export function dispatchSyncEvent(input: CreateSyncEventInput): SyncDispatchResult {
-  return enqueueEvent(input.entity, input.operation, input.entityId, input.payload);
-}
-
-// ── Task-Specific Dispatchers ────────────────────────────────────────────
-
-/**
- * Dispatch task creation sync event.
- *
- * @param taskId - ID of the created task
- * @param payload - Task creation data
- * @returns Dispatch result
- */
-export function dispatchTaskCreated(
-  taskId: string,
-  payload: TaskSyncEvent['payload']
-): SyncDispatchResult {
-  return enqueueEvent('task', 'create', taskId, payload);
-}
-
-/**
- * Dispatch task update sync event.
- *
- * @param taskId - ID of the updated task
- * @param payload - Task update data
- * @returns Dispatch result
- */
-export function dispatchTaskUpdated(
-  taskId: string,
-  payload: TaskSyncEvent['payload']
-): SyncDispatchResult {
-  return enqueueEvent('task', 'update', taskId, payload);
-}
-
-/**
- * Dispatch task deletion sync event.
- *
- * @param taskId - ID of the deleted task
- * @param deletedAt - ISO timestamp of deletion
- * @returns Dispatch result
- */
-export function dispatchTaskDeleted(
-  taskId: string,
-  deletedAt: string
-): SyncDispatchResult {
-  return enqueueEvent('task', 'delete', taskId, { deletedAt });
-}
-
-/**
- * Dispatch task toggle (completion) sync event.
- *
- * @param taskId - ID of the toggled task
- * @param completed - New completion status
- * @returns Dispatch result
- */
-export function dispatchTaskToggled(
-  taskId: string,
-  completed: boolean
-): SyncDispatchResult {
-  return enqueueEvent('task', 'update', taskId, { completed });
-}
-
-// ── Batch Operations ─────────────────────────────────────────────────────
-
-/**
- * Dispatch multiple sync events.
- * Continues on individual failures, reports aggregate result.
- *
- * @param events - Array of sync events to dispatch
- * @returns Aggregate result with success count and failures
- */
-export function dispatchBatchSyncEvents(
-  events: CreateSyncEventInput[]
-): { successCount: number; failures: Array<{ index: number; error: string }> } {
-  const failures: Array<{ index: number; error: string }> = [];
-  let successCount = 0;
-
-  for (let i = 0; i < events.length; i++) {
-    const result = dispatchSyncEvent(events[i]);
-    if (result.success) {
-      successCount++;
-    } else {
-      failures.push({ index: i, error: result.error ?? 'Unknown error' });
-    }
-  }
-
-  return { successCount, failures };
-}
-
-// ── Future Entity Placeholders ───────────────────────────────────────────
-
-// Habits, meals, budget, workouts will follow same pattern:
-// export function dispatchHabitCreated(habitId: string, payload: unknown): SyncDispatchResult
-// export function dispatchMealCreated(mealId: string, payload: unknown): SyncDispatchResult
-// etc.
+// No other exports.
+// All sync events must use: dispatch({ entity, operation, entityId, payload })
