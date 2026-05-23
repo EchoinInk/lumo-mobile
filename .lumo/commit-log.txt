@@ -1861,3 +1861,10 @@ COMMIT: chore(lumo): update commit-log.txt
 FILES:
 .lumo/commit-log.txt
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 22:18:02
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/features/debug/sync/selectors.ts
+
