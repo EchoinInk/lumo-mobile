@@ -16,11 +16,18 @@
  * - Log initialization events
  */
 
-import { useEffect, useRef } from 'react';
-import { bootstrapSync } from '@/services/sync/syncBootstrap';
-import { initializeNetworkMonitor } from '@/services/sync/network';
-import { logSyncEvent, logBootstrapTiming } from '@/services/sync/monitor/syncLogger';
-import { useSyncStore } from '@/store/useSyncStore';
+import {
+    logBootstrapTiming,
+    logSyncEvent,
+} from "@/services/sync/monitor/syncLogger";
+import {
+    initializeNetworkMonitor,
+    isOffline,
+    subscribeToNetworkChanges,
+} from "@/services/sync/network";
+import { bootstrapSync } from "@/services/sync/syncBootstrap";
+import { useSyncStore } from "@/store/useSyncStore";
+import { useEffect, useRef } from "react";
 
 // ── Singleton State ─────────────────────────────────────────────────────────
 
@@ -47,34 +54,68 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       const startTime = Date.now();
 
       try {
-        logSyncEvent('Bootstrap', undefined, undefined, 'START', 'Starting sync system initialization');
+        logSyncEvent(
+          "Bootstrap",
+          undefined,
+          undefined,
+          "START",
+          "Starting sync system initialization",
+        );
 
         // Step 1: Initialize network monitoring
         const networkStart = Date.now();
         initializeNetworkMonitor();
         const networkDuration = Date.now() - networkStart;
-        logBootstrapTiming('Network monitoring', networkDuration);
+        logBootstrapTiming("Network monitoring", networkDuration);
 
-        // Step 2: Bootstrap sync system (recovery + processor)
+        // Step 2: Set initial offline state
+        setOffline(isOffline());
+
+        // Step 3: Subscribe to network changes to update store
+        const unsubscribe = subscribeToNetworkChanges((state) => {
+          setOffline(state === "offline");
+        });
+
+        // Step 4: Bootstrap sync system (recovery + processor)
         const syncStart = Date.now();
         bootstrapSync();
         const syncDuration = Date.now() - syncStart;
-        logBootstrapTiming('Sync bootstrap', syncDuration);
+        logBootstrapTiming("Sync bootstrap", syncDuration);
 
-        // Step 3: Update offline state from network monitor
-        // (This will be updated by network monitor events, but set initial state)
         const totalDuration = Date.now() - startTime;
-        logBootstrapTiming('Total initialization', totalDuration);
+        logBootstrapTiming("Total initialization", totalDuration);
 
-        logSyncEvent('Bootstrap', undefined, undefined, 'COMPLETE', `Sync system initialized in ${totalDuration}ms`);
+        logSyncEvent(
+          "Bootstrap",
+          undefined,
+          undefined,
+          "COMPLETE",
+          `Sync system initialized in ${totalDuration}ms`,
+        );
+
+        // Store unsubscribe for cleanup
+        return unsubscribe;
       } catch (error) {
-        logSyncEvent('Bootstrap', undefined, undefined, 'ERROR', 'Sync system initialization failed');
-        console.error('[SyncProvider] Initialization failed:', error);
+        logSyncEvent(
+          "Bootstrap",
+          undefined,
+          undefined,
+          "ERROR",
+          "Sync system initialization failed",
+        );
+        console.error("[SyncProvider] Initialization failed:", error);
       }
     };
 
     // Run bootstrap asynchronously (non-blocking)
-    bootstrap();
+    const unsubscribePromise = bootstrap();
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribePromise.then((unsubscribe) => {
+        if (unsubscribe) unsubscribe();
+      });
+    };
   }, [setOffline]);
 
   return <>{children}</>;
