@@ -20,9 +20,9 @@
  * Hydration happens in SessionProvider on app start.
  */
 
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createPersistStorage } from './createPersistStorage';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createPersistStorage } from "./createPersistStorage";
 
 // ── Auth Status ───────────────────────────────────────────────────────────
 
@@ -34,10 +34,10 @@ import { createPersistStorage } from './createPersistStorage';
  * - signed_out   : previously authenticated, now signed out
  */
 export type AuthStatus =
-  | 'loading'
-  | 'authenticated'
-  | 'anonymous'
-  | 'signed_out';
+  | "loading"
+  | "authenticated"
+  | "anonymous"
+  | "signed_out";
 
 // ── User ─────────────────────────────────────────────────────────────────
 
@@ -85,7 +85,7 @@ type AuthStore = AuthState & AuthActions;
 
 const initialState: AuthState = {
   user: null,
-  status: 'loading',
+  status: "loading",
   hasHydrated: false,
   hasCompletedOnboarding: false,
   error: null,
@@ -103,14 +103,14 @@ export const useAuthStore = create<AuthStore>()(
       setUser: (user) =>
         set({
           user,
-          status: 'authenticated',
+          status: "authenticated",
           error: null,
         }),
 
       clearUser: () =>
         set({
           user: null,
-          status: 'signed_out',
+          status: "signed_out",
         }),
 
       setStatus: (status) => set({ status }),
@@ -122,8 +122,8 @@ export const useAuthStore = create<AuthStore>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => createPersistStorage('auth')),
+      name: "auth-storage",
+      storage: createJSONStorage(() => createPersistStorage()),
       partialize: (state) => ({
         user: state.user,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
@@ -136,16 +136,16 @@ export const useAuthStore = create<AuthStore>()(
 
 /** True when the user is authenticated (has a valid session). */
 export const selectIsAuthenticated = (state: AuthState): boolean =>
-  state.status === 'authenticated' && state.user !== null;
+  state.status === "authenticated" && state.user !== null;
 
 /** True when the session restore has not yet completed. */
 export const selectIsLoading = (state: AuthState): boolean =>
-  state.status === 'loading' || !state.hasHydrated;
+  state.status === "loading" || !state.hasHydrated;
 
 /** True when the app is in local-first anonymous mode. */
 export const selectIsAnonymous = (state: AuthState): boolean =>
-  state.status === 'anonymous';
+  state.status === "anonymous";
 
 /** True when auth is settled (not in loading state). */
 export const selectIsSettled = (state: AuthState): boolean =>
-  state.hasHydrated && state.status !== 'loading';
+  state.hasHydrated && state.status !== "loading";
