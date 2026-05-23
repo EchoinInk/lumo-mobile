@@ -1166,3 +1166,10 @@ src/services/sync/adapters/supabase/sync.retry.ts
 src/services/sync/adapters/supabase/sync.writer.ts
 src/services/sync/queue/syncProcessor.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-23 21:52:58
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+.lumo/commit-log.txt
+src/services/sync/monitor/syncHealth.ts
+
