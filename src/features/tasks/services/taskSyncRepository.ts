@@ -13,6 +13,7 @@
  * Flow: Screen → Hook → taskSyncRepository → local + sync queue
  */
 
+import { createOptionalRepositoryContext } from "@/services/repositories/factory";
 import { hasPendingOperations } from "@/services/storage/syncQueue";
 import { isOnline } from "@/services/sync/network";
 import { createQueueItem } from "@/services/sync/queue/queue.factory";
