@@ -218,7 +218,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Toggle task completion status.
    * Throws a normalised Error when the task is not found.
-   * Enqueues update sync operation.
+   * Pure local persistence — no sync logic.
    */
   async toggleTask(id: string): Promise<Task> {
     const tasks = this.loadTasks();
@@ -241,21 +241,6 @@ export class TaskLocalRepository implements ITaskRepository {
     const next = [...tasks];
     next[index] = updated;
     this.persistTasks(next);
-
-    // Enqueue sync operation (non-blocking, graceful failure)
-    try {
-      recordQueueItem({
-        entity: "task",
-        operation: "update",
-        entityId: id,
-        payload: { completed: updated.completed },
-      });
-    } catch (err) {
-      console.error(
-        "[TaskLocalRepository] Failed to enqueue toggle operation:",
-        err,
-      );
-    }
 
     return updated;
   }
