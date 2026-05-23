@@ -52,6 +52,11 @@ export const VALID_TRANSITIONS: StateTransition[] = [
   },
   {
     from: "processing",
+    to: "synced",
+    guard: (item) => item.status === "processing",
+  },
+  {
+    from: "processing",
     to: "completed",
     guard: (item) => item.status === "processing",
   },
@@ -66,9 +71,19 @@ export const VALID_TRANSITIONS: StateTransition[] = [
     guard: (item) => item.status === "processing" && item.retryCount >= 5,
   },
   {
+    from: "processing",
+    to: "conflict",
+    guard: (item) => item.status === "processing",
+  },
+  {
     from: "failed",
     to: "processing",
     guard: (item) => item.status === "failed" && item.retryCount < 5,
+  },
+  {
+    from: "conflict",
+    to: "processing",
+    guard: (item) => item.status === "conflict",
   },
 ];
 
@@ -78,6 +93,7 @@ export const VALID_TRANSITIONS: StateTransition[] = [
  * Terminal states that cannot transition to any other state.
  */
 export const TERMINAL_STATES: Set<QueueItemState> = new Set([
+  "synced",
   "completed",
   "dead_letter",
 ]);
@@ -149,7 +165,8 @@ export function validateTransition(
 export function canProcess(item: SyncQueueItem): boolean {
   return (
     item.status === "pending" ||
-    (item.status === "failed" && item.retryCount < 5)
+    (item.status === "failed" && item.retryCount < 5) ||
+    item.status === "conflict"
   );
 }
 
@@ -157,7 +174,10 @@ export function canProcess(item: SyncQueueItem): boolean {
  * Check if an item can be retried.
  */
 export function canRetry(item: SyncQueueItem): boolean {
-  return item.status === "failed" && item.retryCount < 5;
+  return (
+    (item.status === "failed" && item.retryCount < 5) ||
+    item.status === "conflict"
+  );
 }
 
 /**
@@ -244,9 +264,12 @@ export function checkInvariants(item: SyncQueueItem): {
     violations.push("dead_letter items must have retryCount >= 5");
   }
 
-  // Check 4: completed items must have error = null
-  if (item.status === "completed" && item.error !== null) {
-    violations.push("completed items must have error = null");
+  // Check 4: completed/synced items must have error = null
+  if (
+    (item.status === "completed" || item.status === "synced") &&
+    item.error !== null
+  ) {
+    violations.push("completed/synced items must have error = null");
   }
 
   // Check 5: processing items must have valid timestamp
