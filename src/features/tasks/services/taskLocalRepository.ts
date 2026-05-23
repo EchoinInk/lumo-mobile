@@ -1,5 +1,6 @@
 import { deleteKey, getString, setString } from "@/services/storage/mmkv";
 import { StorageKeys } from "@/services/storage/storageKeys";
+import { recordQueueItem } from "@/services/storage/syncQueue";
 import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 import { ITaskRepository } from "./taskRepository.types";
 
@@ -104,7 +105,7 @@ export class TaskLocalRepository implements ITaskRepository {
   }
 
   /**
-   * Create a new task and persist it.
+   * Create a new task, persist it, and enqueue sync operation.
    */
   async createTask(input: CreateTaskInput): Promise<Task> {
     const tasks = this.loadTasks();
@@ -122,6 +123,22 @@ export class TaskLocalRepository implements ITaskRepository {
     };
 
     this.persistTasks([...tasks, newTask]);
+
+    // Enqueue sync operation (non-blocking, always succeeds)
+    try {
+      recordQueueItem({
+        entity: "task",
+        operation: "create",
+        entityId: newTask.id,
+        payload: { title: input.title, priority: input.priority },
+      });
+    } catch (err) {
+      console.error(
+        "[TaskLocalRepository] Failed to enqueue create operation:",
+        err,
+      );
+    }
+
     return newTask;
   }
 
@@ -143,6 +160,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Update an existing task by ID.
    * Throws a normalised Error when the task is not found.
+   * Enqueues sync operation after local persistence.
    */
   async updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
     const tasks = this.loadTasks();
@@ -166,6 +184,21 @@ export class TaskLocalRepository implements ITaskRepository {
     next[index] = updated;
     this.persistTasks(next);
 
+    // Enqueue sync operation (non-blocking, graceful failure)
+    try {
+      recordQueueItem({
+        entity: "task",
+        operation: "update",
+        entityId: id,
+        payload: input,
+      });
+    } catch (err) {
+      console.error(
+        "[TaskLocalRepository] Failed to enqueue update operation:",
+        err,
+      );
+    }
+
     return updated;
   }
 
@@ -177,6 +210,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Soft delete a task by ID.
    * Sets deletedAt timestamp instead of removing from storage.
+   * Enqueues delete sync operation.
    * Silently succeeds when the task does not exist (idempotent).
    */
   async deleteTask(id: string): Promise<void> {
@@ -195,6 +229,21 @@ export class TaskLocalRepository implements ITaskRepository {
       pendingSync: true,
     };
     this.persistTasks(next);
+
+    // Enqueue sync operation (non-blocking, graceful failure)
+    try {
+      recordQueueItem({
+        entity: "task",
+        operation: "delete",
+        entityId: id,
+        payload: { deletedAt: next[index].deletedAt },
+      });
+    } catch (err) {
+      console.error(
+        "[TaskLocalRepository] Failed to enqueue delete operation:",
+        err,
+      );
+    }
   }
 
   /** IRepository.delete — delegates to deleteTask (soft delete). */
@@ -215,6 +264,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Toggle task completion status.
    * Throws a normalised Error when the task is not found.
+   * Enqueues update sync operation.
    */
   async toggleTask(id: string): Promise<Task> {
     const tasks = this.loadTasks();
@@ -237,6 +287,21 @@ export class TaskLocalRepository implements ITaskRepository {
     const next = [...tasks];
     next[index] = updated;
     this.persistTasks(next);
+
+    // Enqueue sync operation (non-blocking, graceful failure)
+    try {
+      recordQueueItem({
+        entity: "task",
+        operation: "update",
+        entityId: id,
+        payload: { completed: updated.completed },
+      });
+    } catch (err) {
+      console.error(
+        "[TaskLocalRepository] Failed to enqueue toggle operation:",
+        err,
+      );
+    }
 
     return updated;
   }
