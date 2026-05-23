@@ -16,14 +16,18 @@ export type SyncOperation = "create" | "update" | "delete";
  * Canonical queue item states.
  * - pending: Item created, waiting to be processed
  * - processing: Item is currently being processed (has lock)
+ * - synced: Item successfully synced to backend (replaces 'completed' for audit trail)
  * - failed: Item failed processing, may retry
+ * - conflict: Item has a server-side conflict requiring resolution
  * - dead_letter: Item failed after max retries, no further attempts
- * - completed: Item successfully processed, will be removed
+ * - completed: Item successfully processed, will be removed (kept for compatibility)
  */
 export type QueueItemStatus =
   | "pending"
   | "processing"
+  | "synced"
   | "failed"
+  | "conflict"
   | "dead_letter"
   | "completed";
 
@@ -65,6 +69,19 @@ export interface SyncQueueItem {
 
   /** Error message from last failed attempt */
   error?: string | null;
+
+  /**
+   * Idempotency key — generated ONCE at creation, never changes.
+   * Used for replay-safe deduplication across restarts.
+   * Format: entityType:entityId:operation:timestamp
+   */
+  idempotencyKey: string;
+
+  /** Unix timestamp of last processing attempt (null if never attempted) */
+  lastAttemptAt: number | null;
+
+  /** Unix timestamp when successfully synced to backend (null until synced) */
+  syncedAt: number | null;
 }
 
 /**
@@ -91,6 +108,15 @@ interface BaseQueueItem {
 
   /** Operation payload (entity-specific) */
   readonly payload?: unknown;
+
+  /** Idempotency key — immutable after creation */
+  readonly idempotencyKey: string;
+
+  /** Unix timestamp of last processing attempt */
+  readonly lastAttemptAt: number | null;
+
+  /** Unix timestamp of successful backend sync */
+  readonly syncedAt: number | null;
 }
 
 /**
