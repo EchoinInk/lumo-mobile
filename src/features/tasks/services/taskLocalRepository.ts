@@ -179,7 +179,7 @@ export class TaskLocalRepository implements ITaskRepository {
   /**
    * Soft delete a task by ID.
    * Sets deletedAt timestamp instead of removing from storage.
-   * Enqueues delete sync operation.
+   * Pure local persistence — no sync logic.
    * Silently succeeds when the task does not exist (idempotent).
    */
   async deleteTask(id: string): Promise<void> {
@@ -198,21 +198,6 @@ export class TaskLocalRepository implements ITaskRepository {
       pendingSync: true,
     };
     this.persistTasks(next);
-
-    // Enqueue sync operation (non-blocking, graceful failure)
-    try {
-      recordQueueItem({
-        entity: "task",
-        operation: "delete",
-        entityId: id,
-        payload: { deletedAt: next[index].deletedAt },
-      });
-    } catch (err) {
-      console.error(
-        "[TaskLocalRepository] Failed to enqueue delete operation:",
-        err,
-      );
-    }
   }
 
   /** IRepository.delete — delegates to deleteTask (soft delete). */
