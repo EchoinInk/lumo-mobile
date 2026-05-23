@@ -1,24 +1,21 @@
-import { StateStorage } from 'zustand/middleware';
-import { getItem, setItem, removeItem } from './storage';
+import type { StateStorage } from "zustand/middleware";
 
+import {
+  getItem,
+  removeItem,
+  setItem,
+} from "./storage";
 
-/**
- * Creates a Zustand persist storage adapter using MMKV
- * @param name - The storage key name
- * @returns A StateStorage implementation for Zustand persist middleware
- */
-export const createPersistStorage = (name: string): StateStorage => ({
-  getItem: (key: string) => {
-    const storageKey = `${name}_${key}`;
-    const value = getItem<string>(storageKey);
-    return value ?? null;
+export const createPersistStorage = (): StateStorage => ({
+  getItem: async (name) => {
+    return getItem(name);
   },
-  setItem: (key: string, value: string) => {
-    const storageKey = `${name}_${key}`;
-    setItem(storageKey, value);
+
+  setItem: async (name, value) => {
+    setItem(name, value);
   },
-  removeItem: (key: string) => {
-    const storageKey = `${name}_${key}`;
-    removeItem(storageKey);
+
+  removeItem: async (name) => {
+    removeItem(name);
   },
 });
