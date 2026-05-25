@@ -1,5 +1,41 @@
 # Changelog
 
+## Phase 11.3 — Visual QA + App Polish
+
+### Polished
+
+- **Mobile Viewport**: Updated Screen component with proper bottom padding for tab bar visibility, safe area handling for iOS/Android
+- **Tab Bar**: Soft, calm styling with no border, gentle active/inactive colors, larger touch targets (44x44+), subtle icon sizing on focus
+- **Screen Component**: Added `bottomPadding` prop for automatic tab bar spacing, improved ScrollView content container padding
+- **Card Component**: Added `overflow: hidden` for clean rounded corners, improved gradient layout, better accessibility roles
+- **SectionHeader**: Improved spacing with larger margins, cleaner typography hierarchy
+- **Dashboard**: Verified mockup alignment — greeting, Today's Focus with checkboxes, Quick Actions grid, "You did this" progress card, reminder card, encouragement quote
+- **Tasks**: Verified soft pill filters, calm checkboxes (32x32 touch targets), readable task rows, gentle "Break tasks down" support card, prominent but calm Add Task button
+- **Calendar**: Verified aligned date strip, clear timeline spacing, soft pastel highlighting, encouraging copy
+- **Health**: Verified card-based summaries, consistent progress bars, supportive copy, quick links to detailed screens
+- **More Screen**: Feature grid with consistent cards, soft navigation
+- **More Nested Screens**: All use MoreScreenHeader with soft rounded back button, consistent styling, proper bottom padding
+
+### Design System
+
+- All screens use token-backed styling (Colors, Spacing, Radius, Shadows)
+- Touch targets meet 44x44 minimum accessibility requirement
+- Text contrast verified for readability
+- Consistent soft white/lavender background throughout
+- Gentle pastel accent colors (pink, purple, blue)
+- Large rounded corners (28px radius on cards) for premium feel
+- Soft cinematic purple-tinted shadows
+
+### Accessibility
+
+- Minimum 44x44 touch targets on all interactive elements
+- Proper text contrast ratios
+- Screen reader support with accessibility labels
+- Reduced motion support in components
+- Clear visual hierarchy with soft color transitions
+
+---
+
 ## Phase 11.2 — Screen System + Visual Product Recovery
 
 ### Added
