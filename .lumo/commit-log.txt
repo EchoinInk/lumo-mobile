@@ -19564,3 +19564,9 @@ COMMIT: chore(lumo): update storageKeys.ts
 FILES:
 src/services/storage/storageKeys.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 08:55:07
+COMMIT: chore(lumo): update useOnboardingStore.ts
+FILES:
+src/features/onboarding/store/useOnboardingStore.ts
+
