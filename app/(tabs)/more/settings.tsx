@@ -125,6 +125,7 @@ export default function SettingsScreen() {
                       styles.settingItemBorder,
                   ]}
                   activeOpacity={item.hasToggle ? 1 : 0.7}
+                  onPress={() => handleSettingPress(item.label)}
                 >
                   <View style={styles.settingIcon}>{item.icon}</View>
                   <Text variant="body" style={styles.settingLabel}>
