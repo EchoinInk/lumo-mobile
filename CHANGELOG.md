@@ -1,5 +1,50 @@
 # Changelog
 
+## Phase 12.1 — Production Hardening Foundation
+
+### Added
+
+- **Shared Feedback Components** (`src/components/feedback/`):
+  - `ErrorState.tsx` — gentle error display with soft UI
+  - `EmptyState.tsx` — calm empty states with reassuring messages
+  - `LoadingState.tsx` — quiet loading indicator for hydration
+  - `RetryView.tsx` — graceful retry UI with "try again when you're ready" copy
+  - `OfflineView.tsx` — offline state with reassurance that data is safe
+  - `ErrorBoundary.tsx` — class component catching render crashes
+
+- **Root Error Boundary Integration** (`app/_layout.tsx`):
+  - Wrapped root layout with ErrorBoundary
+  - Preserved onboarding redirect behavior
+  - Maintained first-run routing
+  - No navigation regressions
+
+- **Calm Empty States** (`src/constants/feedbackMessages.ts`):
+  - Added `EMPTY_MESSAGES` for various contexts (tasks, habits, meals, budget, dashboard)
+  - Gentle, non-judgmental language ("Nothing here right now", "This space is calm and waiting")
+  - `getEmptyMessage()` helper for consistent messaging
+
+- **Standardized Loading States**:
+  - Dashboard: Uses LoadingState during onboarding hydration
+  - Tasks: Added loading and error states with RetryView
+  - Health: Added LoadingState for habit hydration
+  - More/Habits: Added LoadingState for habit hydration
+
+### Design
+
+- Calm, spacious, soft UI
+- Token-backed using existing theme
+- Non-alarming language
+- No harsh reds, no stack traces
+- Low cognitive load design
+- Accessible
+
+### Technical
+
+- ErrorBoundary uses `console.warn` only (no analytics, no Sentry)
+- Preserved local-first architecture
+- Screen → Hook → Store → Repository → Storage flow maintained
+- No backend dependencies added
+
 ## Phase 11.9 — Onboarding Foundation
 
 ### Added
