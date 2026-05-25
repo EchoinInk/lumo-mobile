@@ -1,5 +1,48 @@
 # Changelog
 
+## Phase 11.8 — Dashboard Personalization + Empty States
+
+### Added
+
+- **Dashboard Data Composition** (`app/(tabs)/index.tsx`):
+  - Integrated `useTasks()` and `useHabits()` for real local data
+  - Dashboard now shows Today’s Focus from real tasks
+  - Dashboard now shows Today’s Routines from real habits
+  - Combined daily progress (tasks + habits) with adaptive messaging
+
+- **Dashboard Components**:
+  - `DailyProgressCard` — shows combined task + habit completion with supportive labels
+  - `TodayFocusCard` — lists today's priority tasks with toggle completion
+  - `TodaysRoutinesCard` — lists today's habits with streak badges
+  - Updated `QuickActions` with working navigation routes
+
+- **Dashboard Utils** (`src/features/dashboard/utils/dashboardProgress.ts`):
+  - `calculateDailyProgress()` — combines task and habit completion stats
+  - `getSupportiveLabel()` — returns calm, non-punitive messages based on progress:
+    - 0 items: "A quiet day is still a valid day."
+    - 1-49%: "You've started. That counts."
+    - 50-99%: "You're making steady progress."
+    - 100%: "Today's essentials are complete."
+
+- **Calm Empty States**:
+  - "Nothing urgent here." (no tasks)
+  - "You can add one small step when you're ready." (empty tasks)
+  - "A gentle routine can help anchor the day." (no habits)
+  - "Today is a blank canvas. Add what feels right." (no data at all)
+
+- **Quick Actions** (now functional):
+  - Add Task → navigates to Tasks tab
+  - Add Habit → navigates to More/Habits
+  - Calendar → navigates to Calendar tab
+  - More → navigates to More tab
+
+### Technical
+
+- All data flows through existing local-first architecture
+- No backend changes, no new dependencies
+- Components remain presentational; data logic in hooks
+- TypeScript passes
+
 ## Phase 11.7 — Real Habits Flow
 
 ### Added
