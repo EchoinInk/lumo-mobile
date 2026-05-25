@@ -19589,3 +19589,9 @@ FILES:
 src/features/onboarding/components/OnboardingProgress.tsx
 src/features/onboarding/components/OnboardingShell.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 08:56:08
+COMMIT: chore(lumo): update ChoiceChip.tsx
+FILES:
+src/features/onboarding/components/ChoiceChip.tsx
+
