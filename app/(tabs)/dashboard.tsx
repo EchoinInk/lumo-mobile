@@ -1,28 +1,49 @@
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
-import { StatCard } from "@/src/components/ui/StatCard";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
+import { LinearGradient } from "expo-linear-gradient";
 import {
     CheckCircle2,
     Flame,
-    Plus,
     Sparkles,
     Trophy,
     Utensils,
-    Wallet,
+    Wallet
 } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock data for stats
 const mockStats = [
-  { label: "Tasks", value: "18", change: "5 done", icon: CheckCircle2, color: Colors.blue },
-  { label: "Habits", value: "7", change: "streak", icon: Flame, color: Colors.purple },
-  { label: "Calories", value: "1,320", change: "of 1,800", icon: Utensils, color: Colors.pink },
-  { label: "Budget", value: "$420", change: "left", icon: Wallet, color: Colors.success },
+  {
+    label: "Tasks",
+    value: "18",
+    change: "5 done",
+    icon: CheckCircle2,
+    color: Colors.blue,
+  },
+  {
+    label: "Habits",
+    value: "7",
+    change: "streak",
+    icon: Flame,
+    color: Colors.purple,
+  },
+  {
+    label: "Calories",
+    value: "1,320",
+    change: "of 1,800",
+    icon: Utensils,
+    color: Colors.pink,
+  },
+  {
+    label: "Budget",
+    value: "$420",
+    change: "left",
+    icon: Wallet,
+    color: Colors.success,
+  },
 ];
 
 // Mock small wins
@@ -52,7 +73,12 @@ export default function DashboardScreen() {
         {mockStats.map((stat, index) => (
           <Card key={index} variant="elevated" style={styles.statCard}>
             <View style={styles.statHeader}>
-              <View style={[styles.statIconContainer, { backgroundColor: stat.color + "15" }]}>
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: stat.color + "15" },
+                ]}
+              >
                 <stat.icon size={18} color={stat.color} />
               </View>
               <Text variant="caption" color={Colors.textSecondary}>
@@ -84,12 +110,7 @@ export default function DashboardScreen() {
                 >
                   {day}
                 </Text>
-                <View
-                  style={[
-                    styles.dayDot,
-                    isToday && styles.dayDotActive,
-                  ]}
-                />
+                <View style={[styles.dayDot, isToday && styles.dayDotActive]} />
               </View>
             );
           })}
@@ -140,7 +161,11 @@ export default function DashboardScreen() {
       <Card variant="gradient" style={styles.encouragementCard}>
         <View style={styles.encouragementContent}>
           <Sparkles size={20} color={Colors.textInverse} />
-          <Text variant="body" color={Colors.textInverse} style={styles.encouragementText}>
+          <Text
+            variant="body"
+            color={Colors.textInverse}
+            style={styles.encouragementText}
+          >
             You are amazing! Keep going!
           </Text>
           <Trophy size={20} color={Colors.textInverse} />
