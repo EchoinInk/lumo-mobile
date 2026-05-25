@@ -18999,3 +18999,9 @@ COMMIT: chore(lumo): update BottomTabAddButton.tsx
 FILES:
 src/components/ui/BottomTabAddButton.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 04:51:55
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/(tabs)/_layout.tsx
+

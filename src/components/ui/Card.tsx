@@ -1,82 +1,94 @@
-import { Colors, Radius, Shadows, Spacing } from '@/theme/tokens';
-import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { TouchableOpacity, TouchableOpacityProps, View, ViewProps } from 'react-native';
+import { Colors, Radius, Shadows, Spacing } from "@/theme/tokens";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import {
+    TouchableOpacity,
+    TouchableOpacityProps,
+    View,
+    ViewProps,
+} from "react-native";
 
-type CardVariant = 'default' | 'elevated' | 'gradient' | 'outlined' | 'glass' | 'interactive' | 'compact';
+type CardVariant =
+  | "default"
+  | "elevated"
+  | "gradient"
+  | "outlined"
+  | "glass"
+  | "interactive"
+  | "compact";
 
 interface CardProps extends ViewProps {
   children: React.ReactNode;
   variant?: CardVariant;
   pressable?: boolean;
-  onPress?: TouchableOpacityProps['onPress'];
+  onPress?: TouchableOpacityProps["onPress"];
   padding?: keyof typeof Spacing;
   accessibilityLabel?: string;
   reducedMotion?: boolean;
 }
 
-export function Card({ 
-  children, 
-  variant = 'default', 
+export function Card({
+  children,
+  variant = "default",
   pressable = false,
   onPress,
-  padding = 'lg',
+  padding = "lg",
   accessibilityLabel,
   reducedMotion = false,
-  className = '',
-  ...props 
+  className = "",
+  ...props
 }: CardProps) {
-  const paddingValue = variant === 'compact' ? Spacing.md : Spacing[padding];
+  const paddingValue = variant === "compact" ? Spacing.md : Spacing[padding];
 
   const getVariantStyles = () => {
     switch (variant) {
-      case 'elevated':
+      case "elevated":
         return {
           backgroundColor: Colors.card,
-          borderRadius: Radius.lg,
-          ...Shadows.lg,
+          borderRadius: Radius["3xl"],
+          ...Shadows.card,
         };
-      case 'gradient':
+      case "gradient":
         return {
-          borderRadius: Radius.lg,
-          ...Shadows.md,
+          borderRadius: Radius["3xl"],
+          ...Shadows.card,
         };
-      case 'outlined':
+      case "outlined":
         return {
           backgroundColor: Colors.card,
-          borderRadius: Radius.lg,
+          borderRadius: Radius["3xl"],
           borderWidth: 1,
           borderColor: Colors.border,
         };
-      case 'glass':
+      case "glass":
         return {
           backgroundColor: Colors.cardGlass,
-          borderRadius: Radius.lg,
+          borderRadius: Radius["3xl"],
           ...Shadows.soft,
         };
-      case 'interactive':
+      case "interactive":
         return {
           backgroundColor: Colors.card,
-          borderRadius: Radius.lg,
-          ...Shadows.md,
+          borderRadius: Radius["3xl"],
+          ...Shadows.card,
         };
-      case 'compact':
+      case "compact":
         return {
           backgroundColor: Colors.card,
-          borderRadius: Radius.md,
+          borderRadius: Radius["2xl"],
           ...Shadows.sm,
         };
       default:
         return {
           backgroundColor: Colors.card,
-          borderRadius: Radius.lg,
+          borderRadius: Radius["3xl"],
           ...Shadows.soft,
         };
     }
   };
 
   const cardContent = (
-    <View 
+    <View
       className={className}
       style={{
         ...getVariantStyles(),
@@ -86,7 +98,7 @@ export function Card({
       accessibilityLabel={accessibilityLabel}
       {...props}
     >
-      {variant === 'gradient' ? (
+      {variant === "gradient" ? (
         <LinearGradient
           colors={[Colors.gradientStart, Colors.gradientEnd]}
           start={{ x: 0, y: 0 }}
@@ -103,7 +115,7 @@ export function Card({
 
   if (pressable) {
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={onPress}
         activeOpacity={reducedMotion ? 0.9 : 0.7}
         accessibilityRole="button"
