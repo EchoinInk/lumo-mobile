@@ -19211,3 +19211,10 @@ FILES:
 src/features/more/components/MoreScreenHeader.tsx
 src/features/more/components/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 06:16:35
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/(tabs)/more/budget.tsx
+app/(tabs)/more/payments.tsx
+

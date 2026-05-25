@@ -2,10 +2,10 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { ArrowLeft, Plus, Utensils } from "lucide-react-native";
+import { Plus, Utensils } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock meals data
@@ -18,16 +18,7 @@ const mockMeals = [
 export default function MealsScreen() {
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="My Meals" subtitle="Today" />
-      </View>
+      <MoreScreenHeader title="My Meals" subtitle="Today" />
 
       {/* Calorie Summary */}
       <Card variant="gradient" style={styles.summaryCard}>
@@ -95,15 +86,6 @@ export default function MealsScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   summaryCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.xl,

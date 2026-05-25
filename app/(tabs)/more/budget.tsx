@@ -1,6 +1,7 @@
 import { Card } from "@/src/components/ui/Card";
 import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
+import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
 import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
