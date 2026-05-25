@@ -453,4 +453,31 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "500",
   },
+  habitList: {
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  addButton: {
+    marginBottom: Spacing.xl,
+  },
+  gradientButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius["2xl"],
+    ...Shadows.glow,
+  },
+  addButtonText: {
+    fontWeight: "600",
+  },
+  emptyCard: {
+    marginBottom: Spacing.lg,
+    padding: Spacing.lg,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    marginBottom: Spacing.xs,
+  },
 });
