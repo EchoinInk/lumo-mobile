@@ -165,64 +165,6 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  focusCard: {
-    marginBottom: Spacing.xl,
-    padding: Spacing.lg,
-  },
-  cardTitle: {
-    marginBottom: Spacing.md,
-    fontWeight: "600",
-  },
-  focusList: {
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  focusItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: Radius.sm,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: Colors.success,
-    borderColor: Colors.success,
-  },
-  checkboxHighlight: {
-    borderColor: Colors.pink,
-    backgroundColor: Colors.pink + "10",
-  },
-  focusText: {
-    flex: 1,
-    fontWeight: "500",
-  },
-  focusTextCompleted: {
-    textDecorationLine: "line-through",
-    color: Colors.textTertiary,
-  },
-  progressRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-  },
-  progressBar: {
-    flex: 1,
-    height: 6,
-    backgroundColor: Colors.lavender,
-    borderRadius: Radius.full,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: Radius.full,
-  },
   quickActionsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -236,16 +178,18 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     alignItems: "flex-start",
   },
-  actionDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  actionIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: Radius.md,
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: Spacing.sm,
   },
   actionLabel: {
     fontWeight: "500",
   },
-  youDidThisCard: {
+});
     marginBottom: Spacing.xl,
     padding: Spacing.lg,
   },
