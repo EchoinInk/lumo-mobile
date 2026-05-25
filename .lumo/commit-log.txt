@@ -19667,3 +19667,9 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 09:09:23
+COMMIT: chore(lumo): update index.ts
+FILES:
+src/components/feedback/index.ts
+

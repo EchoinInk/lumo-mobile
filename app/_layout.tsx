@@ -1,15 +1,17 @@
 /**
  * Root Layout
  * Handles first-run routing for onboarding
+ * Wrapped with ErrorBoundary for production hardening
  */
 
+import { ErrorBoundary } from "@/src/components/feedback";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const { isHydrated, isComplete } = useOnboarding();
   const router = useRouter();
   const segments = useSegments();
@@ -37,5 +39,13 @@ export default function RootLayout() {
         headerShown: false,
       }}
     />
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ErrorBoundary>
+      <RootLayoutContent />
+    </ErrorBoundary>
   );
 }
