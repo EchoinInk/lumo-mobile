@@ -19673,3 +19673,9 @@ COMMIT: chore(lumo): update index.ts
 FILES:
 src/components/feedback/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 09:09:46
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/_layout.tsx
+

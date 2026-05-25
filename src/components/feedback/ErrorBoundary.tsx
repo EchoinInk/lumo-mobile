@@ -1,15 +1,14 @@
 /**
  * ErrorBoundary Component
- * 
+ *
  * Production-safe error boundary for React trees.
  * Graceful fallback rendering with calm UX.
  */
 
-import React, { Component, ReactNode } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { errorLogger } from '@/services/error/errorLogger';
-import { useTheme } from '@/hooks/use-theme';
-import { Colors } from '@/theme/colors';
+import { useTheme } from "@/hooks/use-theme";
+import { Colors } from "@/theme/colors";
+import React, { Component, ReactNode } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -22,7 +21,10 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -73,15 +75,18 @@ interface ErrorBoundaryFallbackProps {
   onReset: () => void;
 }
 
-const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({ onReset }) => {
+const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
+  onReset,
+}) => {
   const { isDark } = useTheme();
 
-  return (
-    <ErrorBoundaryInner isDark={isDark} onReset={onReset} />
-  );
+  return <ErrorBoundaryInner isDark={isDark} onReset={onReset} />;
 };
 
-const ErrorBoundaryInner: React.FC<{ isDark: boolean; onReset: () => void }> = ({ isDark, onReset }) => {
+const ErrorBoundaryInner: React.FC<{
+  isDark: boolean;
+  onReset: () => void;
+}> = ({ isDark, onReset }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -117,23 +122,23 @@ const ErrorBoundaryInner: React.FC<{ isDark: boolean; onReset: () => void }> = (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
     maxWidth: 300,
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
   },
@@ -142,11 +147,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     minHeight: 44,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.textPrimary,
   },
 });
