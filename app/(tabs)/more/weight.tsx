@@ -2,10 +2,10 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { ArrowLeft, Plus, Scale, TrendingDown } from "lucide-react-native";
+import { Plus, Scale, TrendingDown } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock weight history
@@ -19,16 +19,7 @@ const mockWeights = [
 export default function WeightScreen() {
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="Weight Loss Tracker" subtitle="Progress" />
-      </View>
+      <MoreScreenHeader title="Weight Loss Tracker" subtitle="Progress" />
 
       {/* Current Weight Card */}
       <Card variant="gradient" style={styles.weightCard}>
@@ -106,15 +97,6 @@ export default function WeightScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   weightCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.xl,

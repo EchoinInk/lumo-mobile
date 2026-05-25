@@ -19218,3 +19218,11 @@ FILES:
 app/(tabs)/more/budget.tsx
 app/(tabs)/more/payments.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 06:16:48
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+app/(tabs)/more/budget.tsx
+app/(tabs)/more/groceries.tsx
+app/(tabs)/more/meals.tsx
+

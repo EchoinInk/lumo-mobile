@@ -3,10 +3,10 @@ import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { ArrowLeft, CheckCircle2, Plus } from "lucide-react-native";
+import { CheckCircle2, Plus } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock cleaning tasks
@@ -33,16 +33,7 @@ export default function CleaningScreen() {
 
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="Cleaning Schedule" subtitle="This Week" />
-      </View>
+      <MoreScreenHeader title="Cleaning Schedule" subtitle="This Week" />
 
       {/* Progress Card */}
       <Card variant="gradient" style={styles.progressCard}>
@@ -120,15 +111,6 @@ export default function CleaningScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   progressCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.xl,

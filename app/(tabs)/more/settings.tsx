@@ -1,17 +1,9 @@
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Spacing } from "@/src/theme/tokens";
-import { router } from "expo-router";
-import {
-    ArrowLeft,
-    Bell,
-    ChevronRight,
-    Moon,
-    Shield,
-    User,
-} from "lucide-react-native";
+import { Bell, ChevronRight, Moon, Shield, User } from "lucide-react-native";
 import React from "react";
 import {
     ScrollView,
@@ -74,16 +66,7 @@ const settingsSections: SettingsSection[] = [
 export default function SettingsScreen() {
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="Settings" subtitle="App Preferences" />
-      </View>
+      <MoreScreenHeader title="Settings" subtitle="App Preferences" />
 
       {/* Settings Sections */}
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -132,15 +115,6 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   section: {
     marginBottom: Spacing.xl,
   },
