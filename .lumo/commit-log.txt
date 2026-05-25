@@ -19246,3 +19246,9 @@ COMMIT: chore(lumo): update habits.tsx
 FILES:
 app/(tabs)/more/habits.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 06:32:46
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/_layout.tsx
+

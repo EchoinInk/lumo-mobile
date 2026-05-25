@@ -1,8 +1,15 @@
-import { UX } from '@/constants/ux';
-import { Colors, Padding } from '@/theme/tokens';
-import React from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, ScrollViewProps, View, ViewProps } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { UX } from "@/constants/ux";
+import { Colors, Padding, Spacing } from "@/theme/tokens";
+import React from "react";
+import {
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    ScrollViewProps,
+    View,
+    ViewProps,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ScreenProps extends ViewProps {
   children: React.ReactNode;
@@ -13,7 +20,13 @@ interface ScreenProps extends ViewProps {
   scrollViewProps?: ScrollViewProps;
   centered?: boolean;
   accessibilityLabel?: string;
+  /** Extra bottom padding to account for tab bar (default: true for tab screens) */
+  bottomPadding?: boolean;
 }
+
+// Bottom padding for tab bar visibility
+const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 88 : 72;
+const BOTTOM_SAFE_PADDING = Spacing.xl;
 
 export function Screen({
   children,
@@ -21,26 +34,35 @@ export function Screen({
   padded = true,
   keyboardAvoiding = false,
   backgroundColor = Colors.background,
-  className = '',
+  className = "",
   scrollViewProps,
   centered = false,
   accessibilityLabel,
+  bottomPadding = true,
   ...props
 }: ScreenProps) {
-  const paddingValue = typeof padded === 'boolean' 
-    ? (padded ? Padding.lg : Padding.none)
-    : Padding[padded];
+  const paddingValue =
+    typeof padded === "boolean"
+      ? padded
+        ? Padding.lg
+        : Padding.none
+      : Padding[padded];
+
+  const bottomPaddingValue = bottomPadding
+    ? TAB_BAR_HEIGHT + BOTTOM_SAFE_PADDING
+    : 0;
 
   const content = (
-    <View 
+    <View
       className={`flex-1 ${className}`}
       style={{
         backgroundColor,
         paddingHorizontal: paddingValue,
-        paddingVertical: paddingValue,
+        paddingTop: paddingValue,
+        paddingBottom: bottomPaddingValue,
         maxWidth: UX.content.maxWidth,
-        alignSelf: centered ? 'center' : 'stretch',
-        width: centered ? '100%' : undefined,
+        alignSelf: centered ? "center" : "stretch",
+        width: centered ? "100%" : undefined,
       }}
       accessible={!!accessibilityLabel}
       accessibilityLabel={accessibilityLabel}
@@ -51,55 +73,56 @@ export function Screen({
     </View>
   );
 
+  const scrollContent = (
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: paddingValue,
+        paddingTop: paddingValue,
+        paddingBottom: bottomPaddingValue,
+      }}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      accessible={false}
+      {...scrollViewProps}
+    >
+      <View
+        style={{
+          maxWidth: UX.content.maxWidth,
+          alignSelf: centered ? "center" : "stretch",
+          width: "100%",
+        }}
+      >
+        {children}
+      </View>
+    </ScrollView>
+  );
+
   if (keyboardAvoiding) {
     return (
-      <SafeAreaView 
-        style={{ flex: 1, backgroundColor }} 
-        edges={['top', 'left', 'right']}
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor }}
+        edges={["top", "left", "right"]}
         accessible={false}
       >
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
-          {scrollable ? (
-            <ScrollView 
-              contentContainerStyle={{ flexGrow: 1 }}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              accessible={false}
-              {...scrollViewProps}
-            >
-              {content}
-            </ScrollView>
-          ) : (
-            content
-          )}
+          {scrollable ? scrollContent : content}
         </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView 
-      style={{ flex: 1, backgroundColor }} 
-      edges={['top', 'left', 'right']}
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor }}
+      edges={["top", "left", "right"]}
       accessible={false}
     >
-      {scrollable ? (
-        <ScrollView 
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          accessible={false}
-          {...scrollViewProps}
-        >
-          {content}
-        </ScrollView>
-      ) : (
-        content
-      )}
+      {scrollable ? scrollContent : content}
     </SafeAreaView>
   );
 }
