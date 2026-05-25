@@ -1,8 +1,40 @@
 # Changelog
 
+## Phase 11.2 — Screen System + Visual Product Recovery
+
+### Added
+
+- **Theme Updates**: Soft white/lavender backgrounds, pastel accent colors, calm blue/pink/purple gradients
+- **Updated Shadow Tokens**: Cinematic purple-tinted shadows for premium feel
+- **Updated Radius Tokens**: Large rounded cards up to 40px radius for gentle aesthetic
+- **BottomTabAddButton Component**: Circular pink-purple gradient Add button for center tab
+- **Tab Layout**: 5 tabs (Start, Dashboard, Add, Calendar, More) with proper icons
+- **Start Screen**: Greeting card, Today's Focus, Quick Actions, Progress card, Reminder card
+- **Dashboard Screen**: At-a-glance stats, weekly overview, small wins, encouragement card
+- **Calendar Screen**: Weekly date strip, day schedule, highlighted appointments
+- **More Screen**: Feature grid with cards linking to nested screens
+- **Nested Screens**: Budget Tracker, Payment Logs, Weekly Groceries, My Meals, Cleaning Schedule, Weight Loss Tracker, My Workout Log, Settings, About
+- **Modal Infrastructure**: Add-modal screen for quick actions
+- **Reusable UI Components**: StatCard, QuickActionCard, ProgressBar, SectionHeader
+
+### Design Philosophy
+
+- **Soft & Gentle**: No harsh edges, spacious layouts, low cognitive load
+- **Neurodivergent-Friendly**: Supportive copy, minimal distractions, clear navigation
+- **Premium Aesthetic**: Soft gradients, cinematic shadows, rounded corners throughout
+- **Consistent Navigation**: Clear bottom tabs with center Add button
+
+### UX Principles
+
+- Thin screens that compose feature components
+- Token-backed styling, no hardcoded values
+- Mock data only, no Supabase connections
+- Icon consistency with lucide-react-native
+
 ## Phase 12 — Production Hardening
 
 ### Added
+
 - **Error System** (src/services/error/): errorLogger.ts for calm error logging, errorClassifier.ts for intelligent error categorization, errorRecovery.ts for graceful recovery with exponential backoff
 - **Analytics Services** (src/services/analytics/): analyticsService.ts for lightweight event tracking, analyticsEvents.ts for typed event definitions, analyticsQueue.ts for offline-safe event batching
 - **Feedback Components** (src/components/feedback/): ErrorState, ErrorBoundary, RetryView, OfflineView, EmptyState, LoadingState, SuccessState, SkeletonCard for calm, emotionally safe UX states
@@ -14,6 +46,7 @@
 - **Feedback Message Constants** (src/constants/feedbackMessages.ts): Calm error, success, loading, retry, and offline messages
 
 ### Error Philosophy
+
 - **Emotionally Safe**: Errors feel reassuring, not alarming
 - **No Technical Jargon**: "Something didn't work" instead of "Fatal exception"
 - **Forgiving**: Users are never punished for failures
@@ -21,6 +54,7 @@
 - **Graceful Degradation**: Offline states feel safe, expected, non-destructive
 
 ### Error Classification
+
 - **Network Errors**: Connection issues with retry support
 - **Storage Errors**: Data persistence problems with fallback
 - **Auth Errors**: Authentication failures with reset strategy
@@ -29,18 +63,21 @@
 - **Unknown Errors**: Fallback to calm general messaging
 
 ### Empty State Philosophy
+
 - **Supportive Tone**: "A gentle place to begin" instead of "You haven't completed anything yet"
 - **Lightweight Encouragement**: No pressure, no gamification
 - **Clear Next Action**: Always provide a path forward
 - **Calm Composition**: Spacious, breathable, not overwhelming
 
 ### Loading State Philosophy
+
 - **Skeleton Placeholders**: Preserved layout stability
 - **Soft Transitions**: No flashing, no layout jumps
 - **Avoid Spinner Overload**: Contextual loading only
 - **Predictable Rendering**: Consistent patterns across features
 
 ### Retry Architecture
+
 - **Exponential Backoff**: Calm delay progression (1s, 2s, 4s)
 - **Max Retries**: 3 attempts by default, configurable
 - **Offline Awareness**: Respects network state
@@ -48,6 +85,7 @@
 - **Progress Feedback**: Shows attempt count without pressure
 
 ### Offline UX Philosophy
+
 - **Safe Messaging**: "Changes will sync when you're back online" instead of "Connection lost"
 - **Expected Behavior**: Offline feels normal, not exceptional
 - **Non-Destructive**: Emphasizes data safety
@@ -55,6 +93,7 @@
 - **Degraded Gracefully**: Features work when possible
 
 ### Analytics Philosophy
+
 - **Behavioral Insight**: Track task completion, onboarding drop-off, feature adoption
 - **NOT Surveillance**: No personal behavioral profiling, no session reconstruction
 - **Opt-Out Support**: Users can disable analytics anytime
@@ -63,6 +102,7 @@
 - **Batched Delivery**: Efficient event flushing
 
 ### Analytics Architecture
+
 - **Feature → Analytics Service → Queue → Provider**: Clean abstraction, no vendor lock-in
 - **Event Batching**: 10 events per batch, configurable
 - **Flush Interval**: 30 seconds, configurable
@@ -71,6 +111,7 @@
 - **Typed Events**: Full TypeScript coverage
 
 ### Error Boundaries
+
 - **Screen-Level Boundaries**: Graceful fallback per screen
 - **Safe Logging Hooks**: Errors logged without exposing stack traces
 - **Retry Support**: Users can retry failed screens
@@ -78,6 +119,7 @@
 - **No App Crashes**: Errors contained, never crash entire app tree
 
 ### Accessibility + Feedback
+
 - **Reduced Motion**: All feedback components respect reduced motion
 - **Dynamic Font Sizing**: Text scales with system preferences
 - **Calm Contrast**: No flashing error states, no jittery loaders
@@ -85,6 +127,7 @@
 - **Touch Targets**: 44x44 minimum for all interactive elements
 
 ### Performance Requirements
+
 - **Lightweight Feedback**: Minimal component overhead
 - **No Rerender Storms**: Memoized where appropriate
 - **Layout Stability**: Skeletons preserve structure
@@ -92,6 +135,7 @@
 - **Efficient Queuing**: Analytics batching prevents spam
 
 ### Design Language
+
 - **Soft & Spacious**: Calm spacing, not cluttered
 - **Emotionally Calm**: No alarming reds everywhere
 - **Restrained Blur**: Subtle depth, not overwhelming
@@ -101,6 +145,7 @@
 ## Phase 11 — Advanced UX Layer
 
 ### Added
+
 - **Animation Primitives** (src/animations/): Reusable animation system with transitions, presets, haptics, motion utilities, and reduced motion support
 - **Animated Components** (src/components/animated/): FadeIn, ScalePress, AnimatedCard, SharedTransitionCard, and CelebrationPulse components with calm, subtle animations
 - **Onboarding Components** (src/components/onboarding/): OnboardingContainer, OnboardingProgress, FocusSelectionCard, PreferenceSelector, and WelcomeHero components for calm, emotionally intelligent onboarding
@@ -112,6 +157,7 @@
 - **Onboarding Constants** (src/constants/onboarding.ts): Centralized configuration for onboarding flow, options, and personalization defaults
 
 ### Motion Philosophy
+
 - All animations are subtle, calm, and respect reduced motion preferences
 - Motion reduces friction and improves clarity, never competes for attention
 - Haptic feedback is used sparingly and intentionally (selection, completion, onboarding progression)
@@ -119,6 +165,7 @@
 - No flashy, hyperactive, or dopamine-driven animations
 
 ### Onboarding Flow
+
 - **Step 1**: "What do you struggle with most?" — Multi-select struggle areas (tasks, routines, meals, overwhelm, budgeting, consistency)
 - **Step 2**: "How do you prefer planning?" — Single-select planning preference (minimal, visual, structured, flexible)
 - **Step 3**: "Choose your focus areas" — Multi-select focus areas (habits, tasks, meals, wellness, fitness)
@@ -126,6 +173,7 @@
 - Calm, reassuring, emotionally safe onboarding experience
 
 ### Accessibility
+
 - Reduced motion support integrated across all animations
 - Haptic feedback can be disabled via accessibility preferences
 - Animation intensity scaling (none, reduced, normal)
@@ -133,11 +181,13 @@
 - All animations respect system and app-level accessibility preferences automatically
 
 ### Dependencies
+
 - `react-native-reanimated` — Animation library
 - `expo-haptics` — Haptic feedback
 - `expo-blur` — Blur effects for depth
 
 ### Architecture
+
 - Feature-first onboarding architecture with hooks, screens, services, and utilities
 - Modular animation primitives that can be composed across the app
 - Centralized motion configuration in src/animations/motion.ts
@@ -147,6 +197,7 @@
 - Dashboard personalization generated from onboarding choices
 
 ### UX Tone
+
 - Emotional intelligence and safety prioritized over gamification
 - Calm, breathable, supportive interactions
 - No achievement pressure, streak obsession, or urgency
@@ -156,6 +207,7 @@
 ## Phase 9 — Backend & Sync Architecture
 
 ### Added
+
 - **Supabase Infrastructure**: Typed Supabase client with `expo-secure-store` session persistence, URL polyfill, and environment variable configuration
 - **Authentication Foundation**: Auth service, auth store (Zustand), auth types, session restoration, hydration handling — supports sign in, sign up, sign out, and session restore
 - **Offline-First Sync Queue**: MMKV-persisted operation queue with create/update/delete support, retry tracking, failure handling, and queue persistence across app restarts
@@ -171,6 +223,7 @@
 - **Setup Documentation**: `docs/backend-setup.md` covering architecture, data flow, file structure, extension guide, and security notes
 
 ### Dependencies
+
 - `@supabase/supabase-js` — Supabase client SDK
 - `expo-secure-store` — Native keychain/keystore token storage
 - `react-native-url-polyfill` — URL API polyfill for React Native
@@ -179,6 +232,7 @@
 - `react-native-mmkv` — MMKV storage (now in package.json)
 
 ### Architecture
+
 - Repository pattern enforced: UI → Hook → Repository → API Service → Supabase
 - Local-first writes with optimistic updates — user interactions never block on network
 - Sync queue persists in MMKV, survives app restarts, processes when online
@@ -188,12 +242,14 @@
 - Storage keys centralized in `services/storage/storageKeys.ts`
 
 ### Changed
+
 - Updated `tsconfig.json` with `baseUrl` and `paths` for `@/` alias resolution
 - Updated `app/_layout.tsx` to call `initializeBackend()` on mount
 - Updated repository factory to use `taskSyncRepository` as default
 - Updated `.gitignore` to exclude `.env` files
 
 ### Notes
+
 - No auth screens implemented — this phase is infrastructure only
 - No React Query — sync is handled via queue + processor pattern
 - Supabase client gracefully warns if env vars are missing (app still runs locally)
@@ -205,6 +261,7 @@
 ## Phase 8 — Performance Architecture
 
 ### Added
+
 - FlashList infrastructure with AppFlashList wrapper component
 - Reusable list primitives (ListEmptyState, ListLoadingState, ListSeparator, MemoizedListItem)
 - Memoization utilities (useStableCallback, useMemoizedValue, useListOptimization hooks)
@@ -213,6 +270,7 @@
 - Rendering guidelines documentation (docs/performance-guidelines.md)
 
 ### Improved
+
 - Scalable rendering architecture with FlashList standardization
 - Virtualization defaults with estimatedItemSize and removeClippedSubviews
 - List rendering stability through memoized components and stable callbacks
@@ -220,6 +278,7 @@
 - TaskRow component with React.memo and custom comparison function
 
 ### Fixed
+
 - Excessive inline callback rendering risks through useStableCallback
 - Potential large-list re-render bottlenecks with FlashList virtualization
 - Oversized screen component structures through component extraction
@@ -227,6 +286,7 @@
 ## [SWE-1.6] - UX & Accessibility Foundation
 
 ### Added
+
 - UX constraint system (src/constants/ux.ts) with token-backed values for touch targets, animation durations, spacing rhythm, content constraints, hierarchy depth, card density, form constraints, reduced motion defaults, interaction timing, focus behavior, and typography constraints
 - Accessibility utility helpers (src/utils/accessibility.ts) with functions for touch target sizing, accessible labels, semantic roles, reduced motion detection, screen reader detection, accessibility props creation, font scaling, focus management, announcements, animation duration handling, press state styling, label validation, heading structure, and platform-specific adjustments
 - Motion token system (src/theme/motion.ts) with duration values, easing curves, reduced motion variants, scale values, opacity values, and transition priorities
@@ -235,11 +295,13 @@
 - Neurodivergent UX guidelines (docs/UX_GUIDELINES.md) documenting spacing rules, interaction rules, accessibility standards, motion rules, hierarchy rules, form design standards, dashboard density rules, and navigation simplicity rules
 
 ### Updated
+
 - Screen component (src/components/ui/Screen.tsx) with centered variant, keyboardShouldPersistTaps, accessibility props, content width constraint from UX tokens, and improved accessibility behavior
 - Button component (src/components/ui/Button.tsx) with accessibilityRole, accessibilityLabel and accessibilityHint support, reduced motion support, minimum 44x44 touch targets for all sizes, improved pressed states, proper accessibility state for disabled and loading states, and accessible loading indicator
 - Card component (src/components/ui/Card.tsx) with new interactive and compact variants, accessibility labels, reduced motion support, improved press states, and accessibilityRole for pressable cards
 
 ### Accessibility
+
 - Minimum 44x44 touch targets enforced across all interactive components
 - Semantic accessibility roles (button, header, text, adjustable) implemented
 - Reduced motion handling integrated with useReducedMotion hook and motion token system
@@ -249,6 +311,7 @@
 - Focus ring styling defined in UX constraints for clear visual feedback
 
 ### Architecture
+
 - All UX values are token-backed using existing design token system
 - Accessibility helpers provide reusable utilities for consistent implementation
 - Motion system prioritizes state clarity (P0) over delight (P1)
@@ -258,6 +321,7 @@
 ## [Phase 6] - Local-First Data Architecture
 
 ### Added
+
 - Repository pattern with shared contracts (IRepository.ts)
 - Task repository interface (ITaskRepository)
 - MMKV storage layer with proper initialization (mmkv.ts)
@@ -271,6 +335,7 @@
 - Storage keys constants for namespaced MMKV storage
 
 ### Changed
+
 - Refactored task architecture to repository pattern
 - Migrated task store from global to feature-level (src/features/tasks/store/)
 - Migrated persistence ownership from components to repository layer
@@ -280,6 +345,7 @@
 - Isolated MMKV storage operations to dedicated service layer
 
 ### Architecture
+
 - Adopted local-first data strategy with MMKV persistence
 - Established scalable repository abstraction for future backend migration
 - Isolated persistence layer from UI components
@@ -289,12 +355,14 @@
 - Centralized repository ownership via factory pattern
 
 ### Performance
+
 - Optimized for FlashList usage with stable callbacks
 - Memoized task filtering and sorting operations
 - Isolated re-renders through feature-level stores
 - Prepared architecture for scalable task lists
 
 ### Notes
+
 - Tasks feature is now fully local-first with MMKV persistence
 - Future backend migration requires minimal UI changes (swap repository in factory)
 - All components follow strict separation of concerns
@@ -304,6 +372,7 @@
 ## [Phase 5 - Step 2: Task Feature Foundation]
 
 ### Added
+
 - Created task type definitions (Task, TaskPriority, TaskFilter) in features/tasks/types/task.ts
 - Created TaskRow component with custom checkbox, priority badges, and completion styling
 - Created TaskList component using FlashList for performant rendering
@@ -316,6 +385,7 @@
 - Added mock data initialization from mockTasks
 
 ### Changed
+
 - TasksScreen now uses composition pattern with dedicated task components
 - Replaced inline task rendering with TaskRow and TaskList components
 - Simplified TasksScreen from 132 lines to 83 lines through component extraction
@@ -324,6 +394,7 @@
 - Improved separation of concerns - screen orchestrates, components render
 
 ### Architecture Decisions
+
 - Task components follow feature-first organization in features/tasks/components/
 - Type definitions centralized in features/tasks/types/task.ts
 - Custom checkbox implementation using TouchableOpacity to avoid missing UI primitive
@@ -334,12 +405,14 @@
 - Token-backed styling maintained throughout all new components
 
 ### Fixed
+
 - Fixed FlashList prop error by removing unsupported estimatedItemSize
 - Fixed TaskSection to properly wrap children content
 
 ## [Phase 5 - Step 1: Dashboard Implementation]
 
 ### Added
+
 - Created DashboardHeader component with greeting and avatar
 - Created TodayFocusCard component wrapping FocusCard for dashboard-specific focus display
 - Created QuickActions component with lucide-react-native icons (Plus, Clock, CheckCircle, FileText)
@@ -348,12 +421,14 @@
 - Refactored DashboardScreen to orchestrate modular dashboard components
 
 ### Changed
+
 - DashboardScreen now uses composition pattern with dedicated dashboard components
 - Removed inline mock icons in favor of lucide-react-native icons
 - Simplified DashboardScreen from 123 lines to 73 lines through component extraction
 - Improved separation of concerns - screen orchestrates, components render
 
 ### Architecture Decisions
+
 - Dashboard components follow feature-first organization in features/dashboard/components/
 - Thin screen architecture - DashboardScreen only orchestrates, no rendering logic
 - Static mock data only - no business logic or state management yet
