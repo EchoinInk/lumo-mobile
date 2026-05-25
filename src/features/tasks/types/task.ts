@@ -17,6 +17,7 @@ export interface Task {
   completed: boolean;
   priority: TaskPriority;
   dueDate?: string;
+  dueTime?: string;
   createdAt: string;
   updatedAt: string;
   /** Soft delete timestamp for sync — null if not deleted */
