@@ -1,8 +1,8 @@
-import { Colors, Spacing } from '@/theme/tokens';
-import React from 'react';
-import { StyleSheet, View, ViewProps } from 'react-native';
-import { Button } from './Button';
-import { Text } from './Text';
+import { Colors, Spacing } from "@/theme/tokens";
+import React from "react";
+import { StyleSheet, View, ViewProps } from "react-native";
+import { Button } from "./Button";
+import { Text } from "./Text";
 
 interface SectionHeaderProps extends ViewProps {
   title: string;
@@ -12,15 +12,15 @@ interface SectionHeaderProps extends ViewProps {
   rightElement?: React.ReactNode;
 }
 
-export function SectionHeader({ 
-  title, 
-  subtitle, 
-  actionLabel, 
+export function SectionHeader({
+  title,
+  subtitle,
+  actionLabel,
   onAction,
   rightElement,
-  className = '',
+  className = "",
   style,
-  ...props 
+  ...props
 }: SectionHeaderProps) {
   return (
     <View className={className} style={[styles.container, style]} {...props}>
@@ -29,7 +29,11 @@ export function SectionHeader({
           {title}
         </Text>
         {subtitle && (
-          <Text variant="caption" color={Colors.textSecondary} style={styles.subtitle}>
+          <Text
+            variant="caption"
+            color={Colors.textSecondary}
+            style={styles.subtitle}
+          >
             {subtitle}
           </Text>
         )}
@@ -47,18 +51,21 @@ export function SectionHeader({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: Spacing.lg,
+    marginTop: Spacing.sm,
   },
   leftContent: {
     flex: 1,
   },
   title: {
     marginBottom: Spacing.xs,
+    fontWeight: "600",
   },
   subtitle: {
-    marginTop: Spacing.xs,
+    marginTop: 0,
+    lineHeight: 20,
   },
 });
