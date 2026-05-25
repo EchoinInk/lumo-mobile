@@ -1,11 +1,10 @@
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Spacing } from "@/src/theme/tokens";
-import { router } from "expo-router";
-import { ArrowLeft, Heart, Sparkles } from "lucide-react-native";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Heart, Sparkles } from "lucide-react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 const appInfo = [
   { label: "Version", value: "1.0.0" },
@@ -16,16 +15,7 @@ const appInfo = [
 export default function AboutScreen() {
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="About Lumo" subtitle="App Information" />
-      </View>
+      <MoreScreenHeader title="About Lumo" subtitle="App Information" />
 
       {/* App Info Cards */}
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -84,15 +74,6 @@ export default function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   welcomeCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.xl,

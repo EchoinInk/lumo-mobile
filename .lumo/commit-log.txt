@@ -19204,3 +19204,10 @@ COMMIT: chore(lumo): update _layout.tsx
 FILES:
 app/(tabs)/more/_layout.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 06:16:02
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/features/more/components/MoreScreenHeader.tsx
+src/features/more/components/index.ts
+
