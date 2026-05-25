@@ -2,9 +2,9 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Text } from "@/src/components/ui/Text";
-import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
+import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import { CheckCircle2, Circle, Sparkles, Target } from "lucide-react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface FocusItem {
@@ -25,8 +25,8 @@ export function TodaysFocusCard() {
   const toggleItem = (id: string) => {
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      )
+        item.id === id ? { ...item, completed: !item.completed } : item,
+      ),
     );
   };
 
@@ -64,10 +64,7 @@ export function TodaysFocusCard() {
             )}
             <Text
               variant="body"
-              style={[
-                styles.itemText,
-                item.completed && styles.completedText,
-              ]}
+              style={[styles.itemText, item.completed && styles.completedText]}
             >
               {item.text}
             </Text>
@@ -75,7 +72,12 @@ export function TodaysFocusCard() {
         ))}
       </View>
 
-      <ProgressBar progress={progress} showLabel height={6} variant="gradient" />
+      <ProgressBar
+        progress={progress}
+        showLabel
+        height={6}
+        variant="gradient"
+      />
 
       <Button
         variant="ghost"
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     textDecorationLine: "line-through",
-    color: Colors.textMuted,
+    color: Colors.textTertiary,
   },
   addButton: {
     marginTop: Spacing.md,
