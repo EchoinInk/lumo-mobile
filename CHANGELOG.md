@@ -1,5 +1,73 @@
 # Changelog
 
+## Phase 11.7 — Real Habits Flow
+
+### Added
+
+- **Habit Types** (`src/features/habits/types/habit.ts`):
+  - `Habit` interface with id, title, description, frequency, targetDays, streakCount, completedDates, color, icon, timestamps
+  - `CreateHabitInput` and `UpdateHabitInput` for create/edit operations
+  - Support for daily and weekly habits
+  - Soft delete with `deletedAt` for sync compatibility
+
+- **Habit Local Repository** (`src/features/habits/services/habitLocalRepository.ts`):
+  - `getHabits()`, `getHabitById(id)`, `createHabit(input)`, `updateHabit(id, updates)`
+  - `deleteHabit(id)` with soft delete, `hardDeleteHabit(id)`
+  - `completeHabit(id, date)` and `uncompleteHabit(id, date)` for daily tracking
+  - Automatic streak calculation based on completion history
+  - MMKV persistence through `StorageKeys.HABITS`
+
+- **Habit Store** (`src/features/habits/store/useHabitStore.ts`):
+  - Zustand store with `habits`, `isHydrated`, `isLoading`, `error` state
+  - Actions: `hydrate()`, `addHabit()`, `updateHabit()`, `deleteHabit()`, `completeHabit()`, `uncompleteHabit()`, `clearError()`
+  - Background persistence to MMKV
+
+- **Habit Hook** (`src/features/habits/hooks/useHabits.ts`):
+  - Exposes: `habits`, `todayHabits`, `completedToday`, `pendingToday`
+  - Stats: `completionRate`, `totalStreak`, `bestStreak`
+  - Actions with error handling: `addHabit`, `updateHabit`, `deleteHabit`, `toggleHabit`, `isCompletedToday`
+  - Automatic hydration on mount
+
+- **HabitFormModal** (`src/features/habits/components/HabitFormModal.tsx`):
+  - Calm rounded modal/sheet with keyboard handling
+  - Create: "Add a gentle routine" / Edit: "Edit routine"
+  - Title input (required), description (optional)
+  - Frequency chips: Daily, Weekly
+  - Target day chips for weekly habits (Mon-Sun)
+  - Color picker with 7 calm color options
+  - Gradient primary button, quiet "Not now" cancel button
+
+- **HabitListItem** (`src/features/habits/components/HabitListItem.tsx`):
+  - Shows habit title, description preview (1 line)
+  - Frequency badge with target days for weekly habits
+  - Streak count with flame icon when > 0
+  - Soft completion checkbox with habit color accent
+  - Edit (pencil) and Delete (trash) action buttons
+  - No harsh red UI
+
+- **Health Screen Integration** (`app/(tabs)/health.tsx`):
+  - Replaced mock habits with real habit data
+  - Shows today's habits count, completed count, completion progress bar
+  - Lists today's habits with toggle, edit, delete
+  - Add habit button with gradient
+  - Empty state: "No habits yet" with supportive copy
+  - Modal for adding/editing habits
+
+- **More/Habits Screen** (`app/(tabs)/more/habits.tsx`):
+  - Full dedicated habits screen with stats summary
+  - Shows completed count, best streak, success rate
+  - Lists all today's habits with full actions
+  - Add habit button and modal
+  - Empty state with supportive copy
+
+### Technical
+
+- All persistence flows through `HabitLocalRepository` → MMKV
+- Soft delete pattern for future sync support
+- Streak calculation based on consecutive completion days
+- Weekly habits filter by target days for today's view
+- TypeScript passes, no new dependencies
+
 ## Phase 11.6 — Task Editing + Due Dates
 
 ### Added
