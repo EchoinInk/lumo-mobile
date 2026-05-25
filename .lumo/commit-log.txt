@@ -19576,3 +19576,9 @@ COMMIT: chore(lumo): update useOnboarding.ts
 FILES:
 src/features/onboarding/hooks/useOnboarding.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 08:55:43
+COMMIT: chore(lumo): update OnboardingShell.tsx
+FILES:
+src/features/onboarding/components/OnboardingShell.tsx
+

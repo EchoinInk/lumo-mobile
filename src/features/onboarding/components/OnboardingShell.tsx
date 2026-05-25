@@ -7,13 +7,13 @@ import { Button } from "@/src/components/ui/Button";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    View,
 } from "react-native";
 import { OnboardingProgress } from "./OnboardingProgress";
 
@@ -64,7 +64,11 @@ export function OnboardingShell({
               {title}
             </Text>
             {subtitle && (
-              <Text variant="body" color={Colors.textSecondary} style={styles.subtitle}>
+              <Text
+                variant="body"
+                color={Colors.textSecondary}
+                style={styles.subtitle}
+              >
                 {subtitle}
               </Text>
             )}
@@ -79,15 +83,16 @@ export function OnboardingShell({
               onPress={onNext}
               disabled={!canProceed}
               variant="primary"
-              size="large"
+              size="lg"
               style={styles.nextButton}
-            >n              {nextLabel}
+            >
+              n {nextLabel}
             </Button>
             {onBack && (
               <Button
                 onPress={onBack}
                 variant="ghost"
-                size="medium"
+                size="md"
                 style={styles.backButton}
               >
                 Back
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
+    paddingTop: Spacing["2xl"],
     paddingBottom: Spacing.xl,
   },
   header: {
