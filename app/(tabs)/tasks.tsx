@@ -11,8 +11,7 @@ import {
     Circle,
     Clock,
     Lightbulb,
-    Plus,
-    Target,
+    Plus
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -119,21 +118,25 @@ export default function TasksScreen() {
             variant={task.completed ? "outlined" : "elevated"}
             style={[
               styles.taskCard,
-              task.priority === "focus" && styles.taskCardFocus,
+              task.priority === "high" &&
+                !task.completed &&
+                styles.taskCardHigh,
             ]}
           >
             <TouchableOpacity
               onPress={() => toggleTask(task.id)}
               style={styles.taskContent}
               activeOpacity={0.7}
+              accessibilityLabel={`${task.completed ? "Completed" : "Pending"} task: ${task.title}`}
+              accessibilityRole="button"
             >
               <View
                 style={[
                   styles.checkbox,
                   task.completed && styles.checkboxChecked,
-                  task.priority === "focus" &&
+                  task.priority === "high" &&
                     !task.completed &&
-                    styles.checkboxFocus,
+                    styles.checkboxHigh,
                 ]}
               >
                 {task.completed ? (
@@ -155,29 +158,37 @@ export default function TasksScreen() {
                 </Text>
 
                 <View style={styles.taskMeta}>
-                  <View style={styles.timeBadge}>
-                    <Clock size={12} color={Colors.textTertiary} />
-                    <Text variant="small" color={Colors.textTertiary}>
-                      {task.time}
+                  {task.dueDate && (
+                    <View style={styles.timeBadge}>
+                      <Clock size={12} color={Colors.textTertiary} />
+                      <Text variant="small" color={Colors.textTertiary}>
+                        {new Date(task.dueDate).toLocaleDateString()}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View
+                    style={[
+                      styles.priorityBadge,
+                      {
+                        backgroundColor: getPriorityColor(task.priority) + "15",
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.priorityDot,
+                        { backgroundColor: getPriorityColor(task.priority) },
+                      ]}
+                    />
+                    <Text
+                      variant="small"
+                      color={getPriorityColor(task.priority)}
+                    >
+                      {task.priority.charAt(0).toUpperCase() +
+                        task.priority.slice(1)}
                     </Text>
                   </View>
-
-                  {task.recurring && (
-                    <View style={styles.recurringBadge}>
-                      <Text variant="small" color={Colors.purple}>
-                        Recurring
-                      </Text>
-                    </View>
-                  )}
-
-                  {task.priority === "focus" && !task.completed && (
-                    <View style={styles.focusBadge}>
-                      <Target size={12} color={Colors.pink} />
-                      <Text variant="small" color={Colors.pink}>
-                        Focus
-                      </Text>
-                    </View>
-                  )}
                 </View>
               </View>
             </TouchableOpacity>
@@ -208,7 +219,13 @@ export default function TasksScreen() {
       </Card>
 
       {/* Add Task Button */}
-      <TouchableOpacity style={styles.addButton} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={styles.addButton}
+        activeOpacity={0.8}
+        onPress={() => setIsModalVisible(true)}
+        accessibilityLabel="Add new task"
+        accessibilityRole="button"
+      >
         <LinearGradient
           colors={[Colors.pink, Colors.purple]}
           start={{ x: 0, y: 0 }}
@@ -225,6 +242,12 @@ export default function TasksScreen() {
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      {/* Add Task Modal */}
+      <AddTaskModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      />
     </Screen>
   );
 }
@@ -255,7 +278,7 @@ const styles = StyleSheet.create({
   taskCard: {
     padding: Spacing.md,
   },
-  taskCardFocus: {
+  taskCardHigh: {
     borderLeftWidth: 3,
     borderLeftColor: Colors.pink,
   },
@@ -277,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.success,
     borderColor: Colors.success,
   },
-  checkboxFocus: {
+  checkboxHigh: {
     borderColor: Colors.pink,
     backgroundColor: Colors.pink + "10",
   },
@@ -308,14 +331,18 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: Radius.sm,
   },
-  focusBadge: {
+  priorityBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.xs,
-    backgroundColor: Colors.pink + "15",
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
     borderRadius: Radius.sm,
+  },
+  priorityDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   supportCard: {
     marginBottom: Spacing.xl,
