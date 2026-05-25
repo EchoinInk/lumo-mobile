@@ -138,7 +138,7 @@ export default function TasksScreen() {
       <Screen scrollable padded>
         <RetryView
           title="Something didn't load gently"
-          message="Your tasks are still safe. Try again when you're ready."
+          description="Your tasks are still safe. Try again when you're ready."
           onRetry={() => window.location.reload()}
         />
       </Screen>
