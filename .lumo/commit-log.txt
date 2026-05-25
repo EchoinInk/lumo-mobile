@@ -18981,3 +18981,9 @@ COMMIT: chore(lumo): update colors.ts
 FILES:
 src/theme/colors.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 04:50:57
+COMMIT: chore(lumo): update shadows.ts
+FILES:
+src/theme/shadows.ts
+
