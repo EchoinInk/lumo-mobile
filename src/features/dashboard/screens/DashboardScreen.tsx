@@ -3,7 +3,6 @@ import { Screen } from "@/src/components/ui/Screen";
 import { useHabits } from "@/src/features/habits";
 import { useTasks } from "@/src/features/tasks";
 import { router } from "expo-router";
-import { StyleSheet } from "react-native";
 import { DailyProgressCard } from "../components/DailyProgressCard";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { DashboardSection } from "../components/DashboardSection";
