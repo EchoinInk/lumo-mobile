@@ -167,3 +167,7 @@ export const getRetryMessage = (key: string): FeedbackMessage => {
 export const getOfflineMessage = (key: string): FeedbackMessage => {
   return OFFLINE_MESSAGES[key] || OFFLINE_MESSAGES.default;
 };
+
+export const getEmptyMessage = (key: string): FeedbackMessage => {
+  return EMPTY_MESSAGES[key] || EMPTY_MESSAGES.default;
+};
