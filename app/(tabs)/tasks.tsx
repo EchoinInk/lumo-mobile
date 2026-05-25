@@ -2,6 +2,7 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { AddTaskModal } from "@/src/features/tasks/components/AddTaskModal";
 import { useTasks } from "@/src/features/tasks/hooks/useTasks";
 import { TaskPriority } from "@/src/features/tasks/types/task";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
@@ -11,7 +12,7 @@ import {
     Circle,
     Clock,
     Lightbulb,
-    Plus
+    Plus,
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
