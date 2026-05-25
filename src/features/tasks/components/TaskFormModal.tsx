@@ -124,7 +124,6 @@ export function TaskFormModal({
   const subtitleText =
     mode === "edit" ? "Make it work for you" : "Every big journey starts small";
   const submitText = mode === "edit" ? "Save changes" : "Add task";
-  const submitIcon = mode === "edit" ? Check : Plus;
 
   return (
     <Modal
