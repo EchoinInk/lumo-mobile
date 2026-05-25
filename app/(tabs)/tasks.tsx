@@ -2,6 +2,8 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { useTasks } from "@/src/features/tasks/hooks/useTasks";
+import { TaskPriority } from "@/src/features/tasks/types/task";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -15,60 +17,6 @@ import {
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-// Mock tasks data
-const mockTasks = [
-  {
-    id: "1",
-    title: "Morning meditation",
-    time: "8:00 AM",
-    completed: true,
-    priority: "focus",
-  },
-  {
-    id: "2",
-    title: "Review design mockups",
-    time: "9:30 AM",
-    completed: false,
-    priority: "focus",
-  },
-  {
-    id: "3",
-    title: "Team standup meeting",
-    time: "10:00 AM",
-    completed: false,
-    priority: "normal",
-  },
-  {
-    id: "4",
-    title: "Drink water",
-    time: "11:00 AM",
-    completed: false,
-    priority: "reminder",
-    recurring: true,
-  },
-  {
-    id: "5",
-    title: "Lunch break",
-    time: "12:30 PM",
-    completed: false,
-    priority: "normal",
-  },
-  {
-    id: "6",
-    title: "Focus block: coding",
-    time: "2:00 PM",
-    completed: false,
-    priority: "focus",
-  },
-  {
-    id: "7",
-    title: "Walk 20 minutes",
-    time: "4:00 PM",
-    completed: false,
-    priority: "reminder",
-  },
-];
-
 type FilterType = "all" | "today" | "upcoming" | "done";
 
 const filters: { key: FilterType; label: string }[] = [
@@ -78,26 +26,52 @@ const filters: { key: FilterType; label: string }[] = [
   { key: "done", label: "Done" },
 ];
 
+// Priority to filter mapping
+const getPriorityFromKey = (key: string): TaskPriority | null => {
+  switch (key) {
+    case "high":
+      return "high";
+    case "medium":
+      return "medium";
+    case "low":
+      return "low";
+    default:
+      return null;
+  }
+};
+
 export default function TasksScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("today");
-  const [tasks, setTasks] = useState(mockTasks);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const {
+    tasks,
+    activeTasks,
+    completedTasks,
+    toggleTask,
+    completedCount,
+    totalCount,
+  } = useTasks();
 
   const filteredTasks = tasks.filter((task) => {
     if (activeFilter === "all") return true;
     if (activeFilter === "done") return task.completed;
     if (activeFilter === "today") return !task.completed;
     if (activeFilter === "upcoming")
-      return !task.completed && task.priority !== "reminder";
+      return !task.completed && task.priority !== "low";
     return true;
   });
 
-  const completedCount = tasks.filter((t) => t.completed).length;
-  const totalCount = tasks.length;
-
-  const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
-    );
+  const getPriorityColor = (priority: TaskPriority) => {
+    switch (priority) {
+      case "high":
+        return Colors.pink;
+      case "medium":
+        return Colors.warning;
+      case "low":
+        return Colors.blue;
+      default:
+        return Colors.textSecondary;
+    }
   };
 
   return (
