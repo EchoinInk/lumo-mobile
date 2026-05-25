@@ -1,5 +1,55 @@
 # Changelog
 
+## Phase 11.6 — Task Editing + Due Dates
+
+### Added
+
+- **Reusable TaskFormModal**:
+  - Unified modal for both creating and editing tasks
+  - `mode: "create" | "edit"` prop switches behavior
+  - `initialTask` prop pre-populates form in edit mode
+  - Calm, spacious UI with keyboard handling
+
+- **Task Editing Flow**:
+  - Pencil icon on each task row for editing
+  - Edit mode pre-fills title, notes, priority, due date/time
+  - Save changes persists through repository
+  - Cancel safely returns without changes
+
+- **Due Date & Time Support**:
+  - Task types updated: `dueDate?: string` and `dueTime?: string`
+  - Simple chip-based date selection: Today, Tomorrow, No date
+  - Optional time input with text field
+  - Due info displays as "Today", "Tomorrow", or formatted date
+
+- **Enhanced Task List Display**:
+  - Notes preview shown when available (1 line truncation)
+  - Due date/time badge with "Today"/"Tomorrow" smart labels
+  - Edit + Delete action buttons side by side
+
+- **Improved Filtering**:
+  - "Today" filter: incomplete tasks due today or without due date
+  - "Upcoming" filter: incomplete tasks due tomorrow or later
+  - "Done" filter: completed tasks
+
+- **Dashboard Prioritization**:
+  - Today&apos;s Focus now prioritizes tasks by:
+    1. Incomplete high priority tasks due today
+    2. Other incomplete tasks due today
+    3. Overdue tasks
+    4. Newest incomplete tasks by creation date
+
+- **Calm Empty States**:
+  - Supportive copy that avoids guilt-driven language
+  - Context-aware messages per filter tab
+  - "No tasks for today" / "No upcoming tasks" / "No completed tasks yet"
+
+### Technical
+
+- Persistence preserved: all edits flow through `TaskLocalRepository` → MMKV
+- No backend changes, no Supabase, no new dependencies
+- TypeScript passes, all types updated
+
 ## Phase 11.5 — Local Persistence Hardening
 
 ### Verified
