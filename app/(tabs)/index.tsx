@@ -72,7 +72,8 @@ const quickActions = [
 ];
 
 export default function DashboardScreen() {
-  const { tasks, completedCount, toggleTask, hasHydrated } = useTasks();
+  const { tasks, completedCount, totalCount, toggleTask, hasHydrated } =
+    useTasks();
 
   // Prioritize tasks for Today's Focus:
   // 1. Incomplete high priority tasks due today
