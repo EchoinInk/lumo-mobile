@@ -113,12 +113,3 @@ export default function DashboardScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-});
