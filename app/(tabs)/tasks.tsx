@@ -122,6 +122,28 @@ export default function TasksScreen() {
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <Screen scrollable padded>
+        <LoadingState message="Loading your tasks..." />
+      </Screen>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Screen scrollable padded>
+        <RetryView
+          title="Something didn't load gently"
+          message="Your tasks are still safe. Try again when you're ready."
+          onRetry={() => window.location.reload()}
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen scrollable padded>
       {/* Header */}
