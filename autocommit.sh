@@ -13,11 +13,6 @@ fi
 
 cd "$REPO_ROOT"
 
-LOG_DIR=".lumo"
-LOG_FILE="$LOG_DIR/commit-log.txt"
-
-mkdir -p "$LOG_DIR"
-
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━"
 echo "🧠 Lumo Auto Commit Running"
