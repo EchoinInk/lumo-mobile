@@ -62,6 +62,15 @@ export default function HabitsScreen() {
     setSelectedHabit(undefined);
   };
 
+  // Loading state
+  if (!isHydrated) {
+    return (
+      <Screen scrollable padded>
+        <LoadingState message="Loading your habits..." />
+      </Screen>
+    );
+  }
+
   return (
     <Screen scrollable padded>
       <MoreScreenHeader title="My Habits" subtitle="Daily Tracking" />
