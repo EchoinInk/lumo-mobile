@@ -2,9 +2,13 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
-import { AddTaskModal } from "@/src/features/tasks/components/AddTaskModal";
+import { TaskFormModal } from "@/src/features/tasks/components/TaskFormModal";
 import { useTasks } from "@/src/features/tasks/hooks/useTasks";
-import { TaskPriority } from "@/src/features/tasks/types/task";
+import {
+  CreateTaskInput,
+  Task,
+  TaskPriority,
+} from "@/src/features/tasks/types/task";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -12,6 +16,7 @@ import {
   Circle,
   Clock,
   Lightbulb,
+  Pencil,
   Plus,
   Trash2,
 } from "lucide-react-native";
@@ -44,17 +49,65 @@ const getPriorityFromKey = (key: string): TaskPriority | null => {
 export default function TasksScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("today");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { tasks, toggleTask, deleteTask, completedCount, totalCount, error } =
-    useTasks();
+  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
+  const {
+    tasks,
+    toggleTask,
+    deleteTask,
+    updateTask,
+    createTask,
+    completedCount,
+    totalCount,
+    error,
+    isLoading,
+  } = useTasks();
+
+  // Date helpers
+  const today = new Date().toISOString().split("T")[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
   const filteredTasks = tasks.filter((task) => {
     if (activeFilter === "all") return true;
     if (activeFilter === "done") return task.completed;
-    if (activeFilter === "today") return !task.completed;
-    if (activeFilter === "upcoming")
-      return !task.completed && task.priority !== "low";
+    if (activeFilter === "today") {
+      // Show incomplete tasks due today or without a due date
+      if (task.completed) return false;
+      return !task.dueDate || task.dueDate === today;
+    }
+    if (activeFilter === "upcoming") {
+      // Show incomplete tasks due tomorrow or later
+      if (task.completed) return false;
+      return task.dueDate && task.dueDate > today;
+    }
     return true;
   });
+
+  const handleAddPress = () => {
+    setModalMode("create");
+    setSelectedTask(undefined);
+    setIsModalVisible(true);
+  };
+
+  const handleEditPress = (task: Task) => {
+    setModalMode("edit");
+    setSelectedTask(task);
+    setIsModalVisible(true);
+  };
+
+  const handleModalSubmit = (data: CreateTaskInput) => {
+    if (modalMode === "edit" && selectedTask) {
+      updateTask(selectedTask.id, data);
+    } else {
+      createTask(data);
+    }
+    setIsModalVisible(false);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedTask(undefined);
+  };
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
@@ -115,6 +168,37 @@ export default function TasksScreen() {
         </Card>
       )}
 
+      {/* Loading State */}
+      {isLoading && (
+        <Card variant="outlined" style={styles.emptyCard}>
+          <Text variant="body" color={Colors.textSecondary}>
+            Loading your tasks...
+          </Text>
+        </Card>
+      )}
+
+      {/* Empty States */}
+      {!isLoading && filteredTasks.length === 0 && (
+        <Card variant="outlined" style={styles.emptyCard}>
+          <Text
+            variant="body"
+            color={Colors.textSecondary}
+            style={styles.emptyTitle}
+          >
+            {activeFilter === "done"
+              ? "No completed tasks yet"
+              : activeFilter === "upcoming"
+                ? "No upcoming tasks"
+                : "No tasks for today"}
+          </Text>
+          <Text variant="caption" color={Colors.textTertiary}>
+            {activeFilter === "done"
+              ? "Complete a task and it will appear here"
+              : "Add a task to get started — small steps count"}
+          </Text>
+        </Card>
+      )}
+
       {/* Task List */}
       <View style={styles.taskList}>
         {filteredTasks.map((task) => (
@@ -163,12 +247,35 @@ export default function TasksScreen() {
                     {task.title}
                   </Text>
 
+                  {task.description && (
+                    <Text
+                      variant="caption"
+                      color={Colors.textTertiary}
+                      style={styles.taskNotes}
+                      numberOfLines={1}
+                    >
+                      {task.description}
+                    </Text>
+                  )}
+
                   <View style={styles.taskMeta}>
-                    {task.dueDate && (
+                    {(task.dueDate || task.dueTime) && (
                       <View style={styles.timeBadge}>
                         <Clock size={12} color={Colors.textTertiary} />
                         <Text variant="small" color={Colors.textTertiary}>
-                          {new Date(task.dueDate).toLocaleDateString()}
+                          {task.dueDate === today
+                            ? "Today"
+                            : task.dueDate === tomorrow
+                              ? "Tomorrow"
+                              : task.dueDate
+                                ? new Date(task.dueDate).toLocaleDateString(
+                                    undefined,
+                                    { month: "short", day: "numeric" },
+                                  )
+                                : ""}
+                          {task.dueTime
+                            ? (task.dueDate ? " at " : "") + task.dueTime
+                            : ""}
                         </Text>
                       </View>
                     )}
@@ -200,16 +307,30 @@ export default function TasksScreen() {
                 </View>
               </TouchableOpacity>
 
-              {/* Delete Button - subtle, calm */}
-              <TouchableOpacity
-                onPress={() => deleteTask(task.id)}
-                style={styles.deleteButton}
-                activeOpacity={0.6}
-                accessibilityLabel={`Delete task: ${task.title}`}
-                accessibilityRole="button"
-              >
-                <Trash2 size={18} color={Colors.textTertiary} />
-              </TouchableOpacity>
+              {/* Action Buttons */}
+              <View style={styles.taskActions}>
+                {/* Edit Button */}
+                <TouchableOpacity
+                  onPress={() => handleEditPress(task)}
+                  style={styles.actionButton}
+                  activeOpacity={0.6}
+                  accessibilityLabel={`Edit task: ${task.title}`}
+                  accessibilityRole="button"
+                >
+                  <Pencil size={16} color={Colors.textTertiary} />
+                </TouchableOpacity>
+
+                {/* Delete Button */}
+                <TouchableOpacity
+                  onPress={() => deleteTask(task.id)}
+                  style={styles.actionButton}
+                  activeOpacity={0.6}
+                  accessibilityLabel={`Delete task: ${task.title}`}
+                  accessibilityRole="button"
+                >
+                  <Trash2 size={16} color={Colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
             </View>
           </Card>
         ))}
@@ -241,7 +362,7 @@ export default function TasksScreen() {
       <TouchableOpacity
         style={styles.addButton}
         activeOpacity={0.8}
-        onPress={() => setIsModalVisible(true)}
+        onPress={handleAddPress}
         accessibilityLabel="Add new task"
         accessibilityRole="button"
       >
@@ -262,10 +383,13 @@ export default function TasksScreen() {
         </LinearGradient>
       </TouchableOpacity>
 
-      {/* Add Task Modal */}
-      <AddTaskModal
+      {/* Task Form Modal */}
+      <TaskFormModal
         visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        mode={modalMode}
+        initialTask={selectedTask}
+        onSubmit={handleModalSubmit}
+        onClose={handleModalClose}
       />
     </Screen>
   );
@@ -413,8 +537,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  deleteButton: {
+  taskActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  actionButton: {
     padding: Spacing.sm,
-    marginLeft: Spacing.sm,
+  },
+  taskNotes: {
+    marginBottom: Spacing.xs,
+  },
+  emptyCard: {
+    marginBottom: Spacing.xl,
+    padding: Spacing.lg,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    marginBottom: Spacing.xs,
   },
 });
