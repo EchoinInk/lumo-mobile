@@ -121,6 +121,15 @@ export default function HealthScreen() {
     setSelectedHabit(undefined);
   };
 
+  // Loading state
+  if (!isHydrated) {
+    return (
+      <Screen scrollable padded>
+        <LoadingState message="Loading your health data..." />
+      </Screen>
+    );
+  }
+
   return (
     <Screen scrollable padded>
       {/* Header */}
