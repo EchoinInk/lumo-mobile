@@ -2,10 +2,20 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { Text } from "@/src/components/ui/Text";
 import { MoreScreenHeader } from "@/src/features/more/components";
+import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
 import { Colors, Spacing } from "@/src/theme/tokens";
-import { Bell, ChevronRight, Moon, Shield, User } from "lucide-react-native";
+import { router } from "expo-router";
+import {
+    Bell,
+    ChevronRight,
+    Moon,
+    RefreshCw,
+    Shield,
+    User,
+} from "lucide-react-native";
 import React from "react";
 import {
+    Alert,
     ScrollView,
     StyleSheet,
     Switch,
