@@ -19679,3 +19679,9 @@ COMMIT: chore(lumo): update _layout.tsx
 FILES:
 app/_layout.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 09:13:51
+COMMIT: chore(lumo): update ErrorBoundary.tsx
+FILES:
+src/components/feedback/ErrorBoundary.tsx
+

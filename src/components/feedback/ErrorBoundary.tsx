@@ -41,8 +41,8 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error for debugging
-    errorLogger.log(error, {
+    // Log error for debugging (console only - no analytics)
+    console.warn("[ErrorBoundary] Render error:", error, {
       componentStack: errorInfo.componentStack,
       errorBoundary: true,
     });
