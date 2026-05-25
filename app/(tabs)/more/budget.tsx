@@ -1,12 +1,11 @@
 import { Card } from "@/src/components/ui/Card";
 import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { ArrowLeft, Plus } from "lucide-react-native";
+import { Plus } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock budget data
@@ -30,16 +29,7 @@ export default function BudgetScreen() {
 
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="Budget Tracker" subtitle="May 2024" />
-      </View>
+      <MoreScreenHeader title="Budget Tracker" subtitle="May 2024" />
 
       {/* Budget Overview Card */}
       <Card variant="gradient" style={styles.overviewCard}>
@@ -117,15 +107,6 @@ export default function BudgetScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   overviewCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.xl,

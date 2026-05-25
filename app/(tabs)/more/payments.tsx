@@ -1,11 +1,10 @@
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { ArrowLeft, Plus, Receipt } from "lucide-react-native";
+import { Plus, Receipt } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Mock payments data
@@ -25,16 +24,7 @@ const mockPayments = [
 export default function PaymentsScreen() {
   return (
     <Screen scrollable padded>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <SectionHeader title="Payment Logs" subtitle="May 2024" />
-      </View>
+      <MoreScreenHeader title="Payment Logs" subtitle="May 2024" />
 
       {/* Payments List */}
       <ScrollView
@@ -111,15 +101,6 @@ export default function PaymentsScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  backButton: {
-    padding: Spacing.sm,
-  },
   list: {
     gap: Spacing.md,
     marginBottom: Spacing.xl,
