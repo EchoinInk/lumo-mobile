@@ -19234,3 +19234,9 @@ app/(tabs)/more/cleaning.tsx
 app/(tabs)/more/settings.tsx
 app/(tabs)/more/weight.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 06:17:13
+COMMIT: chore(lumo): update workouts.tsx
+FILES:
+app/(tabs)/more/workouts.tsx
+
