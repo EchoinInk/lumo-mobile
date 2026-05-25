@@ -31,6 +31,36 @@
 - Mock data only, no Supabase connections
 - Icon consistency with lucide-react-native
 
+## Phase 11.2B — Core Tab Screens + Mockup Alignment
+
+### Changed
+
+- **Tab Layout Restructure**: Changed from 5 tabs (Start/Dashboard/Add/Calendar/More) to 4 primary tabs:
+  - Dashboard (index.tsx) - Main home/overview
+  - Tasks - Task list with filters
+  - Calendar - Schedule with date strip
+  - Health - Wellness overview with summaries
+  - More - Feature grid linking to nested screens
+
+### Updated Screens
+
+- **Dashboard (index.tsx)**: Greeting header, Today's Focus card with checkboxes, Quick Actions grid, "You did this!" progress card, Reminder card, supportive encouragement quote
+- **Tasks (tasks.tsx)**: Segmented filters (All/Today/Upcoming/Done), task list with calm checkboxes, time labels, priority/focus tags, "Break tasks down" support card, gradient Add Task button
+- **Calendar (calendar.tsx)**: Compact month/week header, horizontal date strip, day schedule timeline, highlighted active event, encouragement card (polished existing)
+- **Health (health.tsx)**: Habits summary with streak, Calories summary with progress, Weight summary with change indicator, Workout summary, quick links to health-related More screens, encouragement card
+
+### Design Alignment
+
+- All screens now match the Lumo mockup aesthetic
+- Soft white/lavender backgrounds throughout
+- Calm blue/pink/purple gradient accents
+- Rounded cards with soft shadows
+- Spacious, low-density layouts
+- Neurodivergent-friendly supportive copy
+- Premium pastel planner aesthetic
+- Minimal but clear lucide-react-native icons
+- Consistent bottom tab navigation
+
 ## Phase 12 — Production Hardening
 
 ### Added
