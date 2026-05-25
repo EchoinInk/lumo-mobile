@@ -47,11 +47,13 @@ export function Card({
           backgroundColor: Colors.card,
           borderRadius: Radius["3xl"],
           ...Shadows.card,
+          overflow: "hidden" as const,
         };
       case "gradient":
         return {
           borderRadius: Radius["3xl"],
           ...Shadows.card,
+          overflow: "hidden" as const,
         };
       case "outlined":
         return {
@@ -59,43 +61,60 @@ export function Card({
           borderRadius: Radius["3xl"],
           borderWidth: 1,
           borderColor: Colors.border,
+          overflow: "hidden" as const,
         };
       case "glass":
         return {
           backgroundColor: Colors.cardGlass,
           borderRadius: Radius["3xl"],
           ...Shadows.soft,
+          overflow: "hidden" as const,
         };
       case "interactive":
         return {
           backgroundColor: Colors.card,
           borderRadius: Radius["3xl"],
           ...Shadows.card,
+          overflow: "hidden" as const,
         };
       case "compact":
         return {
           backgroundColor: Colors.card,
           borderRadius: Radius["2xl"],
           ...Shadows.sm,
+          overflow: "hidden" as const,
         };
       default:
         return {
           backgroundColor: Colors.card,
           borderRadius: Radius["3xl"],
           ...Shadows.soft,
+          overflow: "hidden" as const,
         };
     }
   };
+
+  const variantStyles = getVariantStyles();
 
   const cardContent = (
     <View
       className={className}
       style={{
-        ...getVariantStyles(),
+        backgroundColor: variantStyles.backgroundColor,
+        borderRadius: variantStyles.borderRadius,
+        borderWidth: variantStyles.borderWidth,
+        borderColor: variantStyles.borderColor,
+        overflow: variantStyles.overflow,
+        shadowColor: (variantStyles as any).shadowColor,
+        shadowOffset: (variantStyles as any).shadowOffset,
+        shadowOpacity: (variantStyles as any).shadowOpacity,
+        shadowRadius: (variantStyles as any).shadowRadius,
+        elevation: (variantStyles as any).elevation,
         padding: paddingValue,
       }}
       accessible={!!accessibilityLabel}
       accessibilityLabel={accessibilityLabel}
+      accessibilityRole={pressable ? "button" : undefined}
       {...props}
     >
       {variant === "gradient" ? (
@@ -103,7 +122,10 @@ export function Card({
           colors={[Colors.gradientStart, Colors.gradientEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{ borderRadius: Radius.lg, padding: paddingValue }}
+          style={{
+            margin: -paddingValue,
+            padding: paddingValue,
+          }}
         >
           {children}
         </LinearGradient>
@@ -117,12 +139,29 @@ export function Card({
     return (
       <TouchableOpacity
         onPress={onPress}
-        activeOpacity={reducedMotion ? 0.9 : 0.7}
+        activeOpacity={reducedMotion ? 0.95 : 0.85}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        style={{ ...getVariantStyles() }}
+        style={{
+          ...getVariantStyles(),
+          padding: paddingValue,
+        }}
       >
-        {cardContent}
+        {variant === "gradient" ? (
+          <LinearGradient
+            colors={[Colors.gradientStart, Colors.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              margin: -paddingValue,
+              padding: paddingValue,
+            }}
+          >
+            {children}
+          </LinearGradient>
+        ) : (
+          children
+        )}
       </TouchableOpacity>
     );
   }
