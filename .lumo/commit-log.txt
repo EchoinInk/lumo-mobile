@@ -19348,3 +19348,9 @@ COMMIT: chore(lumo): update task.ts
 FILES:
 src/features/tasks/types/task.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 07:11:35
+COMMIT: chore(lumo): update TaskFormModal.tsx
+FILES:
+src/features/tasks/components/TaskFormModal.tsx
+

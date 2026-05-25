@@ -1,11 +1,10 @@
-import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Input } from "@/src/components/ui/Input";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar, Check, Clock, Plus, X } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -20,471 +19,484 @@ import {
 import { CreateTaskInput, Task, TaskPriority } from "../types/task";
 
 interface TaskFormModalProps {
-    visible: boolean;
-    mode: "create" | "edit";
-    initialTask?: Task;
-    onSubmit: (data: CreateTaskInput) => void;
-    onClose: () => void;
+  visible: boolean;
+  mode: "create" | "edit";
+  initialTask?: Task;
+  onSubmit: (data: CreateTaskInput) => void;
+  onClose: () => void;
 }
 
 const priorities: { key: TaskPriority; label: string; color: string }[] = [
-    { key: "low", label: "Low", color: Colors.blue },
-    { key: "medium", label: "Medium", color: Colors.warning },
-    { key: "high", label: "High", color: Colors.pink },
+  { key: "low", label: "Low", color: Colors.blue },
+  { key: "medium", label: "Medium", color: Colors.warning },
+  { key: "high", label: "High", color: Colors.pink },
 ];
 
 const dateOptions = [
-    { key: "today", label: "Today" },
-    { key: "tomorrow", label: "Tomorrow" },
-    { key: "none", label: "No date" },
+  { key: "today", label: "Today" },
+  { key: "tomorrow", label: "Tomorrow" },
+  { key: "none", label: "No date" },
 ];
 
 export function TaskFormModal({
-    visible,
-    mode,
-    initialTask,
-    onSubmit,
-    onClose,
+  visible,
+  mode,
+  initialTask,
+  onSubmit,
+  onClose,
 }: TaskFormModalProps) {
-    const [title, setTitle] = useState("");
-    const [notes, setNotes] = useState("");
-    const [priority, setPriority] = useState<TaskPriority>("medium");
-    const [selectedDate, setSelectedDate] = useState<string>("none");
-    const [dueTime, setDueTime] = useState<string>("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("medium");
+  const [selectedDate, setSelectedDate] = useState<string>("none");
+  const [dueTime, setDueTime] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Initialize form when modal opens or initialTask changes
-    useEffect(() => {
-        if (visible) {
-            if (mode === "edit" && initialTask) {
-                setTitle(initialTask.title);
-                setNotes(initialTask.description || "");
-                setPriority(initialTask.priority);
-                setDueTime(initialTask.dueTime || "");
+  // Initialize form when modal opens or initialTask changes
+  useEffect(() => {
+    if (visible) {
+      if (mode === "edit" && initialTask) {
+        setTitle(initialTask.title);
+        setNotes(initialTask.description || "");
+        setPriority(initialTask.priority);
+        setDueTime(initialTask.dueTime || "");
 
-                // Determine date selection from dueDate
-                if (initialTask.dueDate) {
-                    const today = new Date().toISOString().split("T")[0];
-                    const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-                    if (initialTask.dueDate === today) {
-                        setSelectedDate("today");
-                    } else if (initialTask.dueDate === tomorrow) {
-                        setSelectedDate("tomorrow");
-                    } else {
-                        setSelectedDate("none");
-                    }
-                } else {
-                    setSelectedDate("none");
-                }
-            } else {
-                // Reset for create mode
-                setTitle("");
-                setNotes("");
-                setPriority("medium");
-                setSelectedDate("none");
-                setDueTime("");
-            }
+        // Determine date selection from dueDate
+        if (initialTask.dueDate) {
+          const today = new Date().toISOString().split("T")[0];
+          const tomorrow = new Date(Date.now() + 86400000)
+            .toISOString()
+            .split("T")[0];
+          if (initialTask.dueDate === today) {
+            setSelectedDate("today");
+          } else if (initialTask.dueDate === tomorrow) {
+            setSelectedDate("tomorrow");
+          } else {
+            setSelectedDate("none");
+          }
+        } else {
+          setSelectedDate("none");
         }
-    }, [visible, mode, initialTask]);
+      } else {
+        // Reset for create mode
+        setTitle("");
+        setNotes("");
+        setPriority("medium");
+        setSelectedDate("none");
+        setDueTime("");
+      }
+    }
+  }, [visible, mode, initialTask]);
 
-    const handleSubmit = async () => {
-        if (!title.trim()) return;
+  const handleSubmit = async () => {
+    if (!title.trim()) return;
 
-        setIsSubmitting(true);
-        Keyboard.dismiss();
+    setIsSubmitting(true);
+    Keyboard.dismiss();
 
-        // Calculate dueDate from selection
-        let dueDate: string | undefined;
-        if (selectedDate === "today") {
-            dueDate = new Date().toISOString().split("T")[0];
-        } else if (selectedDate === "tomorrow") {
-            dueDate = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-        }
+    // Calculate dueDate from selection
+    let dueDate: string | undefined;
+    if (selectedDate === "today") {
+      dueDate = new Date().toISOString().split("T")[0];
+    } else if (selectedDate === "tomorrow") {
+      dueDate = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+    }
 
-        onSubmit({
-            title: title.trim(),
-            description: notes.trim() || undefined,
-            priority,
-            dueDate,
-            dueTime: dueTime.trim() || undefined,
-        });
+    onSubmit({
+      title: title.trim(),
+      description: notes.trim() || undefined,
+      priority,
+      dueDate,
+      dueTime: dueTime.trim() || undefined,
+    });
 
-        setIsSubmitting(false);
-        onClose();
-    };
+    setIsSubmitting(false);
+    onClose();
+  };
 
-    const handleClose = () => {
-        Keyboard.dismiss();
-        onClose();
-    };
+  const handleClose = () => {
+    Keyboard.dismiss();
+    onClose();
+  };
 
-    const isValid = title.trim().length > 0;
-    const titleText = mode === "edit" ? "Edit task" : "Add a small step";
-    const subtitleText = mode === "edit" ? "Make it work for you" : "Every big journey starts small";
-    const submitText = mode === "edit" ? "Save changes" : "Add task";
-    const submitIcon = mode === "edit" ? Check : Plus;
+  const isValid = title.trim().length > 0;
+  const titleText = mode === "edit" ? "Edit task" : "Add a small step";
+  const subtitleText =
+    mode === "edit" ? "Make it work for you" : "Every big journey starts small";
+  const submitText = mode === "edit" ? "Save changes" : "Add task";
+  const submitIcon = mode === "edit" ? Check : Plus;
 
-    return (
-        <Modal
-            visible={visible}
-            transparent
-            animationType="slide"
-            onRequestClose={handleClose}
-        >
-            <TouchableWithoutFeedback onPress={handleClose}>
-                <View style={styles.overlay}>
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={styles.keyboardView}
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
+      <TouchableWithoutFeedback onPress={handleClose}>
+        <View style={styles.overlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardView}
+          >
+            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+              <View style={styles.container}>
+                <Card variant="elevated" style={styles.sheet}>
+                  {/* Header */}
+                  <View style={styles.header}>
+                    <View style={styles.titleContainer}>
+                      <Text variant="title" style={styles.title}>
+                        {titleText}
+                      </Text>
+                      <Text
+                        variant="body"
+                        color={Colors.textSecondary}
+                        style={styles.subtitle}
+                      >
+                        {subtitleText}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={handleClose}
+                      style={styles.closeButton}
+                      activeOpacity={0.7}
                     >
-                        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-                            <View style={styles.container}>
-                                <Card variant="elevated" style={styles.sheet}>
-                                    {/* Header */}
-                                    <View style={styles.header}>
-                                        <View style={styles.titleContainer}>
-                                            <Text variant="title" style={styles.title}>
-                                                {titleText}
-                                            </Text>
-                                            <Text
-                                                variant="body"
-                                                color={Colors.textSecondary}
-                                                style={styles.subtitle}
-                                            >
-                                                {subtitleText}
-                                            </Text>
-                                        </View>
-                                        <TouchableOpacity
-                                            onPress={handleClose}
-                                            style={styles.closeButton}
-                                            activeOpacity={0.7}
-                                        >
-                                            <X size={24} color={Colors.textSecondary} />
-                                        </TouchableOpacity>
-                                    </View>
+                      <X size={24} color={Colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
 
-                                    <ScrollView
-                                        showsVerticalScrollIndicator={false}
-                                        keyboardShouldPersistTaps="handled"
-                                    >
-                                        {/* Task Title */}
-                                        <View style={styles.inputGroup}>
-                                            <Input
-                                                label="What would you like to do?"
-                                                placeholder="e.g., Take a 5-minute walk"
-                                                value={title}
-                                                onChangeText={setTitle}
-                                                autoFocus={mode === "create"}
-                                                returnKeyType="next"
-                                                accessibilityLabel="Task title input"
-                                            />
-                                        </View>
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    {/* Task Title */}
+                    <View style={styles.inputGroup}>
+                      <Input
+                        label="What would you like to do?"
+                        placeholder="e.g., Take a 5-minute walk"
+                        value={title}
+                        onChangeText={setTitle}
+                        autoFocus={mode === "create"}
+                        returnKeyType="next"
+                        accessibilityLabel="Task title input"
+                      />
+                    </View>
 
-                                        {/* Due Date Selection */}
-                                        <View style={styles.inputGroup}>
-                                            <Text
-                                                variant="label"
-                                                color={Colors.textSecondary}
-                                                style={styles.label}
-                                            >
-                                                When?
-                                            </Text>
-                                            <View style={styles.dateContainer}>
-                                                {dateOptions.map((option) => (
-                                                    <TouchableOpacity
-                                                        key={option.key}
-                                                        onPress={() => setSelectedDate(option.key)}
-                                                        activeOpacity={0.7}
-                                                        accessibilityLabel={`Set due date: ${option.label}`}
-                                                        accessibilityRole="button"
-                                                        accessibilityState={{
-                                                            selected: selectedDate === option.key,
-                                                        }}
-                                                    >
-                                                        <View
-                                                            style={[
-                                                                styles.dateChip,
-                                                                selectedDate === option.key && {
-                                                                    backgroundColor: Colors.purple + "20",
-                                                                    borderColor: Colors.purple,
-                                                                    borderWidth: 1,
-                                                                },
-                                                            ]}
-                                                        >
-                                                            <Calendar
-                                                                size={14}
-                                                                color={
-                                                                    selectedDate === option.key
-                                                                        ? Colors.purple
-                                                                        : Colors.textTertiary
-                                                                }
-                                                            />
-                                                            <Text
-                                                                variant="small"
-                                                                color={
-                                                                    selectedDate === option.key
-                                                                        ? Colors.purple
-                                                                        : Colors.textSecondary
-                                                                }
-                                                            >
-                                                                {option.label}
-                                                            </Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View>
-                                        </View>
-
-                                        {/* Due Time (Optional) */}
-                                        {selectedDate !== "none" && (
-                                            <View style={styles.inputGroup}>
-                                                <Input
-                                                    label="Time (optional)"
-                                                    placeholder="e.g., 2:30 PM"
-                                                    value={dueTime}
-                                                    onChangeText={setDueTime}
-                                                    leftIcon={<Clock size={18} color={Colors.textTertiary} />}
-                                                    accessibilityLabel="Due time input"
-                                                />
-                                            </View>
-                                        )}
-
-                                        {/* Priority Selector */}
-                                        <View style={styles.inputGroup}>
-                                            <Text
-                                                variant="label"
-                                                color={Colors.textSecondary}
-                                                style={styles.label}
-                                            >
-                                                How important is this?
-                                            </Text>
-                                            <View style={styles.priorityContainer}>
-                                                {priorities.map((p) => (
-                                                    <TouchableOpacity
-                                                        key={p.key}
-                                                        onPress={() => setPriority(p.key)}
-                                                        activeOpacity={0.7}
-                                                        accessibilityLabel={`${p.label} priority`}
-                                                        accessibilityRole="button"
-                                                        accessibilityState={{
-                                                            selected: priority === p.key,
-                                                        }}
-                                                    >
-                                                        <View
-                                                            style={[
-                                                                styles.priorityPill,
-                                                                priority === p.key && {
-                                                                    backgroundColor: p.color + "20",
-                                                                    borderColor: p.color,
-                                                                    borderWidth: 1,
-                                                                },
-                                                            ]}
-                                                        >
-                                                            <View
-                                                                style={[
-                                                                    styles.priorityDot,
-                                                                    { backgroundColor: p.color },
-                                                                ]}
-                                                            />
-                                                            <Text
-                                                                variant="body"
-                                                                color={
-                                                                    priority === p.key
-                                                                        ? p.color
-                                                                        : Colors.textSecondary
-                                                                }
-                                                            >
-                                                                {p.label}
-                                                            </Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View>
-                                        </View>
-
-                                        {/* Notes (Optional) */}
-                                        <View style={styles.inputGroup}>
-                                            <Input
-                                                label="Notes (optional)"
-                                                placeholder="Any helpful details..."
-                                                value={notes}
-                                                onChangeText={setNotes}
-                                                multiline
-                                                numberOfLines={3}
-                                                textAlignVertical="top"
-                                                accessibilityLabel="Task notes input"
-                                            />
-                                        </View>
-
-                                        {/* Spacer for bottom padding */}
-                                        <View style={styles.spacer} />
-                                    </ScrollView>
-
-                                    {/* Action Buttons */}
-                                    <View style={styles.actions}>
-                                        <TouchableOpacity
-                                            onPress={handleClose}
-                                            style={styles.cancelButton}
-                                            activeOpacity={0.7}
-                                            accessibilityLabel={mode === "edit" ? "Cancel editing" : "Cancel adding task"}
-                                            accessibilityRole="button"
-                                        >
-                                            <Text
-                                                variant="body"
-                                                color={Colors.textSecondary}
-                                                style={styles.cancelText}
-                                            >
-                                                Not now
-                                            </Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            onPress={handleSubmit}
-                                            disabled={!isValid || isSubmitting}
-                                            activeOpacity={0.8}
-                                            accessibilityLabel={submitText}
-                                            accessibilityRole="button"
-                                            accessibilityState={{
-                                                disabled: !isValid || isSubmitting,
-                                            }}
-                                        >
-                                            <LinearGradient
-                                                colors={[Colors.pink, Colors.purple]}
-                                                start={{ x: 0, y: 0 }}
-                                                end={{ x: 1, y: 0 }}
-                                                style={[
-                                                    styles.submitButton,
-                                                    (!isValid || isSubmitting) &&
-                                                        styles.submitButtonDisabled,
-                                                ]}
-                                            >
-                                                <submitIcon size={20} color={Colors.textInverse} />
-                                                <Text
-                                                    variant="body"
-                                                    color={Colors.textInverse}
-                                                    style={styles.submitText}
-                                                >
-                                                    {submitText}
-                                                </Text>
-                                            </LinearGradient>
-                                        </TouchableOpacity>
-                                    </View>
-                                </Card>
+                    {/* Due Date Selection */}
+                    <View style={styles.inputGroup}>
+                      <Text
+                        variant="label"
+                        color={Colors.textSecondary}
+                        style={styles.label}
+                      >
+                        When?
+                      </Text>
+                      <View style={styles.dateContainer}>
+                        {dateOptions.map((option) => (
+                          <TouchableOpacity
+                            key={option.key}
+                            onPress={() => setSelectedDate(option.key)}
+                            activeOpacity={0.7}
+                            accessibilityLabel={`Set due date: ${option.label}`}
+                            accessibilityRole="button"
+                            accessibilityState={{
+                              selected: selectedDate === option.key,
+                            }}
+                          >
+                            <View
+                              style={[
+                                styles.dateChip,
+                                selectedDate === option.key && {
+                                  backgroundColor: Colors.purple + "20",
+                                  borderColor: Colors.purple,
+                                  borderWidth: 1,
+                                },
+                              ]}
+                            >
+                              <Calendar
+                                size={14}
+                                color={
+                                  selectedDate === option.key
+                                    ? Colors.purple
+                                    : Colors.textTertiary
+                                }
+                              />
+                              <Text
+                                variant="small"
+                                color={
+                                  selectedDate === option.key
+                                    ? Colors.purple
+                                    : Colors.textSecondary
+                                }
+                              >
+                                {option.label}
+                              </Text>
                             </View>
-                        </TouchableWithoutFeedback>
-                    </KeyboardAvoidingView>
-                </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Due Time (Optional) */}
+                    {selectedDate !== "none" && (
+                      <View style={styles.inputGroup}>
+                        <Input
+                          label="Time (optional)"
+                          placeholder="e.g., 2:30 PM"
+                          value={dueTime}
+                          onChangeText={setDueTime}
+                          leftIcon={
+                            <Clock size={18} color={Colors.textTertiary} />
+                          }
+                          accessibilityLabel="Due time input"
+                        />
+                      </View>
+                    )}
+
+                    {/* Priority Selector */}
+                    <View style={styles.inputGroup}>
+                      <Text
+                        variant="label"
+                        color={Colors.textSecondary}
+                        style={styles.label}
+                      >
+                        How important is this?
+                      </Text>
+                      <View style={styles.priorityContainer}>
+                        {priorities.map((p) => (
+                          <TouchableOpacity
+                            key={p.key}
+                            onPress={() => setPriority(p.key)}
+                            activeOpacity={0.7}
+                            accessibilityLabel={`${p.label} priority`}
+                            accessibilityRole="button"
+                            accessibilityState={{
+                              selected: priority === p.key,
+                            }}
+                          >
+                            <View
+                              style={[
+                                styles.priorityPill,
+                                priority === p.key && {
+                                  backgroundColor: p.color + "20",
+                                  borderColor: p.color,
+                                  borderWidth: 1,
+                                },
+                              ]}
+                            >
+                              <View
+                                style={[
+                                  styles.priorityDot,
+                                  { backgroundColor: p.color },
+                                ]}
+                              />
+                              <Text
+                                variant="body"
+                                color={
+                                  priority === p.key
+                                    ? p.color
+                                    : Colors.textSecondary
+                                }
+                              >
+                                {p.label}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Notes (Optional) */}
+                    <View style={styles.inputGroup}>
+                      <Input
+                        label="Notes (optional)"
+                        placeholder="Any helpful details..."
+                        value={notes}
+                        onChangeText={setNotes}
+                        multiline
+                        numberOfLines={3}
+                        textAlignVertical="top"
+                        accessibilityLabel="Task notes input"
+                      />
+                    </View>
+
+                    {/* Spacer for bottom padding */}
+                    <View style={styles.spacer} />
+                  </ScrollView>
+
+                  {/* Action Buttons */}
+                  <View style={styles.actions}>
+                    <TouchableOpacity
+                      onPress={handleClose}
+                      style={styles.cancelButton}
+                      activeOpacity={0.7}
+                      accessibilityLabel={
+                        mode === "edit"
+                          ? "Cancel editing"
+                          : "Cancel adding task"
+                      }
+                      accessibilityRole="button"
+                    >
+                      <Text
+                        variant="body"
+                        color={Colors.textSecondary}
+                        style={styles.cancelText}
+                      >
+                        Not now
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={handleSubmit}
+                      disabled={!isValid || isSubmitting}
+                      activeOpacity={0.8}
+                      accessibilityLabel={submitText}
+                      accessibilityRole="button"
+                      accessibilityState={{
+                        disabled: !isValid || isSubmitting,
+                      }}
+                    >
+                      <LinearGradient
+                        colors={[Colors.pink, Colors.purple]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={[
+                          styles.submitButton,
+                          (!isValid || isSubmitting) &&
+                            styles.submitButtonDisabled,
+                        ]}
+                      >
+                        {mode === "edit" ? (
+                          <Check size={20} color={Colors.textInverse} />
+                        ) : (
+                          <Plus size={20} color={Colors.textInverse} />
+                        )}
+                        <Text
+                          variant="body"
+                          color={Colors.textInverse}
+                          style={styles.submitText}
+                        >
+                          {submitText}
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                </Card>
+              </View>
             </TouchableWithoutFeedback>
-        </Modal>
-    );
+          </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: Colors.overlay,
-        justifyContent: "flex-end",
-    },
-    keyboardView: {
-        justifyContent: "flex-end",
-    },
-    container: {
-        paddingHorizontal: Spacing.lg,
-        paddingBottom: Platform.OS === "ios" ? 34 : Spacing.lg,
-    },
-    sheet: {
-        maxHeight: "85%",
-        padding: Spacing.xl,
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: Spacing.xl,
-    },
-    titleContainer: {
-        flex: 1,
-    },
-    title: {
-        fontWeight: "600",
-        marginBottom: Spacing.xs,
-    },
-    subtitle: {
-        lineHeight: 20,
-    },
-    closeButton: {
-        padding: Spacing.sm,
-        marginLeft: Spacing.md,
-    },
-    inputGroup: {
-        marginBottom: Spacing.lg,
-    },
-    label: {
-        marginBottom: Spacing.sm,
-    },
-    dateContainer: {
-        flexDirection: "row",
-        gap: Spacing.md,
-    },
-    dateChip: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: Spacing.xs,
-        paddingHorizontal: Spacing.md,
-        paddingVertical: Spacing.sm,
-        borderRadius: Radius.full,
-        backgroundColor: Colors.lavender,
-    },
-    priorityContainer: {
-        flexDirection: "row",
-        gap: Spacing.md,
-    },
-    priorityPill: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: Spacing.sm,
-        paddingHorizontal: Spacing.lg,
-        paddingVertical: Spacing.md,
-        borderRadius: Radius.full,
-        backgroundColor: Colors.lavender,
-    },
-    priorityDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-    },
-    spacer: {
-        height: Spacing.lg,
-    },
-    actions: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: Spacing.md,
-        paddingTop: Spacing.md,
-        borderTopWidth: 1,
-        borderTopColor: Colors.border,
-    },
-    cancelButton: {
-        paddingVertical: Spacing.md,
-        paddingHorizontal: Spacing.lg,
-    },
-    cancelText: {
-        fontWeight: "500",
-    },
-    submitButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: Spacing.sm,
-        paddingVertical: Spacing.md,
-        paddingHorizontal: Spacing.xl,
-        borderRadius: Radius["2xl"],
-        ...Shadows.glow,
-    },
-    submitButtonDisabled: {
-        opacity: 0.5,
-    },
-    submitText: {
-        fontWeight: "600",
-    },
+  overlay: {
+    flex: 1,
+    backgroundColor: Colors.overlay,
+    justifyContent: "flex-end",
+  },
+  keyboardView: {
+    justifyContent: "flex-end",
+  },
+  container: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Platform.OS === "ios" ? 34 : Spacing.lg,
+  },
+  sheet: {
+    maxHeight: "85%",
+    padding: Spacing.xl,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: Spacing.xl,
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  title: {
+    fontWeight: "600",
+    marginBottom: Spacing.xs,
+  },
+  subtitle: {
+    lineHeight: 20,
+  },
+  closeButton: {
+    padding: Spacing.sm,
+    marginLeft: Spacing.md,
+  },
+  inputGroup: {
+    marginBottom: Spacing.lg,
+  },
+  label: {
+    marginBottom: Spacing.sm,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    gap: Spacing.md,
+  },
+  dateChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.lavender,
+  },
+  priorityContainer: {
+    flexDirection: "row",
+    gap: Spacing.md,
+  },
+  priorityPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.lavender,
+  },
+  priorityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  spacer: {
+    height: Spacing.lg,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  cancelButton: {
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+  },
+  cancelText: {
+    fontWeight: "500",
+  },
+  submitButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius["2xl"],
+    ...Shadows.glow,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitText: {
+    fontWeight: "600",
+  },
 });
