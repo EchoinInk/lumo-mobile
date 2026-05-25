@@ -19082,3 +19082,9 @@ COMMIT: chore(lumo): update more.tsx
 FILES:
 app/(tabs)/more.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 05:04:55
+COMMIT: chore(lumo): update index.tsx
+FILES:
+app/(tabs)/more/index.tsx
+
