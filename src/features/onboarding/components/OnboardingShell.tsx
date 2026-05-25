@@ -1,0 +1,142 @@
+/**
+ * Onboarding Shell
+ * Provides consistent layout for onboarding screens
+ */
+
+import { Button } from "@/src/components/ui/Button";
+import { Text } from "@/src/components/ui/Text";
+import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { ReactNode } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { OnboardingProgress } from "./OnboardingProgress";
+
+interface OnboardingShellProps {
+  children: ReactNode;
+  title: string;
+  subtitle?: string;
+  currentStep: number;
+  totalSteps: number;
+  onNext: () => void;
+  onBack?: () => void;
+  nextLabel?: string;
+  canProceed?: boolean;
+}
+
+export function OnboardingShell({
+  children,
+  title,
+  subtitle,
+  currentStep,
+  totalSteps,
+  onNext,
+  onBack,
+  nextLabel = "Continue",
+  canProceed = true,
+}: OnboardingShellProps) {
+  return (
+    <LinearGradient
+      colors={[Colors.lavender, Colors.background]}
+      style={styles.container}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Progress Header */}
+          <View style={styles.header}>
+            <OnboardingProgress current={currentStep} total={totalSteps} />
+          </View>
+
+          {/* Title Section */}
+          <View style={styles.titleSection}>
+            <Text variant="heading" style={styles.title}>
+              {title}
+            </Text>
+            {subtitle && (
+              <Text variant="body" color={Colors.textSecondary} style={styles.subtitle}>
+                {subtitle}
+              </Text>
+            )}
+          </View>
+
+          {/* Content */}
+          <View style={styles.content}>{children}</View>
+
+          {/* Footer with Actions */}
+          <View style={styles.footer}>
+            <Button
+              onPress={onNext}
+              disabled={!canProceed}
+              variant="primary"
+              size="large"
+              style={styles.nextButton}
+            >n              {nextLabel}
+            </Button>
+            {onBack && (
+              <Button
+                onPress={onBack}
+                variant="ghost"
+                size="medium"
+                style={styles.backButton}
+              >
+                Back
+              </Button>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.xl,
+  },
+  header: {
+    marginBottom: Spacing.xl,
+  },
+  titleSection: {
+    marginBottom: Spacing.xl,
+  },
+  title: {
+    fontWeight: "600",
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    lineHeight: 24,
+  },
+  content: {
+    flex: 1,
+    marginBottom: Spacing.xl,
+  },
+  footer: {
+    gap: Spacing.md,
+  },
+  nextButton: {
+    borderRadius: Radius.lg,
+  },
+  backButton: {
+    alignSelf: "center",
+  },
+});
