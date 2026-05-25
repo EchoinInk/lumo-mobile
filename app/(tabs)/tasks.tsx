@@ -111,6 +111,15 @@ export default function TasksScreen() {
         ))}
       </ScrollView>
 
+      {/* Error State */}
+      {error && (
+        <Card variant="outlined" style={styles.errorCard}>
+          <Text variant="body" color={Colors.textSecondary}>
+            {error}
+          </Text>
+        </Card>
+      )}
+
       {/* Task List */}
       <View style={styles.taskList}>
         {filteredTasks.map((task) => (
@@ -124,75 +133,89 @@ export default function TasksScreen() {
                 styles.taskCardHigh,
             ]}
           >
-            <TouchableOpacity
-              onPress={() => toggleTask(task.id)}
-              style={styles.taskContent}
-              activeOpacity={0.7}
-              accessibilityLabel={`${task.completed ? "Completed" : "Pending"} task: ${task.title}`}
-              accessibilityRole="button"
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  task.completed && styles.checkboxChecked,
-                  task.priority === "high" &&
-                    !task.completed &&
-                    styles.checkboxHigh,
-                ]}
+            <View style={styles.taskRow}>
+              <TouchableOpacity
+                onPress={() => toggleTask(task.id)}
+                style={styles.taskContent}
+                activeOpacity={0.7}
+                accessibilityLabel={`${task.completed ? "Completed" : "Pending"} task: ${task.title}`}
+                accessibilityRole="button"
               >
-                {task.completed ? (
-                  <CheckCircle2 size={20} color={Colors.textInverse} />
-                ) : (
-                  <Circle size={20} color={Colors.border} />
-                )}
-              </View>
-
-              <View style={styles.taskInfo}>
-                <Text
-                  variant="body"
+                <View
                   style={[
-                    styles.taskTitle,
-                    task.completed && styles.taskTitleCompleted,
+                    styles.checkbox,
+                    task.completed && styles.checkboxChecked,
+                    task.priority === "high" &&
+                      !task.completed &&
+                      styles.checkboxHigh,
                   ]}
                 >
-                  {task.title}
-                </Text>
-
-                <View style={styles.taskMeta}>
-                  {task.dueDate && (
-                    <View style={styles.timeBadge}>
-                      <Clock size={12} color={Colors.textTertiary} />
-                      <Text variant="small" color={Colors.textTertiary}>
-                        {new Date(task.dueDate).toLocaleDateString()}
-                      </Text>
-                    </View>
+                  {task.completed ? (
+                    <CheckCircle2 size={20} color={Colors.textInverse} />
+                  ) : (
+                    <Circle size={20} color={Colors.border} />
                   )}
+                </View>
 
-                  <View
+                <View style={styles.taskInfo}>
+                  <Text
+                    variant="body"
                     style={[
-                      styles.priorityBadge,
-                      {
-                        backgroundColor: getPriorityColor(task.priority) + "15",
-                      },
+                      styles.taskTitle,
+                      task.completed && styles.taskTitleCompleted,
                     ]}
                   >
+                    {task.title}
+                  </Text>
+
+                  <View style={styles.taskMeta}>
+                    {task.dueDate && (
+                      <View style={styles.timeBadge}>
+                        <Clock size={12} color={Colors.textTertiary} />
+                        <Text variant="small" color={Colors.textTertiary}>
+                          {new Date(task.dueDate).toLocaleDateString()}
+                        </Text>
+                      </View>
+                    )}
+
                     <View
                       style={[
-                        styles.priorityDot,
-                        { backgroundColor: getPriorityColor(task.priority) },
+                        styles.priorityBadge,
+                        {
+                          backgroundColor:
+                            getPriorityColor(task.priority) + "15",
+                        },
                       ]}
-                    />
-                    <Text
-                      variant="small"
-                      color={getPriorityColor(task.priority)}
                     >
-                      {task.priority.charAt(0).toUpperCase() +
-                        task.priority.slice(1)}
-                    </Text>
+                      <View
+                        style={[
+                          styles.priorityDot,
+                          { backgroundColor: getPriorityColor(task.priority) },
+                        ]}
+                      />
+                      <Text
+                        variant="small"
+                        color={getPriorityColor(task.priority)}
+                      >
+                        {task.priority.charAt(0).toUpperCase() +
+                          task.priority.slice(1)}
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+
+              {/* Delete Button - subtle, calm */}
+              <TouchableOpacity
+                onPress={() => deleteTask(task.id)}
+                style={styles.deleteButton}
+                activeOpacity={0.6}
+                accessibilityLabel={`Delete task: ${task.title}`}
+                accessibilityRole="button"
+              >
+                <Trash2 size={18} color={Colors.textTertiary} />
+              </TouchableOpacity>
+            </View>
           </Card>
         ))}
       </View>
