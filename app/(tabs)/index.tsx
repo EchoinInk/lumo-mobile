@@ -1,287 +1,165 @@
-import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
-import { Text } from "@/src/components/ui/Text";
+import { DailyProgressCard } from "@/src/features/dashboard/components/DailyProgressCard";
+import { TodayFocusCard } from "@/src/features/dashboard/components/TodayFocusCard";
+import { TodaysRoutinesCard } from "@/src/features/dashboard/components/TodaysRoutinesCard";
+import { calculateDailyProgress } from "@/src/features/dashboard/utils/dashboardProgress";
+import { useHabits } from "@/src/features/habits";
 import { useTasks } from "@/src/features/tasks";
-import { Colors, Radius, Spacing } from "@/src/theme/tokens";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-    CheckCircle2,
-    Circle,
-    Flame,
-    Sparkles,
-    Trophy,
-    Utensils,
-    Wallet,
-} from "lucide-react-native";
+import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-// Mock data for stats
-const mockStats = [
-  {
-    label: "Tasks",
-    value: "5",
-    change: "3 done today",
-    icon: CheckCircle2,
-    color: Colors.blue,
-  },
-  {
-    label: "Habits",
-    value: "7",
-    change: "day streak",
-    icon: Flame,
-    color: Colors.purple,
-  },
-  {
-    label: "Calories",
-    value: "1,320",
-    change: "of 1,800",
-    icon: Utensils,
-    color: Colors.pink,
-  },
-  {
-    label: "Budget",
-    value: "$420",
-    change: "remaining",
-    icon: Wallet,
-    color: Colors.success,
-  },
-];
+// Quick Actions Component
+import { Card } from "@/src/components/ui/Card";
+import { Text } from "@/src/components/ui/Text";
+import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { Calendar, Flame, Menu, Plus } from "lucide-react-native";
 
-// Mock small wins
-const smallWins = [
-  { text: "Completed morning routine!", icon: CheckCircle2 },
-  { text: "7-day habit streak", icon: Flame },
-  { text: "Stayed under budget", icon: Wallet },
-];
+function QuickActions() {
+  const actions = [
+    {
+      label: "Add Task",
+      icon: Plus,
+      color: Colors.blue,
+      onPress: () => router.push("/(tabs)/tasks"),
+    },
+    {
+      label: "Add Habit",
+      icon: Flame,
+      color: Colors.purple,
+      onPress: () => router.push("/(tabs)/more/habits"),
+    },
+    {
+      label: "Calendar",
+      icon: Calendar,
+      color: Colors.pink,
+      onPress: () => router.push("/(tabs)/calendar"),
+    },
+    {
+      label: "More",
+      icon: Menu,
+      color: Colors.success,
+      onPress: () => router.push("/(tabs)/more"),
+    },
+  ];
 
-// Fallback mock focus items when no tasks exist
-const fallbackFocusItems = [
-  { id: "1", text: "Morning meds", completed: true },
-  { id: "2", text: "Team standup", completed: true },
-  { id: "3", text: "Focus block: Design", completed: false, highlight: true },
-  { id: "4", text: "Walk 30 min", completed: false },
-];
-
-// Quick actions
-const quickActions = [
-  { label: "Add Task", color: Colors.blue },
-  { label: "Log Meal", color: Colors.pink },
-  { label: "Add Expense", color: Colors.success },
-  { label: "Log Weight", color: Colors.purple },
-];
+  return (
+    <View style={styles.quickActionsGrid}>
+      {actions.map((action) => (
+        <TouchableOpacity
+          key={action.label}
+          onPress={action.onPress}
+          activeOpacity={0.7}
+        >
+          <Card
+            variant="elevated"
+            style={[styles.quickActionCard, { borderColor: action.color }]}
+          >
+            <View
+              style={[
+                styles.actionIcon,
+                { backgroundColor: action.color + "15" },
+              ]}
+            >
+              <action.icon size={18} color={action.color} />
+            </View>
+            <Text variant="body" style={styles.actionLabel}>
+              {action.label}
+            </Text>
+          </Card>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
 
 export default function DashboardScreen() {
-  const { tasks, completedCount, totalCount, toggleTask, hasHydrated } =
-    useTasks();
+  // Get real data from Tasks and Habits
+  const {
+    tasks,
+    completedCount: completedTasks,
+    toggleTask,
+    hasHydrated: tasksHydrated,
+  } = useTasks();
+  const {
+    todayHabits,
+    completedToday: completedHabits,
+    toggleHabit,
+    isHydrated: habitsHydrated,
+  } = useHabits();
 
-  // Prioritize tasks for Today's Focus:
-  // 1. Incomplete high priority tasks due today
-  // 2. Other incomplete tasks due today
-  // 3. Newest incomplete tasks
+  // Calculate daily progress combining tasks and habits
+  const totalTasks = tasks.length;
+  const totalHabits = todayHabits.length;
+  const completedTaskCount = completedTasks;
+  const completedHabitIds = completedHabits.map((h) => h.id);
+
+  const {
+    completionRate,
+    supportiveLabel,
+    totalTodayItems,
+    completedTodayItems,
+  } = calculateDailyProgress(
+    totalTasks,
+    completedTaskCount,
+    totalHabits,
+    completedHabitIds.length,
+  );
+
+  // Prioritize tasks for Today's Focus
   const today = new Date().toISOString().split("T")[0];
-
   const getPriorityScore = (task: (typeof tasks)[0]) => {
     let score = 0;
-    if (task.completed) score -= 1000; // Deprioritize completed
+    if (task.completed) score -= 1000;
     if (task.priority === "high") score += 100;
     if (task.priority === "medium") score += 50;
     if (task.dueDate === today) score += 200;
-    if (task.dueDate && task.dueDate < today) score += 150; // Overdue
-    score += new Date(task.createdAt).getTime() / 1000000000; // Tie-breaker by recency
+    if (task.dueDate && task.dueDate < today) score += 150;
+    score += new Date(task.createdAt).getTime() / 1000000000;
     return score;
   };
 
-  // Use real tasks if available, otherwise fallback to mock
   const sortedTasks =
-    hasHydrated && tasks.length > 0
+    tasksHydrated && tasks.length > 0
       ? [...tasks].sort((a, b) => getPriorityScore(b) - getPriorityScore(a))
       : [];
 
-  const focusItems =
-    hasHydrated && tasks.length > 0
-      ? sortedTasks.slice(0, 4).map((t) => ({
-          id: t.id,
-          text: t.title,
-          completed: t.completed,
-          highlight: t.priority === "high" && !t.completed,
-        }))
-      : fallbackFocusItems;
-
-  const displayCompletedCount = hasHydrated
-    ? completedCount
-    : fallbackFocusItems.filter((t) => t.completed).length;
-  const displayTotalCount = hasHydrated
-    ? Math.min(totalCount, 4)
-    : fallbackFocusItems.length;
-  const progress =
-    displayTotalCount > 0
-      ? (displayCompletedCount / displayTotalCount) * 100
-      : 0;
+  const focusTasks = sortedTasks.slice(0, 4);
+  const allHydrated = tasksHydrated && habitsHydrated;
 
   return (
     <Screen scrollable padded>
       {/* Greeting Header */}
       <SectionHeader title="Good morning, Alex" subtitle="You've got this" />
 
-      {/* Today&apos;s Focus Card */}
-      <Card variant="elevated" style={styles.focusCard}>
-        <Text variant="subheading" style={styles.cardTitle}>
-          Today&apos;s Focus
-        </Text>
-        <View style={styles.focusList}>
-          {focusItems.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.focusItem}
-              onPress={() =>
-                hasHydrated &&
-                tasks.find((t) => t.id === item.id) &&
-                toggleTask(item.id)
-              }
-              activeOpacity={
-                hasHydrated && tasks.find((t) => t.id === item.id) ? 0.7 : 1
-              }
-              accessibilityLabel={`${item.completed ? "Completed" : "Pending"}: ${item.text}`}
-              accessibilityRole="button"
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  item.completed && styles.checkboxChecked,
-                  item.highlight && !item.completed && styles.checkboxHighlight,
-                ]}
-              >
-                {item.completed ? (
-                  <CheckCircle2 size={14} color={Colors.textInverse} />
-                ) : (
-                  <Circle size={14} color={Colors.border} />
-                )}
-              </View>
-              <Text
-                variant="body"
-                style={[
-                  styles.focusText,
-                  item.completed && styles.focusTextCompleted,
-                ]}
-              >
-                {item.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.progressRow}>
-          <View style={styles.progressBar}>
-            <LinearGradient
-              colors={[Colors.pinkSoft, Colors.purpleSoft]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[styles.progressFill, { width: `${progress}%` }]}
-            />
-          </View>
-          <Text variant="caption" color={Colors.textSecondary}>
-            {displayCompletedCount}/{displayTotalCount} done
-          </Text>
-        </View>
-      </Card>
+      {/* Daily Progress Card */}
+      <DailyProgressCard
+        title="Today's Progress"
+        progress={completionRate}
+        subtitle={supportiveLabel}
+        completedCount={completedTodayItems}
+        totalCount={totalTodayItems}
+        variant="gradient"
+      />
 
-      {/* Quick Actions Grid */}
+      {/* Today's Focus */}
+      <TodayFocusCard
+        tasks={focusTasks}
+        onToggle={toggleTask}
+        onAddPress={() => router.push("/(tabs)/tasks")}
+      />
+
+      {/* Today's Routines */}
+      <TodaysRoutinesCard
+        habits={todayHabits.slice(0, 4)}
+        completedIds={completedHabits.map((h) => h.id)}
+        onToggle={toggleHabit}
+        onAddPress={() => router.push("/(tabs)/more/habits")}
+      />
+
+      {/* Quick Actions */}
       <SectionHeader title="Quick Actions" />
-      <View style={styles.quickActionsGrid}>
-        {quickActions.map((action, index) => (
-          <TouchableOpacity key={index} activeOpacity={0.7}>
-            <Card
-              variant="elevated"
-              style={[styles.quickActionCard, { borderColor: action.color }]}
-            >
-              <View
-                style={[styles.actionDot, { backgroundColor: action.color }]}
-              />
-              <Text variant="body" style={styles.actionLabel}>
-                {action.label}
-              </Text>
-            </Card>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* You Did This Progress Card */}
-      <Card variant="gradient" style={styles.youDidThisCard}>
-        <View style={styles.youDidThisContent}>
-          <Trophy size={24} color={Colors.textInverse} />
-          <View style={styles.youDidThisText}>
-            <Text variant="subheading" color={Colors.textInverse}>
-              You did this!
-            </Text>
-            <Text variant="body" color={Colors.textInverse}>
-              {displayCompletedCount} tasks completed today
-            </Text>
-          </View>
-          <View style={styles.streakBadge}>
-            <Text variant="caption" color={Colors.primary}>
-              3 day streak
-            </Text>
-          </View>
-        </View>
-      </Card>
-
-      {/* Stats Grid */}
-      <SectionHeader title="At a glance" />
-      <View style={styles.statsGrid}>
-        {mockStats.map((stat, index) => (
-          <Card key={index} variant="elevated" style={styles.statCard}>
-            <View style={styles.statHeader}>
-              <View
-                style={[
-                  styles.statIconContainer,
-                  { backgroundColor: stat.color + "15" },
-                ]}
-              >
-                <stat.icon size={18} color={stat.color} />
-              </View>
-              <Text variant="caption" color={Colors.textSecondary}>
-                {stat.label}
-              </Text>
-            </View>
-            <Text variant="heading" style={styles.statValue}>
-              {stat.value}
-            </Text>
-            <Text variant="small" color={Colors.textSecondary}>
-              {stat.change}
-            </Text>
-          </Card>
-        ))}
-      </View>
-
-      {/* Reminder Card */}
-      <Card variant="outlined" style={styles.reminderCard}>
-        <View style={styles.reminderContent}>
-          <View
-            style={[
-              styles.reminderIcon,
-              { backgroundColor: Colors.blue + "15" },
-            ]}
-          >
-            <Sparkles size={18} color={Colors.blue} />
-          </View>
-          <View style={styles.reminderText}>
-            <Text variant="body" style={styles.reminderTitle}>
-              Gentle reminder
-            </Text>
-            <Text variant="caption" color={Colors.textSecondary}>
-              Take a moment to breathe and reset
-            </Text>
-          </View>
-        </View>
-      </Card>
-
-      {/* Supportive Encouragement */}
-      <Card variant="elevated" style={styles.encouragementCard}>
-        <Text variant="body" style={styles.encouragementText}>
-          &quot;Small steps every day lead to big changes. You&apos;re doing
-          great!"
-        </Text>
-      </Card>
+      <QuickActions />
     </Screen>
   );
 }
