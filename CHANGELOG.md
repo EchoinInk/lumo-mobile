@@ -1,5 +1,60 @@
 # Changelog
 
+## Phase 11.9 — Onboarding Foundation
+
+### Added
+
+- **Onboarding Flow** (`app/onboarding/`):
+  - Step 1: "What feels hardest right now?" — struggle areas selection
+  - Step 2: "How do you prefer to plan?" — planning style selection
+  - Step 3: "What should Lumo help with first?" — focus areas selection
+  - Complete: "Your space is ready" — welcome screen with "Enter Lumo" CTA
+
+- **Onboarding Types** (`src/features/onboarding/types/onboarding.ts`):
+  - `StruggleArea` — remembering tasks, building routines, meal planning, budgeting, staying consistent, feeling overwhelmed
+  - `PlanningStyle` — minimal, visual, structured, flexible
+  - `FocusArea` — tasks, habits, meals, wellness, fitness, budget
+  - `OnboardingPreferences` — stores user selections
+  - Display labels for all options
+
+- **Onboarding Store** (`src/features/onboarding/store/useOnboardingStore.ts`):
+  - MMKV-based persistence via `StorageKeys.ONBOARDING`
+  - `hydrate()` — loads saved preferences on app start
+  - `setStruggleAreas()`, `setPlanningStyle()`, `setFocusAreas()` — update preferences
+  - `completeOnboarding()` — marks onboarding complete with timestamp
+  - `resetOnboarding()` — clears preferences for testing
+
+- **Onboarding Hook** (`src/features/onboarding/hooks/useOnboarding.ts`):
+  - Auto-hydrates on mount
+  - Exposes all state and actions
+  - Clean API for components
+
+- **Onboarding UI Components**:
+  - `OnboardingShell` — consistent layout with gradient background, progress, title, footer actions
+  - `ChoiceChip` — selectable chips for options with checkmark indicator
+  - `OnboardingProgress` — step indicator bar
+
+- **First-Run Routing** (`app/_layout.tsx`):
+  - Waits for onboarding hydration
+  - Redirects new users to `/onboarding`
+  - Redirects returning users to `/(tabs)`
+  - Prevents flashing wrong screen
+
+- **Settings Integration** (`app/(tabs)/more/settings.tsx`):
+  - Added "Testing" section with "Reset Onboarding" action
+  - Confirmation dialog before reset
+  - Routes to onboarding after reset
+
+- **Feature Exports** (`src/features/onboarding/index.ts`):
+  - Centralized exports for types, store, hook, and components
+
+### Technical
+
+- Self-contained in `src/features/onboarding`
+- Local storage only — no backend
+- No new dependencies
+- Preserves local-first architecture boundaries
+
 ## Phase 11.8 — Dashboard Personalization + Empty States
 
 ### Added
