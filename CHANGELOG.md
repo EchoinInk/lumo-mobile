@@ -1,5 +1,44 @@
 # Changelog
 
+## Phase 11.5 — Local Persistence Hardening
+
+### Verified
+
+- **MMKV Persistence**: Tasks are stored under `StorageKeys.TASKS` with proper serialization
+- **Hydration**: `useTasks` hook automatically hydrates from MMKV on first mount
+- **Repository Pattern**: All CRUD operations go through `TaskLocalRepository`
+  - `createTask()` → persists to MMKV
+  - `toggleTask()` → persists to MMKV
+  - `updateTask()` → persists to MMKV
+  - `deleteTask()` → soft delete with `deletedAt` timestamp
+- **Error Handling**: Repository errors are normalized, UI shows calm error messages
+- **Graceful Degradation**: Corrupted storage returns empty array instead of crashing
+
+### Added
+
+- **useTasks Hook Hardening**:
+  - Added `isLoading` state (true while hydrating)
+  - Added `error` state with calm, supportive messages
+  - Added `clearError()` action
+  - Wrapped all actions with try/catch error handling
+  - Added persistence verification comments
+
+- **Delete Support**:
+  - Subtle trash icon on each task row
+  - Calm, non-destructive UI (muted gray color)
+  - Soft delete (task persists in storage with `deletedAt` flag)
+  - Accessibility labels for screen readers
+
+### Architecture Preserved
+
+- UI → Hook → Store → Repository → Storage boundaries maintained
+- Local-first: All changes persist immediately to MMKV
+- No backend dependencies
+- No React Query
+- Thin screens, rich hooks
+
+---
+
 ## Phase 11.4 — Real Add Task Flow
 
 ### Added
