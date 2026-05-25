@@ -37,6 +37,7 @@ export interface CreateTaskInput {
   description?: string;
   priority: TaskPriority;
   dueDate?: string;
+  dueTime?: string;
 }
 
 export interface UpdateTaskInput {
@@ -45,4 +46,5 @@ export interface UpdateTaskInput {
   completed?: boolean;
   priority?: TaskPriority;
   dueDate?: string;
+  dueTime?: string;
 }
