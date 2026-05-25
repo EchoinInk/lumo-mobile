@@ -1,8 +1,13 @@
 import { TabBarIcon } from "@/src/components/navigation";
-import { BottomTabAddButton } from "@/src/components/ui/BottomTabAddButton";
 import { Colors } from "@/src/theme/tokens";
 import { Tabs } from "expo-router";
-import { CalendarDays, Home, LayoutDashboard, Menu } from "lucide-react-native";
+import {
+    CalendarDays,
+    HeartPulse,
+    LayoutDashboard,
+    ListTodo,
+    Menu,
+} from "lucide-react-native";
 import { Platform } from "react-native";
 
 export default function TabsLayout() {
@@ -29,21 +34,6 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Start",
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused}>
-              <Home
-                size={24}
-                color={focused ? Colors.primary : Colors.textSecondary}
-                strokeWidth={2}
-              />
-            </TabBarIcon>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="dashboard"
-        options={{
           title: "Dashboard",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
@@ -57,17 +47,19 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="tasks"
         options={{
-          title: "",
-          tabBarIcon: ({ focused }) => <BottomTabAddButton focused={focused} />,
+          title: "Tasks",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused}>
+              <ListTodo
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
+                strokeWidth={2}
+              />
+            </TabBarIcon>
+          ),
         }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            navigation.navigate("modals/add-modal");
-          },
-        })}
       />
       <Tabs.Screen
         name="calendar"
@@ -76,6 +68,21 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused}>
               <CalendarDays
+                size={24}
+                color={focused ? Colors.primary : Colors.textSecondary}
+                strokeWidth={2}
+              />
+            </TabBarIcon>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="health"
+        options={{
+          title: "Health",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused}>
+              <HeartPulse
                 size={24}
                 color={focused ? Colors.primary : Colors.textSecondary}
                 strokeWidth={2}
