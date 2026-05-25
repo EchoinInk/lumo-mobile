@@ -3,26 +3,28 @@ import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { HabitFormModal } from "@/src/features/habits/components/HabitFormModal";
+import { HabitListItem } from "@/src/features/habits/components/HabitListItem";
+import { useHabits } from "@/src/features/habits/hooks/useHabits";
+import { CreateHabitInput, Habit } from "@/src/features/habits/types/habit";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
     ArrowRight,
     Dumbbell,
     Flame,
     Heart,
+    Plus,
     Scale,
     TrendingDown,
     Utensils,
 } from "lucide-react-native";
+import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-// Mock health data
+// Mock health data (only for non-habits)
 const healthSummary = {
-  habits: {
-    streak: 7,
-    total: 5,
-    completed: 4,
-  },
   calories: {
     consumed: 1320,
     goal: 1800,
@@ -70,8 +72,54 @@ const healthLinks = [
 export default function HealthScreen() {
   const calorieProgress =
     (healthSummary.calories.consumed / healthSummary.calories.goal) * 100;
-  const habitProgress =
-    (healthSummary.habits.completed / healthSummary.habits.total) * 100;
+
+  // Real habits data
+  const {
+    todayHabits,
+    completedToday,
+    completionRate,
+    totalStreak,
+    isHydrated,
+    isLoading,
+    error,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    toggleHabit,
+    isCompletedToday,
+  } = useHabits();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+  const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>(
+    undefined,
+  );
+
+  const handleAddPress = () => {
+    setModalMode("create");
+    setSelectedHabit(undefined);
+    setIsModalVisible(true);
+  };
+
+  const handleEditPress = (habit: Habit) => {
+    setModalMode("edit");
+    setSelectedHabit(habit);
+    setIsModalVisible(true);
+  };
+
+  const handleModalSubmit = (data: CreateHabitInput) => {
+    if (modalMode === "edit" && selectedHabit) {
+      updateHabit(selectedHabit.id, data);
+    } else {
+      addHabit(data);
+    }
+    setIsModalVisible(false);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedHabit(undefined);
+  };
 
   return (
     <Screen scrollable padded>
@@ -94,15 +142,94 @@ export default function HealthScreen() {
               Habits
             </Text>
             <Text variant="caption" color={Colors.textSecondary}>
-              {healthSummary.habits.streak} day streak
+              {isHydrated ? `${totalStreak} day total streak` : "Loading..."}
             </Text>
           </View>
           <Text variant="subheading" style={styles.summaryValue}>
-            {healthSummary.habits.completed}/{healthSummary.habits.total}
+            {isHydrated
+              ? `${completedToday.length}/${todayHabits.length}`
+              : "-/-"}
           </Text>
         </View>
-        <ProgressBar progress={habitProgress} height={8} variant="gradient" />
+        <ProgressBar
+          progress={isHydrated ? completionRate : 0}
+          height={8}
+          variant="gradient"
+        />
       </Card>
+
+      {/* Today's Habits List */}
+      <SectionHeader title="Today's Habits" />
+
+      {isLoading && (
+        <Card variant="outlined" style={styles.emptyCard}>
+          <Text variant="body" color={Colors.textSecondary}>
+            Loading your habits...
+          </Text>
+        </Card>
+      )}
+
+      {!isLoading && todayHabits.length === 0 && (
+        <Card variant="outlined" style={styles.emptyCard}>
+          <Text
+            variant="body"
+            color={Colors.textSecondary}
+            style={styles.emptyTitle}
+          >
+            No habits yet
+          </Text>
+          <Text variant="caption" color={Colors.textTertiary}>
+            Add a gentle routine to get started
+          </Text>
+        </Card>
+      )}
+
+      <View style={styles.habitList}>
+        {todayHabits.map((habit) => (
+          <HabitListItem
+            key={habit.id}
+            habit={habit}
+            isCompleted={isCompletedToday(habit)}
+            onToggle={() => toggleHabit(habit.id)}
+            onEdit={() => handleEditPress(habit)}
+            onDelete={() => deleteHabit(habit.id)}
+          />
+        ))}
+      </View>
+
+      {/* Add Habit Button */}
+      <TouchableOpacity
+        style={styles.addButton}
+        activeOpacity={0.8}
+        onPress={handleAddPress}
+        accessibilityLabel="Add new habit"
+        accessibilityRole="button"
+      >
+        <LinearGradient
+          colors={[Colors.pink, Colors.purple]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientButton}
+        >
+          <Plus size={20} color={Colors.textInverse} />
+          <Text
+            variant="body"
+            color={Colors.textInverse}
+            style={styles.addButtonText}
+          >
+            Add Habit
+          </Text>
+        </LinearGradient>
+      </TouchableOpacity>
+
+      {/* Habit Form Modal */}
+      <HabitFormModal
+        visible={isModalVisible}
+        mode={modalMode}
+        initialHabit={selectedHabit}
+        onSubmit={handleModalSubmit}
+        onClose={handleModalClose}
+      />
 
       {/* Calories Summary */}
       <Card variant="elevated" style={styles.summaryCard}>
