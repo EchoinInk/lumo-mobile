@@ -1,15 +1,13 @@
-import {
-  getItem,
-  removeItem,
-  setItem,
-} from "@/src/services/storage/mmkv";
-import { StorageKeys } from "@/src/services/storage/storageKeys";
+import { StorageKeys } from "@/services/storage/storageKeys";
 import { CreateHabitInput, Habit, UpdateHabitInput } from "../types/habit";
 
 const HABITS_KEY = StorageKeys.HABITS;
 
 export class HabitLocalRepositoryError extends Error {
-  constructor(message: string, public cause?: unknown) {
+  constructor(
+    message: string,
+    public cause?: unknown,
+  ) {
     super(message);
     this.name = "HabitLocalRepositoryError";
   }
@@ -17,7 +15,7 @@ export class HabitLocalRepositoryError extends Error {
 
 export async function getHabits(): Promise<Habit[]> {
   try {
-    const data = await getItem(HABITS_KEY);
+    const data = getString(HABITS_KEY);
     if (!data) return [];
 
     const parsed = JSON.parse(data) as Habit[];
@@ -57,7 +55,7 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
     };
 
     const updated = [...habits, newHabit];
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
 
     return newHabit;
   } catch (error) {
@@ -68,7 +66,7 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
 
 export async function updateHabit(
   id: string,
-  updates: UpdateHabitInput
+  updates: UpdateHabitInput,
 ): Promise<Habit> {
   try {
     const habits = await getHabits();
@@ -88,11 +86,14 @@ export async function updateHabit(
 
     const updated = [...habits];
     updated[habitIndex] = updatedHabit;
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
 
     return updatedHabit;
   } catch (error) {
-    console.error(`[HabitLocalRepository] Failed to update habit ${id}:`, error);
+    console.error(
+      `[HabitLocalRepository] Failed to update habit ${id}:`,
+      error,
+    );
     throw new HabitLocalRepositoryError(`Failed to update habit ${id}`, error);
   }
 }
@@ -116,9 +117,12 @@ export async function deleteHabit(id: string): Promise<void> {
       syncStatus: "pending",
     };
 
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
   } catch (error) {
-    console.error(`[HabitLocalRepository] Failed to delete habit ${id}:`, error);
+    console.error(
+      `[HabitLocalRepository] Failed to delete habit ${id}:`,
+      error,
+    );
     throw new HabitLocalRepositoryError(`Failed to delete habit ${id}`, error);
   }
 }
@@ -127,10 +131,16 @@ export async function hardDeleteHabit(id: string): Promise<void> {
   try {
     const habits = await getHabits();
     const updated = habits.filter((h) => h.id !== id);
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
   } catch (error) {
-    console.error(`[HabitLocalRepository] Failed to hard delete habit ${id}:`, error);
-    throw new HabitLocalRepositoryError(`Failed to hard delete habit ${id}`, error);
+    console.error(
+      `[HabitLocalRepository] Failed to hard delete habit ${id}:`,
+      error,
+    );
+    throw new HabitLocalRepositoryError(
+      `Failed to hard delete habit ${id}`,
+      error,
+    );
   }
 }
 
@@ -160,16 +170,25 @@ export async function completeHabit(id: string, date: string): Promise<Habit> {
 
     const updated = [...habits];
     updated[habitIndex] = updatedHabit;
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
 
     return updatedHabit;
   } catch (error) {
-    console.error(`[HabitLocalRepository] Failed to complete habit ${id}:`, error);
-    throw new HabitLocalRepositoryError(`Failed to complete habit ${id}`, error);
+    console.error(
+      `[HabitLocalRepository] Failed to complete habit ${id}:`,
+      error,
+    );
+    throw new HabitLocalRepositoryError(
+      `Failed to complete habit ${id}`,
+      error,
+    );
   }
 }
 
-export async function uncompleteHabit(id: string, date: string): Promise<Habit> {
+export async function uncompleteHabit(
+  id: string,
+  date: string,
+): Promise<Habit> {
   try {
     const habits = await getHabits();
     const habitIndex = habits.findIndex((h) => h.id === id);
@@ -187,7 +206,9 @@ export async function uncompleteHabit(id: string, date: string): Promise<Habit> 
     const updatedHabit: Habit = {
       ...habit,
       completedDates: habit.completedDates.filter((d) => d !== date),
-      streakCount: calculateStreak(habit.completedDates.filter((d) => d !== date)),
+      streakCount: calculateStreak(
+        habit.completedDates.filter((d) => d !== date),
+      ),
       updatedAt: new Date().toISOString(),
       syncStatus: "pending",
       version: (habit.version || 1) + 1,
@@ -195,12 +216,18 @@ export async function uncompleteHabit(id: string, date: string): Promise<Habit> 
 
     const updated = [...habits];
     updated[habitIndex] = updatedHabit;
-    await setItem(HABITS_KEY, JSON.stringify(updated));
+    setString(HABITS_KEY, JSON.stringify(updated));
 
     return updatedHabit;
   } catch (error) {
-    console.error(`[HabitLocalRepository] Failed to uncomplete habit ${id}:`, error);
-    throw new HabitLocalRepositoryError(`Failed to uncomplete habit ${id}`, error);
+    console.error(
+      `[HabitLocalRepository] Failed to uncomplete habit ${id}:`,
+      error,
+    );
+    throw new HabitLocalRepositoryError(
+      `Failed to uncomplete habit ${id}`,
+      error,
+    );
   }
 }
 
