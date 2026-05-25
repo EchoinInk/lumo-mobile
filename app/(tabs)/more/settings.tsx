@@ -74,6 +74,32 @@ const settingsSections: SettingsSection[] = [
 ];
 
 export default function SettingsScreen() {
+  const { resetOnboarding } = useOnboarding();
+
+  const handleResetOnboarding = () => {
+    Alert.alert(
+      "Reset Onboarding",
+      "This will reset your onboarding preferences and show the onboarding flow again. Are you sure?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          style: "destructive",
+          onPress: () => {
+            resetOnboarding();
+            router.replace("/onboarding");
+          },
+        },
+      ],
+    );
+  };
+
+  const handleSettingPress = (label: string) => {
+    if (label === "Reset Onboarding") {
+      handleResetOnboarding();
+    }
+  };
+
   return (
     <Screen scrollable padded>
       <MoreScreenHeader title="Settings" subtitle="App Preferences" />
