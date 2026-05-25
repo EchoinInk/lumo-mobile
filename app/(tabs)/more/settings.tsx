@@ -3,14 +3,20 @@ import { Screen } from "@/src/components/ui/Screen";
 import { Text } from "@/src/components/ui/Text";
 import { MoreScreenHeader } from "@/src/features/more/components";
 import { Colors, Spacing } from "@/src/theme/tokens";
-import { Bell, ChevronRight, Moon, Shield, User } from "lucide-react-native";
+import {
+    Bell,
+    ChevronRight,
+    Moon,
+    Shield,
+    User
+} from "lucide-react-native";
 import React from "react";
 import {
     ScrollView,
     StyleSheet,
     Switch,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
 type SettingsItem = {
