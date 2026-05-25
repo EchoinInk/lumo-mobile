@@ -11,14 +11,14 @@ import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-    ArrowRight,
-    Dumbbell,
-    Flame,
-    Heart,
-    Plus,
-    Scale,
-    TrendingDown,
-    Utensils,
+  ArrowRight,
+  Dumbbell,
+  Flame,
+  Heart,
+  Plus,
+  Scale,
+  TrendingDown,
+  Utensils,
 } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
