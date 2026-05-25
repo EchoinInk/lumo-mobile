@@ -19607,3 +19607,9 @@ COMMIT: chore(lumo): update planning.tsx
 FILES:
 app/onboarding/planning.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 08:56:47
+COMMIT: chore(lumo): update focus.tsx
+FILES:
+app/onboarding/focus.tsx
+
