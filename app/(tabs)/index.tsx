@@ -2,10 +2,12 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { useTasks } from "@/src/features/tasks";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     CheckCircle2,
+    Circle,
     Flame,
     Sparkles,
     Trophy,
@@ -53,8 +55,8 @@ const smallWins = [
   { text: "Stayed under budget", icon: Wallet },
 ];
 
-// Today's focus
-const todaysFocus = [
+// Fallback mock focus items when no tasks exist
+const fallbackFocusItems = [
   { id: "1", text: "Morning meds", completed: true },
   { id: "2", text: "Team standup", completed: true },
   { id: "3", text: "Focus block: Design", completed: false, highlight: true },
@@ -70,8 +72,37 @@ const quickActions = [
 ];
 
 export default function DashboardScreen() {
-  const completedCount = todaysFocus.filter((t) => t.completed).length;
-  const progress = (completedCount / todaysFocus.length) * 100;
+  const {
+    tasks,
+    activeTasks,
+    completedTasks,
+    completedCount,
+    totalCount,
+    toggleTask,
+    hasHydrated,
+  } = useTasks();
+
+  // Use real tasks if available, otherwise fallback to mock
+  const focusItems =
+    hasHydrated && tasks.length > 0
+      ? tasks.slice(0, 4).map((t) => ({
+          id: t.id,
+          text: t.title,
+          completed: t.completed,
+          highlight: t.priority === "high",
+        }))
+      : fallbackFocusItems;
+
+  const displayCompletedCount = hasHydrated
+    ? completedCount
+    : fallbackFocusItems.filter((t) => t.completed).length;
+  const displayTotalCount = hasHydrated
+    ? Math.min(totalCount, 4)
+    : fallbackFocusItems.length;
+  const progress =
+    displayTotalCount > 0
+      ? (displayCompletedCount / displayTotalCount) * 100
+      : 0;
 
   return (
     <Screen scrollable padded>
@@ -84,17 +115,32 @@ export default function DashboardScreen() {
           Today&apos;s Focus
         </Text>
         <View style={styles.focusList}>
-          {todaysFocus.map((item) => (
-            <View key={item.id} style={styles.focusItem}>
+          {focusItems.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.focusItem}
+              onPress={() =>
+                hasHydrated &&
+                tasks.find((t) => t.id === item.id) &&
+                toggleTask(item.id)
+              }
+              activeOpacity={
+                hasHydrated && tasks.find((t) => t.id === item.id) ? 0.7 : 1
+              }
+              accessibilityLabel={`${item.completed ? "Completed" : "Pending"}: ${item.text}`}
+              accessibilityRole="button"
+            >
               <View
                 style={[
                   styles.checkbox,
                   item.completed && styles.checkboxChecked,
-                  item.highlight && styles.checkboxHighlight,
+                  item.highlight && !item.completed && styles.checkboxHighlight,
                 ]}
               >
-                {item.completed && (
+                {item.completed ? (
                   <CheckCircle2 size={14} color={Colors.textInverse} />
+                ) : (
+                  <Circle size={14} color={Colors.border} />
                 )}
               </View>
               <Text
@@ -106,7 +152,7 @@ export default function DashboardScreen() {
               >
                 {item.text}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
         <View style={styles.progressRow}>
@@ -119,7 +165,7 @@ export default function DashboardScreen() {
             />
           </View>
           <Text variant="caption" color={Colors.textSecondary}>
-            {completedCount}/{todaysFocus.length} done
+            {displayCompletedCount}/{displayTotalCount} done
           </Text>
         </View>
       </Card>
@@ -153,7 +199,7 @@ export default function DashboardScreen() {
               You did this!
             </Text>
             <Text variant="body" color={Colors.textInverse}>
-              {completedCount} tasks completed today
+              {displayCompletedCount} tasks completed today
             </Text>
           </View>
           <View style={styles.streakBadge}>
