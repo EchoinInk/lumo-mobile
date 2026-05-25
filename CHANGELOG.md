@@ -1,5 +1,47 @@
 # Changelog
 
+## Phase 11.4 — Real Add Task Flow
+
+### Added
+
+- **AddTaskModal** (`src/features/tasks/components/AddTaskModal.tsx`): Calm modal for adding tasks
+  - Title: "Add a small step" with supportive subtitle
+  - Task title input (required)
+  - Optional notes field
+  - Priority selector with calm pill buttons (Low/Medium/High)
+  - Primary gradient "Add task" button
+  - Secondary "Not now" cancel button
+  - Keyboard avoiding view for smooth UX
+  - Accessible labels and roles throughout
+
+- **Tasks Screen Integration**: Connected Tasks screen to real task state
+  - Add Task button opens AddTaskModal
+  - Task list displays real tasks from useTasks hook
+  - Checkboxes toggle task completion
+  - Priority badges shown (colored dot + label)
+  - Completed tasks visually softened
+  - Filter pills work with real data (All/Today/Upcoming/Done)
+
+- **Dashboard Integration**: Today's Focus card now shows real tasks
+  - First 4 tasks from task store displayed
+  - High priority tasks highlighted with pink border
+  - Checkboxes functional (toggle completion)
+  - Fallback to mock data if no tasks exist
+  - Progress bar reflects real completion count
+
+- **Task Feature Index** (`src/features/tasks/index.ts`): Clean barrel exports for components, hooks, types, and store
+
+### Architecture
+
+- Local-first architecture preserved (MMKV persistence)
+- UI → Hook → Store → Repository pattern maintained
+- Thin screens, rich components
+- No global store — task-specific state only
+- Instant UI updates, background persistence
+- Type-safe throughout
+
+---
+
 ## Phase 11.3 — Visual QA + App Polish
 
 ### Polished
