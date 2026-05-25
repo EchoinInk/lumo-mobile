@@ -19131,3 +19131,9 @@ FILES:
 app/(tabs)/more/settings.tsx
 app/(tabs)/more/workouts.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 05:17:51
+COMMIT: chore(lumo): update settings.tsx
+FILES:
+app/(tabs)/more/settings.tsx
+
