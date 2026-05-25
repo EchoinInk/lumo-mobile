@@ -19124,3 +19124,10 @@ COMMIT: chore(lumo): update weight.tsx
 FILES:
 app/(tabs)/more/weight.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 05:17:28
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/(tabs)/more/settings.tsx
+app/(tabs)/more/workouts.tsx
+

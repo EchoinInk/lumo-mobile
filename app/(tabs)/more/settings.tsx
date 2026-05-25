@@ -12,6 +12,7 @@ import {
     Shield,
     User,
 } from "lucide-react-native";
+import React from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -20,7 +21,19 @@ import {
     View,
 } from "react-native";
 
-const settingsSections = [
+type SettingsItem = {
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+  hasToggle?: boolean;
+};
+
+type SettingsSection = {
+  title: string;
+  items: SettingsItem[];
+};
+
+const settingsSections: SettingsSection[] = [
   {
     title: "Account",
     items: [
