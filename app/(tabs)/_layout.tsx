@@ -1,21 +1,57 @@
+import { Colors, Spacing } from "@/src/theme/tokens";
 import { Tabs } from "expo-router";
-import { Calendar, HeartPulse, Home, ListTodo, Menu } from "lucide-react-native";
-import { Colors } from "@/src/theme/tokens";
+import {
+  Calendar,
+  HeartPulse,
+  Home,
+  ListTodo,
+  Menu,
+} from "lucide-react-native";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Soft, calm color scheme
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarInactiveTintColor: Colors.textTertiary,
+        // Clean label styling
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "500",
+          letterSpacing: 0.3,
+        },
+        // Premium soft tab bar styling
+        tabBarStyle: {
+          backgroundColor: Colors.background,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          // Gentle height for comfortable touch targets
+          height: Platform.OS === "ios" ? 88 : 72,
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Platform.OS === "ios" ? 28 : 12,
+          paddingTop: Spacing.sm,
+        },
+        // Remove tab bar border for seamless look
+        tabBarItemStyle: {
+          paddingVertical: Spacing.xs,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Home
+              size={focused ? 26 : 24}
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
 
@@ -23,7 +59,13 @@ export default function TabLayout() {
         name="tasks"
         options={{
           title: "Tasks",
-          tabBarIcon: ({ color, size }) => <ListTodo size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <ListTodo
+              size={focused ? 26 : 24}
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
 
@@ -31,7 +73,13 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: "Calendar",
-          tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Calendar
+              size={focused ? 26 : 24}
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
 
@@ -39,7 +87,13 @@ export default function TabLayout() {
         name="health"
         options={{
           title: "Health",
-          tabBarIcon: ({ color, size }) => <HeartPulse size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <HeartPulse
+              size={focused ? 26 : 24}
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
 
@@ -47,7 +101,13 @@ export default function TabLayout() {
         name="more/index"
         options={{
           title: "More",
-          tabBarIcon: ({ color, size }) => <Menu size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Menu
+              size={focused ? 26 : 24}
+              color={color}
+              strokeWidth={focused ? 2.5 : 2}
+            />
+          ),
         }}
       />
 
