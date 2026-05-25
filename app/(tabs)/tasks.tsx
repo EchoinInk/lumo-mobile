@@ -8,12 +8,12 @@ import { TaskPriority } from "@/src/features/tasks/types/task";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-    CheckCircle2,
-    Circle,
-    Clock,
-    Lightbulb,
-    Plus,
-    Trash2,
+  CheckCircle2,
+  Circle,
+  Clock,
+  Lightbulb,
+  Plus,
+  Trash2,
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -401,5 +401,20 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontWeight: "600",
+  },
+  errorCard: {
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+    backgroundColor: Colors.warning + "10",
+    borderColor: Colors.warning + "30",
+  },
+  taskRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  deleteButton: {
+    padding: Spacing.sm,
+    marginLeft: Spacing.sm,
   },
 });
