@@ -7,7 +7,7 @@ import { HabitFormModal } from "@/src/features/habits/components/HabitFormModal"
 import { HabitListItem } from "@/src/features/habits/components/HabitListItem";
 import { useHabits } from "@/src/features/habits/hooks/useHabits";
 import { CreateHabitInput, Habit } from "@/src/features/habits/types/habit";
-import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
