@@ -29,8 +29,7 @@ echo ""
 # -----------------------------
 # Ignore junk-only changes
 # -----------------------------
-NOISE_PATTERNS="package-lock.json|yarn.lock|\.log$|\.expo|metro|tsbuildinfo"
-
+NOISE_PATTERNS="^\.lumo/|package-lock.json|yarn.lock|\.log$|\.expo|metro|tsbuildinfo"
 # -----------------------------
 # Main loop
 # -----------------------------
