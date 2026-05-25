@@ -19595,3 +19595,9 @@ COMMIT: chore(lumo): update ChoiceChip.tsx
 FILES:
 src/features/onboarding/components/ChoiceChip.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 08:56:20
+COMMIT: chore(lumo): update index.tsx
+FILES:
+app/onboarding/index.tsx
+
