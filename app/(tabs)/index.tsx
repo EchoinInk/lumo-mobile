@@ -72,24 +72,38 @@ const quickActions = [
 ];
 
 export default function DashboardScreen() {
-  const {
-    tasks,
-    activeTasks,
-    completedTasks,
-    completedCount,
-    totalCount,
-    toggleTask,
-    hasHydrated,
-  } = useTasks();
+  const { tasks, completedCount, toggleTask, hasHydrated } = useTasks();
+
+  // Prioritize tasks for Today's Focus:
+  // 1. Incomplete high priority tasks due today
+  // 2. Other incomplete tasks due today
+  // 3. Newest incomplete tasks
+  const today = new Date().toISOString().split("T")[0];
+
+  const getPriorityScore = (task: (typeof tasks)[0]) => {
+    let score = 0;
+    if (task.completed) score -= 1000; // Deprioritize completed
+    if (task.priority === "high") score += 100;
+    if (task.priority === "medium") score += 50;
+    if (task.dueDate === today) score += 200;
+    if (task.dueDate && task.dueDate < today) score += 150; // Overdue
+    score += new Date(task.createdAt).getTime() / 1000000000; // Tie-breaker by recency
+    return score;
+  };
 
   // Use real tasks if available, otherwise fallback to mock
+  const sortedTasks =
+    hasHydrated && tasks.length > 0
+      ? [...tasks].sort((a, b) => getPriorityScore(b) - getPriorityScore(a))
+      : [];
+
   const focusItems =
     hasHydrated && tasks.length > 0
-      ? tasks.slice(0, 4).map((t) => ({
+      ? sortedTasks.slice(0, 4).map((t) => ({
           id: t.id,
           text: t.title,
           completed: t.completed,
-          highlight: t.priority === "high",
+          highlight: t.priority === "high" && !t.completed,
         }))
       : fallbackFocusItems;
 
