@@ -13,6 +13,7 @@ import {
     Clock,
     Lightbulb,
     Plus,
+    Trash2,
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -43,14 +44,8 @@ const getPriorityFromKey = (key: string): TaskPriority | null => {
 export default function TasksScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("today");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const {
-    tasks,
-    activeTasks,
-    completedTasks,
-    toggleTask,
-    completedCount,
-    totalCount,
-  } = useTasks();
+  const { tasks, toggleTask, deleteTask, completedCount, totalCount, error } =
+    useTasks();
 
   const filteredTasks = tasks.filter((task) => {
     if (activeFilter === "all") return true;
