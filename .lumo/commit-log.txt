@@ -20434,3 +20434,9 @@ FILES:
 app.json
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 15:31:41
+COMMIT: chore(lumo): update app.json
+FILES:
+app.json
+
