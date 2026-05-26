@@ -19878,3 +19878,10 @@ COMMIT: chore(lumo): update repositoryContext.ts
 FILES:
 src/services/repositories/repositoryContext.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:25:29
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/services/storage/queue.types.ts
+src/services/storage/storagePartition.ts
+

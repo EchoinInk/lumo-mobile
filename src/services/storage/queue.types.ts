@@ -53,11 +53,38 @@ export interface SyncQueueItem {
   id: string;
 
   /**
-   * Owner of this queue item.
+   * Owner type for this queue item.
    * Stamped at creation time. Never inferred at sync time.
-   * Null in anonymous/local-first mode — will be claimed on sign-in.
+   * - guest: Item created in guest mode (local-only)
+   * - authenticated: Item created while authenticated (may sync to cloud)
    */
-  userId: string | null;
+  ownerType: SyncOwnerType;
+
+  /**
+   * Local owner ID for this queue item.
+   * Always present - provides stable identity for guest and authenticated modes.
+   */
+  localOwnerId: string;
+
+  /**
+   * Cloud owner ID for this queue item.
+   * Present only when ownerType is "authenticated".
+   * Used to identify which authenticated account owns this item.
+   */
+  cloudOwnerId?: string;
+
+  /**
+   * Sync partition key for this queue item.
+   * Identifies which sync queue partition this item belongs to.
+   * Format: guest:{localOwnerId}:syncQueue or user:{cloudOwnerId}:syncQueue
+   */
+  syncPartitionKey: string;
+
+  /**
+   * Whether this item was created during guest → account migration.
+   * Used to identify items that need special handling during migration.
+   */
+  createdDuringMigration?: boolean;
 
   /** Entity type being synced */
   entity: SyncEntity;
@@ -104,8 +131,20 @@ interface BaseQueueItem {
   /** Unique queue entry ID */
   readonly id: string;
 
-  /** Owner — stamped at creation time */
-  readonly userId: string | null;
+  /** Owner type — stamped at creation time */
+  readonly ownerType: SyncOwnerType;
+
+  /** Local owner ID — always present */
+  readonly localOwnerId: string;
+
+  /** Cloud owner ID — present only for authenticated items */
+  readonly cloudOwnerId?: string;
+
+  /** Sync partition key */
+  readonly syncPartitionKey: string;
+
+  /** Whether created during migration */
+  readonly createdDuringMigration?: boolean;
 
   /** Entity type being synced */
   readonly entity: SyncEntity;
