@@ -28,7 +28,7 @@ import {
     getEntityStorageKey,
     getSyncQueueStorageKey,
 } from "../../../services/storage/storagePartition";
-import { storage as mmkvStorage } from "../../../store/storage";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
 
 // ── Tracking Types ─────────────────────────────────────────────────────────────
 

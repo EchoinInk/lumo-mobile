@@ -12,9 +12,12 @@
  * - No destructive operations on source data
  */
 
+import {
+    getEntityStorageKey,
+    getSyncQueueStorageKey,
+} from "../../../services/storage/storagePartition";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
 import type { RepositoryContext } from "../types/auth.types";
-import { getEntityStorageKey, getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
-import { storage as mmkvStorage } from "../../../store/storage";
 
 // ── Rollback Types ─────────────────────────────────────────────────────────────
 
@@ -57,9 +60,7 @@ export function createRollbackSnapshot(
   targetContext: RepositoryContext,
 ): RollbackSnapshot {
   if (targetContext.accountMode !== "authenticated") {
-    throw new Error(
-      "[Rollback] Target context must be in authenticated mode",
-    );
+    throw new Error("[Rollback] Target context must be in authenticated mode");
   }
 
   const snapshotId = generateSnapshotId();
@@ -109,7 +110,9 @@ function generateSnapshotId(): string {
  * @param snapshot - Rollback snapshot to restore from
  * @returns Rollback result
  */
-export function restoreFromSnapshot(snapshot: RollbackSnapshot): RollbackResult {
+export function restoreFromSnapshot(
+  snapshot: RollbackSnapshot,
+): RollbackResult {
   if (!mmkvStorage) {
     return {
       snapshotId: snapshot.id,
@@ -138,7 +141,7 @@ export function restoreFromSnapshot(snapshot: RollbackSnapshot): RollbackResult 
     // This is a safety measure to ensure clean rollback
     for (const entityName of SUPPORTED_ENTITIES) {
       const targetKey = getEntityStorageKey(entityName, snapshot.targetContext);
-      
+
       if (!snapshot.targetDataBackup.has(targetKey)) {
         // Key was created during migration, delete it
         mmkvStorage.remove(targetKey);
@@ -226,7 +229,7 @@ export function validateRollback(snapshot: RollbackSnapshot): {
   // Validate that no extra keys exist
   for (const entityName of SUPPORTED_ENTITIES) {
     const targetKey = getEntityStorageKey(entityName, snapshot.targetContext);
-    
+
     if (!snapshot.targetDataBackup.has(targetKey)) {
       const currentData = mmkvStorage.getString(targetKey);
       if (currentData) {

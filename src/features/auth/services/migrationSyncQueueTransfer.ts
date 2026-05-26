@@ -17,10 +17,10 @@
  * - No deletion of guest partitions
  */
 
-import type { RepositoryContext } from "../types/auth.types";
-import { getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
-import { storage as mmkvStorage } from "../../../store/storage";
 import type { SyncQueueItem } from "../../../services/storage/queue.types";
+import { getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
+import type { RepositoryContext } from "../types/auth.types";
 
 // ── Sync Queue Transfer Types ───────────────────────────────────────────────────
 
@@ -66,9 +66,7 @@ export function createSyncQueueTransferPreview(
   targetContext: RepositoryContext,
 ): SyncQueueTransferPreview {
   if (sourceContext.accountMode !== "guest") {
-    throw new Error(
-      "[SyncQueueTransfer] Source context must be in guest mode",
-    );
+    throw new Error("[SyncQueueTransfer] Source context must be in guest mode");
   }
 
   if (targetContext.accountMode !== "authenticated") {
@@ -183,10 +181,10 @@ export function prepareSyncQueueTransfer(
     if (transferredItems.length > 0) {
       const targetSyncQueueKey = getSyncQueueStorageKey(preview.targetContext);
       const existingTargetItems = preview.targetItems;
-      
+
       // Merge with existing target items, preserving order
       const mergedItems = [...existingTargetItems, ...transferredItems];
-      
+
       mmkvStorage.set(targetSyncQueueKey, JSON.stringify(mergedItems));
     }
 
@@ -279,8 +277,10 @@ export function validateSyncQueueTransfer(
 
   // Validate that original operation order is preserved
   const originalOrder = result.sourceContext.localOwnerId;
-  const transferredOrder = result.transferredItems.map((item) => item.timestamp);
-  
+  const transferredOrder = result.transferredItems.map(
+    (item) => item.timestamp,
+  );
+
   // Check if timestamps are in ascending order (preserving original order)
   for (let i = 1; i < transferredOrder.length; i++) {
     if (transferredOrder[i] < transferredOrder[i - 1]) {
@@ -318,14 +318,18 @@ export function formatSyncQueueTransferReport(
   lines.push(`Sync Queue Transfer Report`);
   lines.push(``);
   lines.push(`Source: ${preview.sourceContext.localOwnerId.slice(0, 8)}...`);
-  lines.push(`Target: ${preview.targetContext.cloudOwnerId?.slice(0, 8) || "unknown"}...`);
+  lines.push(
+    `Target: ${preview.targetContext.cloudOwnerId?.slice(0, 8) || "unknown"}...`,
+  );
   lines.push(``);
 
   lines.push(`Preview:`);
   lines.push(`  Total source items: ${preview.totalSourceItems}`);
   lines.push(`  Total target items: ${preview.totalTargetItems}`);
   lines.push(`  Items to transfer: ${preview.itemsToTransfer}`);
-  lines.push(`  Estimated transfer size: ${preview.estimatedTransferSize} bytes`);
+  lines.push(
+    `  Estimated transfer size: ${preview.estimatedTransferSize} bytes`,
+  );
   lines.push(``);
 
   lines.push(`Transfer Result:`);

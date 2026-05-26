@@ -13,9 +13,12 @@
  * - Deterministic copy order
  */
 
+import {
+    getEntityStorageKey,
+    getSyncQueueStorageKey,
+} from "../../../services/storage/storagePartition";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
 import type { RepositoryContext } from "../types/auth.types";
-import { getEntityStorageKey, getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
-import { storage as mmkvStorage } from "../../../store/storage";
 
 // ── Migration Copy Types ───────────────────────────────────────────────────────
 
@@ -66,9 +69,7 @@ export function copyGuestToAuthenticated(
   targetContext: RepositoryContext,
 ): MigrationCopyReport {
   if (sourceContext.accountMode !== "guest") {
-    throw new Error(
-      "[MigrationCopy] Source context must be in guest mode",
-    );
+    throw new Error("[MigrationCopy] Source context must be in guest mode");
   }
 
   if (targetContext.accountMode !== "authenticated") {
@@ -292,9 +293,7 @@ export function summarizeMigrationCopy(report: MigrationCopyReport): string {
         `  ✓ ${result.entityName}: ${result.itemsCopied} items (${result.bytesCopied} bytes)`,
       );
     } else {
-      lines.push(
-        `  ✗ ${result.entityName}: ${result.error}`,
-      );
+      lines.push(`  ✗ ${result.entityName}: ${result.error}`);
     }
   }
 

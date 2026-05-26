@@ -13,7 +13,7 @@
  */
 
 import type { RepositoryContext } from "../../features/auth/types/auth.types";
-import { storage as mmkvStorage } from "../../store/storage";
+import { storageInstance as mmkvStorage } from "../../store/storage";
 import {
     getEntityStorageKey,
     getMigrationStorageKey,

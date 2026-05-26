@@ -12,9 +12,9 @@
  * - No destructive operations
  */
 
-import type { RepositoryContext } from "../types/auth.types";
 import { getEntityStorageKey } from "../../../services/storage/storagePartition";
-import { storage as mmkvStorage } from "../../../store/storage";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
+import type { RepositoryContext } from "../types/auth.types";
 
 // ── Conflict Strategy Types ─────────────────────────────────────────────────────
 
@@ -76,9 +76,7 @@ export function detectConflicts(
   targetContext: RepositoryContext,
 ): ConflictInfo[] {
   if (sourceContext.accountMode !== "guest") {
-    throw new Error(
-      "[ConflictStrategy] Source context must be in guest mode",
-    );
+    throw new Error("[ConflictStrategy] Source context must be in guest mode");
   }
 
   if (targetContext.accountMode !== "authenticated") {
@@ -91,7 +89,11 @@ export function detectConflicts(
 
   // Check each entity for conflicts
   for (const entityName of SUPPORTED_ENTITIES) {
-    const conflict = detectEntityConflict(sourceContext, targetContext, entityName);
+    const conflict = detectEntityConflict(
+      sourceContext,
+      targetContext,
+      entityName,
+    );
     if (conflict) {
       conflicts.push(conflict);
     }
@@ -255,7 +257,8 @@ function applyMergeStrategy(conflict: ConflictInfo): ConflictResolution {
     strategy: "merge",
     applied: false,
     success: false,
-    error: "Merge strategy not yet implemented - requires custom logic per entity",
+    error:
+      "Merge strategy not yet implemented - requires custom logic per entity",
   };
 }
 
@@ -340,7 +343,9 @@ export function summarizeConflicts(conflicts: ConflictInfo[]): string {
 /**
  * Get recommended strategy for a conflict.
  */
-export function getRecommendedStrategy(conflict: ConflictInfo): ConflictResolutionStrategy {
+export function getRecommendedStrategy(
+  conflict: ConflictInfo,
+): ConflictResolutionStrategy {
   return conflict.recommendedStrategy;
 }
 
