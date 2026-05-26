@@ -78,7 +78,11 @@ export function recordQueueItem(input: CreateQueueItemInput): SyncQueueItem {
   const createdAt = Date.now();
   const item: SyncQueueItem = {
     id: generateId(),
-    userId: input.userId ?? null,
+    ownerType: input.ownerType,
+    localOwnerId: input.localOwnerId,
+    cloudOwnerId: input.cloudOwnerId,
+    syncPartitionKey: input.syncPartitionKey,
+    createdDuringMigration: input.createdDuringMigration,
     entity: input.entity,
     operation: input.operation,
     entityId: input.entityId,

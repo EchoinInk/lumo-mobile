@@ -13,9 +13,9 @@
  * Storage key: sync_dead_letter_v1 (defined in config)
  */
 
-import { getString, setString } from '../../storage/mmkv';
-import { DEAD_LETTER_STORAGE_KEY } from '../config';
-import type { SyncQueueItem } from '../../storage/queue.types';
+import { getString, setString } from "../../storage/mmkv";
+import type { SyncQueueItem } from "../../storage/queue.types";
+import { DEAD_LETTER_STORAGE_KEY } from "../config";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ function loadDeadLetters(): DeadLetterEntry[] {
     if (!raw) return [];
     return JSON.parse(raw) as DeadLetterEntry[];
   } catch {
-    console.error('[DeadLetter] Failed to load dead letter store, resetting');
+    console.error("[DeadLetter] Failed to load dead letter store, resetting");
     return [];
   }
 }
@@ -45,7 +45,7 @@ function persistDeadLetters(entries: DeadLetterEntry[]): void {
   try {
     setString(DEAD_LETTER_STORAGE_KEY, JSON.stringify(entries));
   } catch (err) {
-    console.error('[DeadLetter] Failed to persist dead letter store:', err);
+    console.error("[DeadLetter] Failed to persist dead letter store:", err);
   }
 }
 
@@ -92,9 +92,17 @@ export function getDeadLettersByEntity(entity: string): DeadLetterEntry[] {
 
 /**
  * Get dead letter entries for a specific user.
+ * TODO: Phase 13.2 - Update to use new ownership metadata (localOwnerId/cloudOwnerId)
  */
 export function getDeadLettersByUser(userId: string): DeadLetterEntry[] {
-  return loadDeadLetters().filter((e) => e.item.userId === userId);
+  // Temporary compatibility: check both old userId and new ownership fields
+  return loadDeadLetters().filter(
+    (e) =>
+      // @ts-ignore - Temporary compatibility for userId during migration
+      (e.item as any).userId === userId ||
+      e.item.localOwnerId === userId ||
+      e.item.cloudOwnerId === userId,
+  );
 }
 
 /**
@@ -119,5 +127,5 @@ export function removeDeadLetter(itemId: string): void {
  */
 export function clearDeadLetters(): void {
   persistDeadLetters([]);
-  console.warn('[DeadLetter] Dead letter store cleared');
+  console.warn("[DeadLetter] Dead letter store cleared");
 }
