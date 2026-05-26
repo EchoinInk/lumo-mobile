@@ -14,7 +14,10 @@ import { View } from "react-native";
 function AccountContent() {
   const authUser = useAuthSessionStore((s) => s.authUser);
   const cloudOwnerId = useAuthSessionStore((s) => s.cloudOwnerId);
+  const localOwnerId = useAuthSessionStore((s) => s.localOwnerId);
+  const accountMode = useAuthSessionStore((s) => s.accountMode);
   const signOut = useAuthSessionStore((s) => s.signOut);
+  const migrationStatus = useGuestMigrationStatus();
 
   const handleLogout = async () => {
     try {
@@ -58,6 +61,39 @@ function AccountContent() {
             Account ID: {cloudOwnerId?.slice(0, 8)}...
           </Text>
         </View>
+
+        {/* Debug-only migration diagnostics */}
+        {__DEV__ && (
+          <View className="bg-card rounded-lg p-4 mb-4 border border-border">
+            <Text variant="subheading" className="mb-2">
+              Migration Diagnostics (Dev Only)
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Account Mode: {accountMode}
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Local Owner ID: {localOwnerId?.slice(0, 8)}...
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Cloud Owner ID: {cloudOwnerId?.slice(0, 8)}...
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Migration Status: {migrationStatus.status}
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Rollback Available:{" "}
+              {migrationStatus.rollbackAvailable ? "Yes" : "No"}
+            </Text>
+            <Text variant="small" color="textTertiary" className="mb-1">
+              Cleanup Eligible: {migrationStatus.cleanupEligible ? "Yes" : "No"}
+            </Text>
+            {migrationStatus.latestReport && (
+              <Text variant="small" color="textTertiary" className="mb-1">
+                Last Validation: {migrationStatus.latestReport.status}
+              </Text>
+            )}
+          </View>
+        )}
 
         <Button variant="danger" onPress={handleLogout} className="mb-4">
           Sign out
