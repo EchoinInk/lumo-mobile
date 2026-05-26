@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Screen } from "@/components/ui/Screen";
 import { Text } from "@/components/ui/Text";
 import { AuthGuard } from "@/features/auth/components/AuthGuard";
+import { useGuestMigrationStatus } from "@/features/auth/hooks/useGuestMigrationStatus";
 import {
     beginLogoutTransition,
     finalizeLogoutTransition,
