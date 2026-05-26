@@ -29,7 +29,7 @@ import type {
     AuthSessionState,
     AuthTransitionState,
     CloudOwnerId,
-    LocalOwnerId
+    LocalOwnerId,
 } from "../types/auth.types";
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -49,6 +49,14 @@ interface AuthSessionStoreState {
   hasCompletedGuestMigration: boolean;
   /** True once the store has hydrated from storage */
   hasHydrated: boolean;
+  /** Authenticated user data (present when authenticated) */
+  authUser: AuthUser | null;
+  /** Timestamp of last session restore */
+  lastSessionRestoreAt: string | null;
+  /** Auth hydration status for offline-safe restoration */
+  authHydrationStatus: "pending" | "hydrating" | "hydrated" | "failed";
+  /** Optional auth error for graceful degradation */
+  authError: string | null;
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────────

@@ -20011,3 +20011,9 @@ FILES:
 src/services/api/auth/index.ts
 src/services/api/auth/supabaseAuth.mapper.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:45:26
+COMMIT: chore(lumo): update useAuthSessionStore.ts
+FILES:
+src/features/auth/store/useAuthSessionStore.ts
+
