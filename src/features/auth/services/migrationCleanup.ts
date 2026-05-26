@@ -441,7 +441,7 @@ export async function runControlledGuestCleanup(
       },
     };
 
-    return currentCleanupState.latestResult;
+    return currentCleanupState.latestResult!;
   } finally {
     isRunning = false;
   }

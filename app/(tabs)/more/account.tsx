@@ -27,6 +27,8 @@ function AccountContent() {
   const migrationStatus = useGuestMigrationStatus();
   const [harnessResult, setHarnessResult] = useState<string | null>(null);
   const [isRunningHarness, setIsRunningHarness] = useState(false);
+  const [cleanupResult, setCleanupResult] = useState<string | null>(null);
+  const [isRunningCleanup, setIsRunningCleanup] = useState(false);
 
   const handleLogout = async () => {
     try {
