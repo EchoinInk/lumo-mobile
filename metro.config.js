@@ -2,6 +2,10 @@ const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
 const path = require("path");
 
+// Force environment variables before loading config
+process.env.EXPO_USE_HERMES = "false";
+process.env.EXPO_UNSTABLE_TRANSFORM_PROFILE = "default";
+
 const config = getDefaultConfig(__dirname);
 
 config.resolver.alias = {
@@ -20,6 +24,13 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     return originalResolveRequest(context, moduleName, platform);
   }
   return context.resolveRequest(context, moduleName, platform);
+};
+
+// Force transformer configuration
+config.transformer = {
+  ...config.transformer,
+  hermesParser: false,
+  unstable_transformProfile: "default",
 };
 
 module.exports = withNativeWind(config, {
