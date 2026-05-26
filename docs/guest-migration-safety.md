@@ -604,3 +604,209 @@ interface MigrationHarnessReport {
   error: string | null;
 }
 ```
+
+## Controlled Guest Cleanup (Phase 13.7)
+
+### Purpose
+
+Phase 13.7 implements controlled guest partition cleanup after migration safety has been proven. This phase is destructive-capable, but cleanup must never run automatically.
+
+### Core Rule
+
+```
+migration ≠ cleanup
+```
+
+Migration copies and validates.
+Cleanup removes old guest-owned leftovers only after safety gates pass.
+
+### Cleanup Lifecycle
+
+1. **Migration Completion** — Guest → account migration must complete successfully
+2. **Validation Pass** — All validation checks must pass
+3. **Rollback Window** — 7-day rollback window must expire
+4. **Cleanup Preview** — Create preview of what will be deleted
+5. **Confirmation Token** — Explicit confirmation token required
+6. **Cleanup Execution** — Delete only verified cleanup candidates
+7. **Completion** — Verify authenticated data preserved
+
+### Cleanup Gates
+
+Cleanup is blocked if any of these conditions are not met:
+
+- **Migration Not Completed** — Migration safety pass must complete successfully
+- **Validation Not Passed** — All validation checks must pass
+- **Rollback Window Not Expired** — 7-day rollback window must expire
+- **Pending Sync Transfer** — No pending sync transfer operations
+- **Active Guest Ownership** — No active guest session ownership
+- **Candidate Not Cleanup-Safe** — Candidate must be marked cleanup-safe
+- **Missing Confirmation Token** — Explicit confirmation token required
+- **Unknown Owner** — Owner must be known and verified
+- **Storage Key Mismatch** — Storage keys must match expected pattern
+- **Rollback Snapshot Missing** — Rollback snapshot must exist
+
+### Confirmation Token Rule
+
+Cleanup must only run when passed:
+
+```ts
+confirmationToken: "CONFIRM_GUEST_CLEANUP";
+```
+
+If missing or invalid, cleanup returns blocked result. No UI button should call cleanup without this token.
+
+### Blocked Cleanup Examples
+
+**Example 1: Rollback Window Not Expired**
+
+```
+Cleanup blocked: rollback_window_not_expired
+Reason: Rollback window has not expired (3 days remaining)
+```
+
+**Example 2: Missing Confirmation Token**
+
+```
+Cleanup blocked: missing_confirmation_token
+Reason: Missing or invalid confirmation token
+```
+
+**Example 3: Validation Not Passed**
+
+```
+Cleanup blocked: validation_not_passed
+Reason: Migration validation did not pass
+```
+
+### Cleanup Behavior
+
+**Delete Only:**
+
+- Guest entity partitions already copied + validated
+- Guest sync partitions already transferred/prepared
+- Migration test partitions if explicitly marked test data
+- Orphaned guest partitions marked cleanup eligible
+
+**Never Delete:**
+
+- Active guest session data
+- Authenticated partitions
+- Rollback snapshot until final cleanup completion
+- Unrelated settings
+- Global storage
+
+### Fail-Closed Safety
+
+If any check is ambiguous:
+
+- Block cleanup
+- Return reason
+- Preserve all data
+
+### Resumable Cleanup
+
+Cleanup tracks:
+
+- `cleanupId` — Unique cleanup identifier
+- `startedAt` — Timestamp when cleanup started
+- `completedAt` — Timestamp when cleanup completed
+- `deletedKeys` — Keys successfully deleted
+- `skippedKeys` — Keys skipped during cleanup
+- `failedKeys` — Keys that failed to delete
+- `currentStep` — Current step if paused
+- `errors` — Errors encountered during cleanup
+
+If cleanup fails midway:
+
+- Do not retry automatically
+- Expose `resumeGuestCleanup()` for manual resume
+- Continue only from known safe candidates
+
+### Rollback Metadata Rules
+
+- Rollback snapshot preserved until final cleanup completion
+- Rollback metadata deleted only after final confirmation
+- Rollback capability remains available during cleanup window
+- Rollback snapshot deletion is final step of cleanup
+
+### Production UI Deferred
+
+Production cleanup UI is intentionally deferred to a future phase because:
+
+1. **Safety First** — Cleanup must be proven safe in development first
+2. **User Control** — Users should have clear visibility into what will be deleted
+3. **Confirmation** — Explicit confirmation should be required for destructive operations
+4. **Recovery** — Users should have ability to cancel cleanup before completion
+5. **Testing** — Development-only testing ensures safety before production exposure
+
+### Cleanup API
+
+```typescript
+// Create cleanup preview
+createCleanupPreview(localOwnerId)
+  → GuestCleanupPreview
+
+// Validate cleanup candidate
+validateCleanupCandidate(candidate)
+  → boolean
+
+// Run controlled guest cleanup
+runControlledGuestCleanup(localOwnerId, confirmationToken)
+  → Promise<GuestCleanupResult>
+
+// Resume interrupted cleanup
+resumeGuestCleanup(cleanupId)
+  → Promise<GuestCleanupResult>
+
+// Get cleanup status
+getCleanupStatus()
+  → GuestCleanupState
+
+// Reset cleanup status
+resetCleanupStatus()
+  → void
+```
+
+### Cleanup Test Harness
+
+The test harness includes cleanup integration:
+
+```typescript
+// Run controlled cleanup test harness
+runControlledCleanupHarness()
+  → Promise<MigrationHarnessResult>
+
+// Verify mock guest cleanup completed
+verifyMockGuestCleanupCompleted()
+  → boolean
+
+// Verify authenticated data preserved
+verifyAuthenticatedDataPreserved()
+  → boolean
+```
+
+### Cleanup Types
+
+```typescript
+type GuestCleanupStatus =
+  | "idle"
+  | "previewing"
+  | "awaiting_confirmation"
+  | "deleting"
+  | "paused"
+  | "completed"
+  | "failed"
+  | "blocked";
+
+type GuestCleanupBlockReason =
+  | "migration_not_completed"
+  | "validation_not_passed"
+  | "rollback_window_not_expired"
+  | "pending_sync_transfer"
+  | "active_guest_ownership"
+  | "candidate_not_cleanup_safe"
+  | "missing_confirmation_token"
+  | "unknown_owner"
+  | "storage_key_mismatch"
+  | "rollback_snapshot_missing";
+```
