@@ -20635,3 +20635,9 @@ COMMIT: chore(lumo): update useSessionBootstrap.ts
 FILES:
 src/features/auth/hooks/useSessionBootstrap.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 01:26:45
+COMMIT: chore(lumo): update useAuthSessionStore.ts
+FILES:
+src/features/auth/store/useAuthSessionStore.ts
+

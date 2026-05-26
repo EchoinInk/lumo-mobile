@@ -1,12 +1,15 @@
-import { router } from "expo-router";
-import { View } from "react-native";
-import { AuthGuard } from "@/features/auth/components/AuthGuard";
 import { Button } from "@/components/ui/Button";
 import { Screen } from "@/components/ui/Screen";
 import { Text } from "@/components/ui/Text";
+import { AuthGuard } from "@/features/auth/components/AuthGuard";
+import {
+    beginLogoutTransition,
+    finalizeLogoutTransition,
+} from "@/features/auth/services/authTransitionOrchestrator";
 import { useAuthSessionStore } from "@/features/auth/store/useAuthSessionStore";
 import { signOutSession } from "@/services/api/auth/supabaseAuth.session";
-import { beginLogoutTransition, finalizeLogoutTransition } from "@/features/auth/services/authTransitionOrchestrator";
+import { router } from "expo-router";
+import { View } from "react-native";
 
 function AccountContent() {
   const authUser = useAuthSessionStore((s) => s.authUser);
@@ -56,18 +59,11 @@ function AccountContent() {
           </Text>
         </View>
 
-        <Button
-          variant="danger"
-          onPress={handleLogout}
-          className="mb-4"
-        >
+        <Button variant="danger" onPress={handleLogout} className="mb-4">
           Sign out
         </Button>
 
-        <Button
-          variant="ghost"
-          onPress={() => router.back()}
-        >
+        <Button variant="ghost" onPress={() => router.back()}>
           Back
         </Button>
       </View>
@@ -76,15 +72,22 @@ function AccountContent() {
 }
 
 export default function AccountScreen() {
-  return (
-    <AuthGuard mode="requireAuthenticated" fallback={
+  const accountMode = useAuthSessionStore((s) => s.accountMode);
+
+  // If in guest mode, show guest fallback
+  if (accountMode === "guest") {
+    return (
       <Screen scrollable>
         <View className="flex-1 justify-center py-12">
           <Text variant="heading" className="mb-2 text-center">
-            Sign in required
+            You're using Lumo as a guest
           </Text>
-          <Text variant="body" color="textSecondary" className="mb-8 text-center">
-            You need to be signed in to view your account
+          <Text
+            variant="body"
+            color="textSecondary"
+            className="mb-8 text-center"
+          >
+            Sign in or create an account to access your account settings
           </Text>
           <Button
             onPress={() => router.push("/auth/login" as any)}
@@ -99,15 +102,50 @@ export default function AccountScreen() {
           >
             Create an account
           </Button>
-          <Button
-            variant="ghost"
-            onPress={() => router.back()}
-          >
+          <Button variant="ghost" onPress={() => router.back()}>
             Back
           </Button>
         </View>
       </Screen>
-    }>
+    );
+  }
+
+  return (
+    <AuthGuard
+      mode="requireAuthenticated"
+      fallback={
+        <Screen scrollable>
+          <View className="flex-1 justify-center py-12">
+            <Text variant="heading" className="mb-2 text-center">
+              Sign in required
+            </Text>
+            <Text
+              variant="body"
+              color="textSecondary"
+              className="mb-8 text-center"
+            >
+              You need to be signed in to view your account
+            </Text>
+            <Button
+              onPress={() => router.push("/auth/login" as any)}
+              className="mb-4"
+            >
+              Sign in
+            </Button>
+            <Button
+              variant="ghost"
+              onPress={() => router.push("/auth/signup" as any)}
+              className="mb-4"
+            >
+              Create an account
+            </Button>
+            <Button variant="ghost" onPress={() => router.back()}>
+              Back
+            </Button>
+          </View>
+        </Screen>
+      }
+    >
       <AccountContent />
     </AuthGuard>
   );
