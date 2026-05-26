@@ -1,5 +1,69 @@
 # Changelog
 
+## Phase 13.4 — Guest Account Migration Safety (Partial)
+
+### Overview
+
+Migration correctness phase focusing on migration safety before destructive cleanup. Phase 13.4 was started but not completed due to permission/tool limits.
+
+### Core Principles
+
+- Migration correctness before destructive cleanup
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No social login
+- No analytics
+- No notifications
+
+### Files Created (Partial)
+
+**Migration Safety Utilities**
+
+- `src/features/auth/services/migrationPreview.ts` — Migration preview utilities (scan guest partitions, calculate migration size/complexity, identify potential conflicts)
+- `src/features/auth/services/migrationCopy.ts` — Deterministic partition copy utilities (copy entity data from guest to authenticated partitions, preserve data integrity)
+- `src/features/auth/services/migrationValidation.ts` — Migration validation utilities (validate copied data integrity, verify entity counts match, detect data corruption)
+- `src/features/auth/services/migrationConflictStrategy.ts` — Conflict strategy scaffolding (define conflict resolution strategies, detect conflict types, apply conflict resolution)
+- `src/features/auth/services/migrationRollback.ts` — Safe rollback path utilities (create rollback snapshot before migration, restore from rollback snapshot, validate rollback integrity)
+
+### Files Deferred
+
+The following utilities were planned but not created due to permission/tool limits:
+
+- Sync queue transfer preparation utilities
+- Orphaned guest partition tracking utilities
+- Integration of migration utilities into auth transition orchestrator
+- Migration orchestration service
+- Destructive guest partition cleanup
+
+### What Phase 13.4 Does NOT Do
+
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No social login
+- No analytics
+- No notifications
+
+### Verification
+
+- TypeScript passes with no errors (migration files do not introduce new errors)
+- No broken imports from planned but uncreated files
+- Migration utilities are self-contained and not yet integrated
+
+### Deferred Work
+
+Recommended next steps to complete Phase 13.4:
+
+- Create sync queue transfer preparation utilities
+- Create orphaned guest partition tracking utilities
+- Integrate migration utilities into auth transition orchestrator
+- Create migration orchestration service
+- Implement destructive guest partition cleanup (only after validation passes)
+- Add migration UI for user confirmation
+- Add migration progress tracking
+- Add migration error recovery
+
 ## Phase 13.3 — Minimal Auth Screens + Guarded Entry
 
 ### Overview

@@ -20276,3 +20276,9 @@ COMMIT: chore(lumo): update migrationConflictStrategy.ts
 FILES:
 src/features/auth/services/migrationConflictStrategy.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:21:43
+COMMIT: chore(lumo): update migrationRollback.ts
+FILES:
+src/features/auth/services/migrationRollback.ts
+
