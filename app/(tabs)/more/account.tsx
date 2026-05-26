@@ -1,0 +1,114 @@
+import { router } from "expo-router";
+import { View } from "react-native";
+import { AuthGuard } from "@/features/auth/components/AuthGuard";
+import { Button } from "@/components/ui/Button";
+import { Screen } from "@/components/ui/Screen";
+import { Text } from "@/components/ui/Text";
+import { useAuthSessionStore } from "@/features/auth/store/useAuthSessionStore";
+import { signOutSession } from "@/services/api/auth/supabaseAuth.session";
+import { beginLogoutTransition, finalizeLogoutTransition } from "@/features/auth/services/authTransitionOrchestrator";
+
+function AccountContent() {
+  const authUser = useAuthSessionStore((s) => s.authUser);
+  const cloudOwnerId = useAuthSessionStore((s) => s.cloudOwnerId);
+  const signOut = useAuthSessionStore((s) => s.signOut);
+
+  const handleLogout = async () => {
+    try {
+      // Begin logout transition
+      beginLogoutTransition(cloudOwnerId || "guest", cloudOwnerId || "guest");
+
+      // Sign out from Supabase
+      await signOutSession();
+
+      // Sign out from session store
+      await signOut();
+
+      // Finalize logout transition
+      finalizeLogoutTransition();
+
+      // Navigate back to More screen
+      router.back();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
+
+  return (
+    <Screen scrollable>
+      <View className="py-8">
+        <Text variant="heading" className="mb-2">
+          Account
+        </Text>
+        <Text variant="body" color="textSecondary" className="mb-8">
+          Manage your account settings
+        </Text>
+
+        <View className="bg-card rounded-lg p-4 mb-4">
+          <Text variant="subheading" className="mb-2">
+            Signed in as
+          </Text>
+          <Text variant="body" className="mb-1">
+            {authUser?.email || "No email"}
+          </Text>
+          <Text variant="small" color="textTertiary">
+            Account ID: {cloudOwnerId?.slice(0, 8)}...
+          </Text>
+        </View>
+
+        <Button
+          variant="danger"
+          onPress={handleLogout}
+          className="mb-4"
+        >
+          Sign out
+        </Button>
+
+        <Button
+          variant="ghost"
+          onPress={() => router.back()}
+        >
+          Back
+        </Button>
+      </View>
+    </Screen>
+  );
+}
+
+export default function AccountScreen() {
+  return (
+    <AuthGuard mode="requireAuthenticated" fallback={
+      <Screen scrollable>
+        <View className="flex-1 justify-center py-12">
+          <Text variant="heading" className="mb-2 text-center">
+            Sign in required
+          </Text>
+          <Text variant="body" color="textSecondary" className="mb-8 text-center">
+            You need to be signed in to view your account
+          </Text>
+          <Button
+            onPress={() => router.push("/auth/login" as any)}
+            className="mb-4"
+          >
+            Sign in
+          </Button>
+          <Button
+            variant="ghost"
+            onPress={() => router.push("/auth/signup" as any)}
+            className="mb-4"
+          >
+            Create an account
+          </Button>
+          <Button
+            variant="ghost"
+            onPress={() => router.back()}
+          >
+            Back
+          </Button>
+        </View>
+      </Screen>
+    }>
+      <AccountContent />
+    </AuthGuard>
+  );
+}
