@@ -19968,3 +19968,9 @@ FILES:
 src/services/api/auth/auth.config.ts
 src/services/api/auth/supabaseAuth.types.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:43:53
+COMMIT: chore(lumo): update auth.config.ts
+FILES:
+src/services/api/auth/auth.config.ts
+
