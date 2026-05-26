@@ -109,7 +109,9 @@ export async function refreshSession(): Promise<
     const user = session?.user ?? null;
 
     const isValid =
-      session !== null && session.expires_at !== null
+      session !== null &&
+      session.expires_at !== undefined &&
+      session.expires_at !== null
         ? session.expires_at * 1000 > Date.now()
         : session !== null;
 
@@ -217,7 +219,7 @@ export async function restorePersistedSession(): Promise<
 
     // Check if session is expired
     const isValid =
-      session.expires_at !== null
+      session.expires_at !== undefined && session.expires_at !== null
         ? session.expires_at * 1000 > Date.now()
         : true;
 
