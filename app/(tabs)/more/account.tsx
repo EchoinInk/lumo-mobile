@@ -184,6 +184,25 @@ function AccountContent() {
                 </Text>
               )}
             </View>
+            <View className="mt-4 border-t border-border pt-4">
+              <Text variant="subheading" className="mb-2">
+                Controlled Cleanup (Dev Only)
+              </Text>
+              <Button
+                onPress={handleRunCleanup}
+                disabled={isRunningCleanup}
+                className="mb-2"
+              >
+                {isRunningCleanup
+                  ? "Running..."
+                  : "Run controlled cleanup test"}
+              </Button>
+              {cleanupResult && (
+                <Text variant="small" color="textTertiary" className="mt-2">
+                  {cleanupResult}
+                </Text>
+              )}
+            </View>
           </View>
         )}
 

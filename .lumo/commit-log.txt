@@ -20823,3 +20823,9 @@ FILES:
 app/(tabs)/more/account.tsx
 src/features/auth/services/migrationCleanup.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:59:23
+COMMIT: chore(lumo): update account.tsx
+FILES:
+app/(tabs)/more/account.tsx
+

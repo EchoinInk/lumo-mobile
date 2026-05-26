@@ -53,7 +53,8 @@ import { getGuestMigrationStatus } from "./guestMigrationOrchestrator";
 
 // ── Cleanup Constants ───────────────────────────────────────────────────────────
 
-const CONFIRMATION_TOKEN = "CONFIRM_GUEST_CLEANUP";
+export const CONFIRMATION_TOKEN = "CONFIRM_GUEST_CLEANUP";
+export const TEST_GUEST_OWNER_ID = "test-guest-owner";
 const ROLLBACK_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 const SUPPORTED_ENTITIES = [
