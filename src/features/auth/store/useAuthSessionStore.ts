@@ -21,11 +21,11 @@
  * Follows existing storage patterns from createPersistStorage.
  */
 
+import { mapSupabaseSessionToAuthUser } from "@/services/api/auth/supabaseAuth.mapper";
 import {
-    mapSupabaseSessionToAuthUser,
     restorePersistedSession,
-    signOutSession
-} from "@/services/api/auth";
+    signOutSession,
+} from "@/services/api/auth/supabaseAuth.session";
 import { createPersistStorage } from "@/store/createPersistStorage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
