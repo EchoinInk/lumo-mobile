@@ -6,11 +6,24 @@
  *
  * Architecture:
  *   UI → Zustand → Repository → MMKV → Sync Queue
+ *
+ * Ownership:
+ * - Each queue item carries ownership metadata at creation time
+ * - Guest sync items are never sent to Supabase
+ * - Authenticated sync items may be sent to Supabase
+ * - Migration sync items are identifiable for data transfer
  */
 
 export type SyncEntity = "task" | "habit" | "meal" | "budget" | "workout";
 
 export type SyncOperation = "create" | "update" | "delete";
+
+/**
+ * Owner type for sync queue items.
+ * - guest: Item created while in guest mode (local-only, never synced to cloud)
+ * - authenticated: Item created while authenticated (may be synced to cloud)
+ */
+export type SyncOwnerType = "guest" | "authenticated";
 
 /**
  * Canonical queue item states.
