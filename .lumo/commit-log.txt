@@ -19836,3 +19836,9 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:19:39
+COMMIT: chore(lumo): update triggerTestError.ts
+FILES:
+src/utils/dev/triggerTestError.ts
+
