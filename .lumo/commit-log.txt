@@ -20144,3 +20144,9 @@ FILES:
 src/features/tasks/services/taskSyncRepository.ts
 src/services/sync/queue/queue.validation.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:01:54
+COMMIT: chore(lumo): update index.ts
+FILES:
+src/services/api/auth/index.ts
+
