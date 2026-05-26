@@ -19891,3 +19891,10 @@ COMMIT: chore(lumo): update queue.types.ts
 FILES:
 src/services/storage/queue.types.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:26:06
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/features/auth/components/AuthGuard.tsx
+src/features/auth/services/accountMigrationPlan.ts
+

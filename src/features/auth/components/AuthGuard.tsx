@@ -13,11 +13,17 @@
  * - allowDuringMigration: Allow access during guest → account migration
  */
 
+import { EmptyState } from "@/components/feedback/EmptyState";
+import { LoadingState } from "@/components/feedback/LoadingState";
 import React from "react";
 import { View } from "react-native";
-import { useAuthSessionStore, selectIsGuest, selectIsAuthenticated, selectIsMigrating, selectIsLoading } from "../store/useAuthSessionStore";
-import { LoadingState } from "@/components/feedback/LoadingState";
-import { EmptyState } from "@/components/feedback/EmptyState";
+import {
+    selectIsAuthenticated,
+    selectIsGuest,
+    selectIsLoading,
+    selectIsMigrating,
+    useAuthSessionStore,
+} from "../store/useAuthSessionStore";
 
 export type AuthGuardMode =
   | "requireGuest"
@@ -81,13 +87,15 @@ export function AuthGuard({
     }
 
     // Default fallback based on mode
-    const message = getFallbackMessage(mode, isGuest, isAuthenticated, isMigrating);
+    const description = getFallbackMessage(
+      mode,
+      isGuest,
+      isAuthenticated,
+      isMigrating,
+    );
     return (
       <View style={{ flex: 1 }}>
-        <EmptyState
-          title="Access Restricted"
-          message={message}
-        />
+        <EmptyState title="Access Restricted" description={description} />
       </View>
     );
   }
