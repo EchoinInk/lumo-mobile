@@ -51,7 +51,9 @@ export async function getCurrentSession(): Promise<
 
     // Check if session is valid and not expired
     const isValid =
-      session !== null && session.expires_at !== null
+      session !== null &&
+      session.expires_at !== undefined &&
+      session.expires_at !== null
         ? session.expires_at * 1000 > Date.now()
         : session !== null;
 
@@ -78,7 +80,9 @@ export async function getCurrentSession(): Promise<
  *
  * @returns Refreshed session result
  */
-export async function refreshSession(): SupabaseAuthResult<SupabaseAuthSession> {
+export async function refreshSession(): Promise<
+  SupabaseAuthResult<SupabaseAuthSession>
+> {
   const client = getSupabaseClient();
 
   if (!client) {
@@ -132,7 +136,7 @@ export async function refreshSession(): SupabaseAuthResult<SupabaseAuthSession> 
  *
  * @returns Sign out result
  */
-export async function signOutSession(): SupabaseAuthResult<void> {
+export async function signOutSession(): Promise<SupabaseAuthResult<void>> {
   const client = getSupabaseClient();
 
   if (!client) {
@@ -172,7 +176,9 @@ export async function signOutSession(): SupabaseAuthResult<void> {
  *
  * @returns Restored session result
  */
-export async function restorePersistedSession(): SupabaseAuthResult<SupabaseAuthSession> {
+export async function restorePersistedSession(): Promise<
+  SupabaseAuthResult<SupabaseAuthSession>
+> {
   const client = getSupabaseClient();
 
   if (!client) {
