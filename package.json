@@ -3,10 +3,10 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "EXPO_USE_HERMES=false expo start",
+    "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "EXPO_USE_HERMES=false expo start --web"
+    "web": "EXPO_USE_HERMES=false EXPO_UNSTABLE_TRANSFORM_PROFILE=default expo start --web"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^12.0.1",
