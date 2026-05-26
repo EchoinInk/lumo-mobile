@@ -48,15 +48,15 @@ class TaskSyncRepository implements ITaskRepository {
     const task = await taskLocalRepository.createTask(input);
 
     // 2. Resolve user ownership (tolerates anonymous mode)
-    const context = await createOptionalRepositoryContext();
+    const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
+    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
-      ownerType:
-        context.accountMode === "authenticated" ? "authenticated" : "guest",
-      localOwnerId: context.localOwnerId,
-      cloudOwnerId: context.cloudOwnerId,
-      syncPartitionKey: context.syncPartitionKey,
+      ownerType: userId ? "authenticated" : "guest",
+      localOwnerId: userId || "guest", // Fallback for guest mode
+      cloudOwnerId: userId || undefined,
+      syncPartitionKey: userId ? `user:${userId}:syncQueue` : "guest:syncQueue",
       entity: "task",
       operation: "create",
       entityId: task.id,
@@ -94,8 +94,12 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
+    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
-      userId,
+      ownerType: userId ? "authenticated" : "guest",
+      localOwnerId: userId || "guest",
+      cloudOwnerId: userId || undefined,
+      syncPartitionKey: userId ? `user:${userId}:syncQueue` : "guest:syncQueue",
       entity: "task",
       operation: "update",
       entityId: id,
