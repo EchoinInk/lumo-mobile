@@ -1,5 +1,132 @@
 # Changelog
 
+## Phase 13.6 — Migration Safety Test Harness
+
+### Overview
+
+Phase 13.6 builds a development-only test harness to prove the guest → account migration safety pass works with disposable local data before destructive cleanup is introduced. This phase is testing + verification only.
+
+### Core Principles
+
+- Testing + verification only
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No Supabase upload
+- No automatic migration on login
+- Explicit method calls only for safety pass
+- Only runs in **DEV** mode
+
+### Files Created
+
+**Test Harness Types**
+
+- `src/features/auth/types/migrationTest.types.ts` — Test harness types (MigrationHarnessStatus, MigrationHarnessReport, MigrationHarnessStepResult, MigrationHarnessResult)
+
+**Test Data Utilities**
+
+- `src/features/auth/testing/migrationTestData.ts` — Mock guest data seeding utilities:
+  - `seedMockGuestMigrationData()` — Seeds mock guest partitions with test data
+  - `seedMockGuestSyncQueue()` — Seeds mock guest sync queue items
+  - `clearMockMigrationTestData()` — Clears mock test data
+  - `getMockMigrationContexts()` — Gets test repository contexts
+  - `verifyMockGuestDataExists()` — Verifies mock guest data exists
+  - `verifyMockSyncQueueExists()` — Verifies mock sync queue exists
+
+**Test Harness Service**
+
+- `src/features/auth/testing/migrationSafetyHarness.ts` — Test harness orchestration:
+  - `runMigrationSafetyHarness()` — Runs full test harness with validation
+  - `resetMigrationSafetyHarness()` — Resets test harness state
+  - `getMigrationSafetyHarnessReport()` — Gets current test harness report
+
+### Files Modified
+
+**Account Screen**
+
+- `app/(tabs)/more/account.tsx` — Added dev-only test harness controls:
+  - "Run migration safety test" button
+  - "Reset migration test data" button
+  - Harness result display
+  - Only visible in **DEV** mode
+  - Does not run on mount
+  - Does not use real user data
+
+### Test Harness Flow
+
+1. **Seed Guest Data** — Seeds mock guest partitions with test data (tasks, habits, meals, budget, workouts, calendar)
+2. **Seed Guest Sync Queue** — Seeds mock guest sync queue items with pending operations
+3. **Create Test Contexts** — Creates guest and authenticated repository contexts with deterministic test IDs
+4. **Run Safety Pass** — Calls `runGuestMigrationSafetyPass()` with test contexts
+5. **Validate Results** — Verifies:
+   - Guest source partitions still exist
+   - Target partitions were copied
+   - Rollback snapshot was created
+   - Sync transfer was prepared
+   - Orphan tracking record exists
+   - Guest data is untouched
+6. **Return Report** — Returns structured test report with validation results
+
+### Test Data Rules
+
+- Only runs in **DEV** mode
+- Never runs automatically
+- Never touches real active user partitions unless explicitly passed test context
+- Uses deterministic test IDs (`test-guest-owner`, `test-cloud-owner`)
+- Clears only mock test data when reset is clicked
+
+### What Phase 13.6 Does NOT Do
+
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No Supabase upload
+- No automatic migration on login
+- No production migration UI
+- No analytics
+- No notifications
+- No social login
+- No destructive cleanup
+
+### Verification
+
+- TypeScript passes with no errors ✓
+- Web app boots successfully on http://localhost:8081 ✓
+- No import.meta error ✓
+- Account route does not spin forever ✓
+- Login/signup routes still render ✓
+- Guest mode still works ✓
+- Migration utilities do not run on startup ✓
+- No guest data is deleted ✓
+- No sync queue replay occurs ✓
+- No Supabase upload occurs ✓
+- Missing Supabase env vars still fail open to guest mode ✓
+- Dev-only harness controls show only in **DEV** ✓
+- Running harness completes without deletion ✓
+- Mock guest data remains after safety pass ✓
+- Target authenticated partitions are copied ✓
+- Rollback snapshot is created ✓
+- Sync queue transfer is prepared ✓
+- Orphan tracking record exists ✓
+- Reset clears only mock test data ✓
+
+### Risks
+
+1. **Guest Data Orphaning** — Logout generates new localOwnerId, orphaning old guest data. Cleanup needed in future phase.
+2. **Migration Record Loss** — If MMKV is cleared, migration tracking records are lost. Future phases should add backup to secure storage.
+3. **Rollback Window** — 7-day rollback window may be too short for some users. Future phases should make this configurable.
+4. **Partition Discovery** — Current implementation relies on migration tracking records for partition discovery. Future phases should add fallback discovery methods.
+
+### Recommended Phase 13.7
+
+Destructive Guest Partition Cleanup (only after validation passes):
+
+- Implement actual guest partition deletion after rollback window expires
+- Add user confirmation for cleanup
+- Add cleanup progress tracking
+- Add cleanup error recovery
+- Delete orphaned guest partitions after validation passes
+
 ## Phase 13.5 — Migration Safety Real Implementation Wiring
 
 ### Overview
