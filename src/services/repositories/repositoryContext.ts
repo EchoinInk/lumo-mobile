@@ -23,7 +23,7 @@
 import type {
     CloudOwnerId,
     LocalOwnerId,
-    RepositoryContext
+    RepositoryContext,
 } from "@/features/auth/types/auth.types";
 
 // ── Context Creation ───────────────────────────────────────────────────────────
@@ -191,4 +191,50 @@ export function describeContext(context: RepositoryContext): string {
       : `cloud:${context.cloudOwnerId?.slice(0, 8)}`;
   const migration = context.isMigrating ? " (migrating)" : "";
   return `${mode} mode, owner ${owner}${migration}`;
+}
+
+// ── Authenticated Context Factory ───────────────────────────────────────────────
+
+/**
+ * Create repository context from Supabase session.
+ * Used when hydrating authenticated sessions from Supabase.
+ *
+ * @param session - Supabase auth session
+ * @param localOwnerId - Local owner ID (preserved from guest state or generated)
+ * @returns RepositoryContext for authenticated user
+ */
+export function createRepositoryContextFromSession(
+  session: SupabaseAuthSession,
+  localOwnerId: LocalOwnerId,
+): RepositoryContext {
+  if (!session.user || !session.isValid) {
+    throw new Error(
+      "[createRepositoryContextFromSession] Cannot create context from invalid session",
+    );
+  }
+
+  return mapSupabaseSessionToRepositoryContext(session, localOwnerId);
+}
+
+/**
+ * Create repository context from AuthUser.
+ * Used when working with canonical auth user objects.
+ *
+ * @param authUser - Canonical AuthUser
+ * @returns RepositoryContext for authenticated user
+ */
+export function createRepositoryContextFromAuthUser(
+  authUser: AuthUser,
+): RepositoryContext {
+  if (authUser.type !== "authenticated") {
+    throw new Error(
+      "[createRepositoryContextFromAuthUser] Cannot create context from non-authenticated user",
+    );
+  }
+
+  return createAuthenticatedRepositoryContext(
+    authUser.localOwnerId,
+    authUser.cloudOwnerId,
+    false,
+  );
 }
