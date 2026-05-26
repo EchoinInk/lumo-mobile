@@ -19898,3 +19898,10 @@ FILES:
 src/features/auth/components/AuthGuard.tsx
 src/features/auth/services/accountMigrationPlan.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:26:19
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/features/auth/components/AuthGuard.tsx
+src/features/auth/hooks/useAuthGuard.ts
+

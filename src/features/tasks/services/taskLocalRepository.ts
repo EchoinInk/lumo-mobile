@@ -1,5 +1,7 @@
+import type { RepositoryContext } from "@/features/auth/types/auth.types";
 import { deleteKey, getString, setString } from "@/services/storage/mmkv";
 import { StorageKeys } from "@/services/storage/storageKeys";
+import { getEntityStorageKey } from "@/services/storage/storagePartition";
 import { CreateTaskInput, Task, UpdateTaskInput } from "../types/task";
 import { ITaskRepository } from "./taskRepository.types";
 
@@ -14,14 +16,39 @@ import { ITaskRepository } from "./taskRepository.types";
  * - Serialize/deserialize task data
  * - Generate IDs and timestamps
  * - Isolate persistence logic from UI
+ * - Support ownership-safe storage partitioning via RepositoryContext
  *
  * Error contract:
  * - No raw JS exceptions escape this class
  * - Storage errors are caught and re-thrown as normalised Error instances
  * - Not-found errors use a consistent message format: "Task <id> not found"
+ *
+ * Ownership:
+ * - When RepositoryContext is provided, uses partitioned storage keys
+ * - When RepositoryContext is not provided, uses legacy StorageKeys.TASKS
+ * - This allows gradual migration without breaking existing code
  */
 export class TaskLocalRepository implements ITaskRepository {
   private readonly STORAGE_KEY = StorageKeys.TASKS;
+  private repositoryContext?: RepositoryContext;
+
+  /**
+   * Set the repository context for ownership-safe storage.
+   * Call this before repository operations to enable partitioned storage.
+   */
+  setRepositoryContext(context: RepositoryContext): void {
+    this.repositoryContext = context;
+  }
+
+  /**
+   * Get the storage key for tasks, respecting repository context if set.
+   */
+  private getStorageKey(): string {
+    if (this.repositoryContext) {
+      return getEntityStorageKey("tasks", this.repositoryContext);
+    }
+    return this.STORAGE_KEY;
+  }
 
   // ── Private helpers ──────────────────────────────────────────────────────
 
@@ -31,7 +58,7 @@ export class TaskLocalRepository implements ITaskRepository {
    */
   private loadTasks(): Task[] {
     try {
-      const raw = getString(this.STORAGE_KEY);
+      const raw = getString(this.getStorageKey());
       if (!raw) return [];
       return JSON.parse(raw) as Task[];
     } catch (err) {
@@ -46,7 +73,7 @@ export class TaskLocalRepository implements ITaskRepository {
    */
   private persistTasks(tasks: Task[]): void {
     try {
-      setString(this.STORAGE_KEY, JSON.stringify(tasks));
+      setString(this.getStorageKey(), JSON.stringify(tasks));
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       throw new Error(
