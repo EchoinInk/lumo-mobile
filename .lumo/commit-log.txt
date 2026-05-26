@@ -20107,3 +20107,9 @@ COMMIT: chore(lumo): update storageIsolation.ts
 FILES:
 src/services/storage/storageIsolation.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:54:04
+COMMIT: chore(lumo): update useSessionBootstrap.ts
+FILES:
+src/features/auth/hooks/useSessionBootstrap.ts
+
