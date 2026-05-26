@@ -1,3 +1,4 @@
+import { useAuthSessionStore } from "@/features/auth/store/useAuthSessionStore";
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
@@ -9,10 +10,12 @@ import {
     CreditCard,
     Dumbbell,
     Home,
+    LogIn,
     Scale,
     Settings,
     ShoppingCart,
     Sparkles,
+    User,
     Utensils,
     Wallet,
 } from "lucide-react-native";
