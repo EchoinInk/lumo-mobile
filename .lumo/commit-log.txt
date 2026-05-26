@@ -20336,3 +20336,9 @@ COMMIT: chore(lumo): update app.json
 FILES:
 app.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 14:20:48
+COMMIT: chore(lumo): update babel.config.js
+FILES:
+babel.config.js
+
