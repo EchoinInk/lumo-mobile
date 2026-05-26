@@ -182,7 +182,7 @@ export async function runGuestMigrationSafetyPass(
     report = {
       ...report,
       preview: {
-        entities: preview.entities || [],
+        entities: preview.entities.map((e) => e.entityName) || [],
         totalSize: preview.totalDataSize || 0,
         itemCount: preview.totalItemCount || 0,
         potentialConflicts: preview.potentialConflicts || [],
@@ -196,10 +196,10 @@ export async function runGuestMigrationSafetyPass(
     currentReport = report;
 
     const conflicts = detectConflicts(sourceContext, targetContext);
-    const conflictResolution = resolveAllConflicts(conflicts, "keep_target");
+    const conflictResolution = resolveAllConflicts(conflicts, "overwrite");
     report = {
       ...report,
-      conflicts: conflictResolution.results.map((r) => ({
+      conflicts: conflictResolution.resolutions.map((r: any) => ({
         entityName: r.entityName,
         strategy: r.strategy,
         success: r.success,
