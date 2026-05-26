@@ -24,6 +24,8 @@ function AccountContent() {
   const accountMode = useAuthSessionStore((s) => s.accountMode);
   const signOut = useAuthSessionStore((s) => s.signOut);
   const migrationStatus = useGuestMigrationStatus();
+  const [harnessResult, setHarnessResult] = useState<string | null>(null);
+  const [isRunningHarness, setIsRunningHarness] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -44,6 +46,37 @@ function AccountContent() {
     } catch (err) {
       console.error("Logout failed:", err);
     }
+  };
+
+  const handleRunHarness = async () => {
+    if (!__DEV__) return;
+    setIsRunningHarness(true);
+    setHarnessResult(null);
+
+    try {
+      const {
+        runMigrationSafetyHarness,
+      } = require("@/features/auth/testing/migrationSafetyHarness");
+      const result = await runMigrationSafetyHarness();
+      setHarnessResult(result.summary);
+    } catch (err) {
+      setHarnessResult(
+        `Error: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    } finally {
+      setIsRunningHarness(false);
+    }
+  };
+
+  const handleResetHarness = () => {
+    if (!__DEV__) return;
+    const {
+      clearMockMigrationTestData,
+      resetMigrationSafetyHarness,
+    } = require("@/features/auth/testing/migrationSafetyHarness");
+    clearMockMigrationTestData();
+    resetMigrationSafetyHarness();
+    setHarnessResult("Test data cleared");
   };
 
   return (

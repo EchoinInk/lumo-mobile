@@ -20774,3 +20774,9 @@ COMMIT: chore(lumo): update migrationSafetyHarness.ts
 FILES:
 src/features/auth/testing/migrationSafetyHarness.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:00:19
+COMMIT: chore(lumo): update account.tsx
+FILES:
+app/(tabs)/more/account.tsx
+
