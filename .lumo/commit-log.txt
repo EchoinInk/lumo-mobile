@@ -20004,3 +20004,10 @@ COMMIT: chore(lumo): update supabaseAuth.mapper.ts
 FILES:
 src/services/api/auth/supabaseAuth.mapper.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:45:13
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/services/api/auth/index.ts
+src/services/api/auth/supabaseAuth.mapper.ts
+

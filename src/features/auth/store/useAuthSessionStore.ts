@@ -2,7 +2,7 @@
  * Auth Session Store
  *
  * Zustand store for auth session state and ownership identity.
- * This is a shell for future Supabase Auth integration.
+ * Wired to Supabase Auth for session management.
  *
  * Responsibilities:
  * - Track current account mode (guest vs authenticated)
@@ -10,11 +10,12 @@
  * - Maintain cloudOwnerId for authenticated mode
  * - Track session and transition states
  * - Track guest migration completion status
+ * - Hydrate and restore Supabase sessions
+ * - Handle sign-out
  *
  * NOT responsible for:
- * - Actual login/logout (handled by future auth service)
- * - Supabase session management (not wired yet)
  * - Feature entity state (owned by feature stores)
+ * - Direct Supabase SDK usage (uses auth layer abstraction)
  *
  * Persisted to MMKV via Zustand persist middleware.
  * Follows existing storage patterns from createPersistStorage.
@@ -28,7 +29,7 @@ import type {
     AuthSessionState,
     AuthTransitionState,
     CloudOwnerId,
-    LocalOwnerId,
+    LocalOwnerId
 } from "../types/auth.types";
 
 // ── State ─────────────────────────────────────────────────────────────────────
