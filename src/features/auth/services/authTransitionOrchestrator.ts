@@ -19,7 +19,7 @@
  * - UI logic (handled by screens/hooks)
  */
 
-import type { LocalOwnerId, CloudOwnerId } from "../types/auth.types";
+import type { CloudOwnerId, LocalOwnerId } from "../types/auth.types";
 
 // ── Transition State ─────────────────────────────────────────────────────────────
 
@@ -196,21 +196,27 @@ export function getCurrentTransition(): TransitionState | null {
  * Check if a transition is currently in progress.
  */
 export function isTransitionInProgress(): boolean {
-  return currentTransition?.status === "in_progress" ?? false;
+  return currentTransition?.status === "in_progress" || false;
 }
 
 /**
  * Check if a guest upgrade is in progress.
  */
 export function isGuestUpgradeInProgress(): boolean {
-  return currentTransition?.type === "guest_upgrade" && currentTransition.status === "in_progress";
+  return (
+    currentTransition?.type === "guest_upgrade" &&
+    currentTransition.status === "in_progress"
+  );
 }
 
 /**
  * Check if a logout is in progress.
  */
 export function isLogoutInProgress(): boolean {
-  return currentTransition?.type === "authenticated_logout" && currentTransition.status === "in_progress";
+  return (
+    currentTransition?.type === "authenticated_logout" &&
+    currentTransition.status === "in_progress"
+  );
 }
 
 /**
