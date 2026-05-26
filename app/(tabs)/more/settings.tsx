@@ -119,7 +119,7 @@ export default function SettingsScreen() {
           style: "destructive",
           onPress: () => {
             resetOnboarding();
-            router.replace("/onboarding");
+            router.replace("/onboarding" as any);
           },
         },
       ],
