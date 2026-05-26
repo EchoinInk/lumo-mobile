@@ -1,79 +1,159 @@
-import { createMMKV } from 'react-native-mmkv';
+import { Platform } from "react-native";
 
 /**
  * MMKV Storage Instance
- * 
+ *
  * Centralized MMKV storage instance for the application.
  * Initialized once to avoid duplication and ensure consistency.
+ * Web-safe: uses localStorage fallback on web platform.
  */
-export const storage = createMMKV();
+let storage: any = null;
+
+// Lazy initialization to avoid module-level execution on web
+function getStorage() {
+  if (storage !== null) {
+    return storage;
+  }
+
+  if (Platform.OS === "web") {
+    // Web fallback using localStorage
+    storage = {
+      getString: (key: string) => {
+        try {
+          return localStorage.getItem(key) ?? undefined;
+        } catch {
+          return undefined;
+        }
+      },
+      set: (key: string, value: string) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Ignore storage errors
+        }
+      },
+      getNumber: (key: string) => {
+        try {
+          const value = localStorage.getItem(key);
+          return value !== null ? parseFloat(value) : undefined;
+        } catch {
+          return undefined;
+        }
+      },
+      getBoolean: (key: string) => {
+        try {
+          const value = localStorage.getItem(key);
+          return value !== null ? value === "true" : undefined;
+        } catch {
+          return undefined;
+        }
+      },
+      remove: (key: string) => {
+        try {
+          localStorage.removeItem(key);
+        } catch {
+          // Ignore storage errors
+        }
+      },
+      clearAll: () => {
+        try {
+          localStorage.clear();
+        } catch {
+          // Ignore storage errors
+        }
+      },
+      contains: (key: string) => {
+        try {
+          return localStorage.getItem(key) !== null;
+        } catch {
+          return false;
+        }
+      },
+      getAllKeys: () => {
+        try {
+          return Object.keys(localStorage);
+        } catch {
+          return [];
+        }
+      },
+    };
+  } else {
+    // Native MMKV
+    const { createMMKV } = require("react-native-mmkv");
+    storage = createMMKV();
+  }
+
+  return storage;
+}
+
+export const storageInstance = getStorage();
 
 /**
  * Get a string value from storage
  */
 export const getString = (key: string): string | undefined => {
-  return storage.getString(key);
+  return storageInstance.getString(key);
 };
 
 /**
  * Set a string value in storage
  */
 export const setString = (key: string, value: string): void => {
-  storage.set(key, value);
+  storageInstance.set(key, value);
 };
 
 /**
  * Get a number value from storage
  */
 export const getNumber = (key: string): number | undefined => {
-  return storage.getNumber(key);
+  return storageInstance.getNumber(key);
 };
 
 /**
  * Set a number value in storage
  */
 export const setNumber = (key: string, value: number): void => {
-  storage.set(key, value);
+  storageInstance.set(key, value);
 };
 
 /**
  * Get a boolean value from storage
  */
 export const getBool = (key: string): boolean | undefined => {
-  return storage.getBoolean(key);
+  return storageInstance.getBoolean(key);
 };
 
 /**
  * Set a boolean value in storage
  */
 export const setBool = (key: string, value: boolean): void => {
-  storage.set(key, value);
+  storageInstance.set(key, value);
 };
 
 /**
  * Delete a key from storage
  */
 export const deleteKey = (key: string): void => {
-  storage.remove(key);
+  storageInstance.remove(key);
 };
 
 /**
  * Clear all keys from storage
  */
 export const clearAll = (): void => {
-  storage.clearAll();
+  storageInstance.clearAll();
 };
 
 /**
  * Check if a key exists in storage
  */
 export const contains = (key: string): boolean => {
-  return storage.contains(key);
+  return storageInstance.contains(key);
 };
 
 /**
  * Get all keys from storage
  */
 export const getAllKeys = (): string[] => {
-  return storage.getAllKeys();
+  return storageInstance.getAllKeys();
 };

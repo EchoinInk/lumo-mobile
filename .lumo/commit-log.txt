@@ -20526,3 +20526,9 @@ app/auth/_layout.tsx
 app/auth/login.tsx
 app/auth/signup.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 16:03:22
+COMMIT: chore(lumo): update package.json
+FILES:
+package.json
+
