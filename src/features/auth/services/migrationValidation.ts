@@ -329,7 +329,7 @@ export function summarizeMigrationValidation(
   lines.push(`Migration Validation Report`);
   lines.push(`Source: ${report.sourceContext.localOwnerId.slice(0, 8)}...`);
   lines.push(
-    `Target: ${report.targetContext.cloudOwnerId?.slice(0, 8) || "unknown"}...`,
+    `Target: ${report.targetContext.cloudOwnerId ? report.targetContext.cloudOwnerId.slice(0, 8) : "unknown"}...`,
   );
   lines.push(``);
 
