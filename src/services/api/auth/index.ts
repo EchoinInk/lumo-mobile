@@ -12,33 +12,26 @@
 
 // Re-export auth configuration
 export {
-  getSupabaseConfig,
-  isSupabaseConfigured,
-  resetAuthConfig,
+    getSupabaseConfig,
+    isSupabaseConfigured,
+    resetAuthConfig
 } from "./auth.config";
 
 // Re-export auth session operations
 export {
-  getCurrentSession,
-  refreshSession,
-  signOutSession,
-  restorePersistedSession,
-  subscribeToAuthChanges,
+    getCurrentSession,
+    refreshSession, restorePersistedSession, signInWithEmailPassword, signOutSession, signUpWithEmailPassword, subscribeToAuthChanges
 } from "./supabaseAuth.session";
 
 // Re-export auth mappers
 export {
-  mapSupabaseUserToAuthUser,
-  mapSupabaseSessionToRepositoryContext,
-  mapSupabaseSessionToAuthUser,
-  extractCloudOwnerId,
-  extractEmail,
+    extractCloudOwnerId,
+    extractEmail, mapSupabaseSessionToAuthUser, mapSupabaseSessionToRepositoryContext, mapSupabaseUserToAuthUser
 } from "./supabaseAuth.mapper";
 
 // Re-export types (for internal use only)
 export type {
-  SupabaseAuthSession,
-  SupabaseAuthError,
-  SupabaseAuthResult,
-  SupabaseAuthConfig,
+    SupabaseAuthConfig, SupabaseAuthError,
+    SupabaseAuthResult, SupabaseAuthSession
 } from "./supabaseAuth.types";
+
