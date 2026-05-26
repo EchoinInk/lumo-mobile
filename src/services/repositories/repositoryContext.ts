@@ -21,10 +21,9 @@
  */
 
 import type {
-  AccountMode,
-  LocalOwnerId,
-  CloudOwnerId,
-  RepositoryContext,
+    CloudOwnerId,
+    LocalOwnerId,
+    RepositoryContext
 } from "@/features/auth/types/auth.types";
 
 // ── Context Creation ───────────────────────────────────────────────────────────
@@ -81,7 +80,9 @@ export function createAuthenticatedRepositoryContext(
  */
 export function getRepositoryContext(): RepositoryContext {
   // Import here to avoid circular dependency
-  const { useAuthSessionStore } = require("@/features/auth/store/useAuthSessionStore");
+  const {
+    useAuthSessionStore,
+  } = require("@/features/auth/store/useAuthSessionStore");
   const state = useAuthSessionStore.getState();
 
   if (!state.hasHydrated) {
@@ -184,9 +185,10 @@ export function isMigratingContext(context: RepositoryContext): boolean {
  */
 export function describeContext(context: RepositoryContext): string {
   const mode = context.accountMode;
-  const owner = context.accountMode === "guest"
-    ? `local:${context.localOwnerId.slice(0, 8)}`
-    : `cloud:${context.cloudOwnerId?.slice(0, 8)}`;
+  const owner =
+    context.accountMode === "guest"
+      ? `local:${context.localOwnerId.slice(0, 8)}`
+      : `cloud:${context.cloudOwnerId?.slice(0, 8)}`;
   const migration = context.isMigrating ? " (migrating)" : "";
   return `${mode} mode, owner ${owner}${migration}`;
 }
