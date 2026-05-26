@@ -9,7 +9,7 @@
  * - EXPO_PUBLIC_SUPABASE_ANON_KEY
  */
 
-import { getEnv } from "@/config/env";
+import { env } from "@/config/env";
 
 interface AuthConfig {
   url: string;
@@ -28,14 +28,11 @@ export function getSupabaseConfig(): AuthConfig {
     return cachedConfig;
   }
 
-  const url = getEnv("EXPO_PUBLIC_SUPABASE_URL");
-  const anonKey = getEnv("EXPO_PUBLIC_SUPABASE_ANON_KEY");
-
-  const isConfigured = !!(url && anonKey && url.length > 0 && anonKey.length > 0);
+  const { supabaseUrl, supabaseAnonKey, isConfigured } = env;
 
   cachedConfig = {
-    url: url || "",
-    anonKey: anonKey || "",
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
     isConfigured,
   };
 

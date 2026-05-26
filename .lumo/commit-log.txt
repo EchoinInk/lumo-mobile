@@ -19961,3 +19961,10 @@ COMMIT: chore(lumo): update index.ts
 FILES:
 src/services/sync/testing/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:43:39
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/services/api/auth/auth.config.ts
+src/services/api/auth/supabaseAuth.types.ts
+
