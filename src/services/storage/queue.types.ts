@@ -233,10 +233,35 @@ export type StrictQueueItem =
  */
 export interface CreateQueueItemInput {
   /**
-   * Owner of this operation.
-   * Pass the authenticated userId, or null for anonymous/local-first mode.
+   * Owner type for this operation.
+   * - guest: Item created in guest mode (local-only)
+   * - authenticated: Item created while authenticated (may sync to cloud)
    */
-  userId?: string | null;
+  ownerType: SyncOwnerType;
+
+  /**
+   * Local owner ID for this operation.
+   * Always required - provides stable identity.
+   */
+  localOwnerId: string;
+
+  /**
+   * Cloud owner ID for this operation.
+   * Required when ownerType is "authenticated".
+   */
+  cloudOwnerId?: string;
+
+  /**
+   * Sync partition key for this operation.
+   * Identifies which sync queue partition this item belongs to.
+   */
+  syncPartitionKey: string;
+
+  /**
+   * Whether this item was created during guest → account migration.
+   */
+  createdDuringMigration?: boolean;
+
   entity: SyncEntity;
   operation: SyncOperation;
   entityId: string;
