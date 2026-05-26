@@ -3,6 +3,7 @@ import { Screen } from "@/src/components/ui/Screen";
 import { Text } from "@/src/components/ui/Text";
 import { MoreScreenHeader } from "@/src/features/more/components";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
+import { useSettingsStore } from "@/src/store/useSettingsStore";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import {
@@ -204,7 +205,12 @@ export default function SettingsScreen() {
                     {item.label}
                   </Text>
                   {item.hasToggle ? (
-                    <Switch value={true} onValueChange={() => {}} />
+                    <Switch
+                      value={getToggleValue(item.label)}
+                      onValueChange={() => handleToggle(item.label)}
+                      accessibilityLabel={`Toggle ${item.label}`}
+                      accessibilityRole="switch"
+                    />
                   ) : (
                     <View style={styles.settingValue}>
                       <Text variant="caption" color={Colors.textSecondary}>
