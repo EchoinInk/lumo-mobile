@@ -65,7 +65,7 @@ export default function MoreScreen() {
         <LogIn size={22} color={Colors.primary} />
       ),
     color: Colors.primary,
-    route: "/more/account",
+    route: "/(tabs)/more/account",
   };
 
   const features = [

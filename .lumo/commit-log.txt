@@ -20611,3 +20611,9 @@ COMMIT: chore(lumo): update babel.config.js
 FILES:
 babel.config.js
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 00:49:55
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/(tabs)/_layout.tsx
+
