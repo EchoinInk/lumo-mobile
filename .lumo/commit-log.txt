@@ -20653,3 +20653,16 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 01:58:13
+COMMIT: feat(lumo): evolve components and logic (8 files)
+FILES:
+src/features/auth/services/migrationConflictStrategy.ts
+src/features/auth/services/migrationCopy.ts
+src/features/auth/services/migrationOrphanedGuestTracking.ts
+src/features/auth/services/migrationPreview.ts
+src/features/auth/services/migrationRollback.ts
+src/features/auth/services/migrationSyncQueueTransfer.ts
+src/features/auth/services/migrationValidation.ts
+src/services/storage/storageIsolation.ts
+
