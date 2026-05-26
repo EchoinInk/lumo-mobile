@@ -20617,3 +20617,9 @@ COMMIT: chore(lumo): update _layout.tsx
 FILES:
 app/(tabs)/_layout.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 00:57:02
+COMMIT: chore(lumo): update index.tsx
+FILES:
+app/(tabs)/more/index.tsx
+

@@ -218,6 +218,23 @@ export const useAuthSessionStore = create<AuthSessionStore>()(
           sessionStatus: "initializing",
         });
 
+        // If Supabase is not configured, immediately initialize guest mode
+        if (!isSupabaseConfigured()) {
+          console.warn(
+            "[AuthSessionStore] Supabase not configured, initializing guest mode",
+          );
+          const localOwnerId = generateLocalOwnerId();
+          set({
+            accountMode: "guest",
+            localOwnerId,
+            cloudOwnerId: null,
+            sessionStatus: "guest",
+            authHydrationStatus: "hydrated",
+            authError: null,
+          });
+          return;
+        }
+
         try {
           const result = await restorePersistedSession();
 
@@ -269,10 +286,15 @@ export const useAuthSessionStore = create<AuthSessionStore>()(
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           console.error("[AuthSessionStore] Failed to hydrate session:", err);
+          // Always fail open to guest mode on error
+          const localOwnerId = generateLocalOwnerId();
           set({
-            authHydrationStatus: "failed",
-            authError: message,
+            accountMode: "guest",
+            localOwnerId,
+            cloudOwnerId: null,
             sessionStatus: "guest",
+            authHydrationStatus: "hydrated",
+            authError: message,
           });
         }
       },
