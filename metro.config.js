@@ -2,10 +2,6 @@ const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
 const path = require("path");
 
-// Disable Hermes globally to avoid import.meta issues
-process.env.EXPO_USE_HERMES = "false";
-process.env.EXPO_USE_FAST_RESOLVER = "1";
-
 const config = getDefaultConfig(__dirname);
 
 config.resolver.alias = {
@@ -24,25 +20,6 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     return originalResolveRequest(context, moduleName, platform);
   }
   return context.resolveRequest(context, moduleName, platform);
-};
-
-// Override transformer configuration to disable Hermes
-config.transformer = {
-  ...config.transformer,
-  hermesParser: false,
-  unstable_transformProfile: "default",
-  minifierConfig: {
-    keep_fnames: true,
-    mangle: {
-      keep_fnames: true,
-    },
-  },
-};
-
-// Override server options to disable hermes-stable
-config.server = {
-  ...config.server,
-  unstable_transformProfile: "default",
 };
 
 module.exports = withNativeWind(config, {
