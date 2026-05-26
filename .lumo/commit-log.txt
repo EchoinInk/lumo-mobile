@@ -20300,3 +20300,9 @@ COMMIT: chore(lumo): update settings.tsx
 FILES:
 app/(tabs)/more/settings.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:41:47
+COMMIT: chore(lumo): update migrationOrphanedGuestTracking.ts
+FILES:
+src/features/auth/services/migrationOrphanedGuestTracking.ts
+

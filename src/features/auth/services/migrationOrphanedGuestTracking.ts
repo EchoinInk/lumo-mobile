@@ -26,7 +26,7 @@
 
 import {
     getEntityStorageKey,
-    getSyncQueueStorageKey
+    getSyncQueueStorageKey,
 } from "../../../services/storage/storagePartition";
 import { storage as mmkvStorage } from "../../../store/storage";
 
@@ -167,6 +167,9 @@ export function discoverGuestPartitions(
     const syncQueueKey = getSyncQueueStorageKey({
       accountMode: "guest",
       localOwnerId: record.localOwnerId,
+      storagePartitionKey: `guest:${record.localOwnerId}`,
+      syncPartitionKey: `guest:${record.localOwnerId}:syncQueue`,
+      isMigrating: false,
     });
 
     const syncQueueData = mmkvStorage.getString(syncQueueKey);
