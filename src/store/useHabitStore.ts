@@ -1,5 +1,5 @@
+import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { create } from "zustand/react";
 import { createPersistStorage } from "./createPersistStorage";
 
 export interface Habit {

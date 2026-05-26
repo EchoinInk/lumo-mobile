@@ -20586,3 +20586,10 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 00:39:29
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/store/useHabitStore.ts
+src/store/useOnboardingStore.ts
+
