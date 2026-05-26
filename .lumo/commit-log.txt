@@ -20270,3 +20270,9 @@ COMMIT: chore(lumo): update migrationValidation.ts
 FILES:
 src/features/auth/services/migrationValidation.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:21:30
+COMMIT: chore(lumo): update migrationConflictStrategy.ts
+FILES:
+src/features/auth/services/migrationConflictStrategy.ts
+
