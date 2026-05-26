@@ -20605,3 +20605,9 @@ COMMIT: chore(lumo): update useOnboardingStore.ts
 FILES:
 src/store/useOnboardingStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 00:44:40
+COMMIT: chore(lumo): update babel.config.js
+FILES:
+babel.config.js
+

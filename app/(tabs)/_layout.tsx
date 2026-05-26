@@ -1,11 +1,11 @@
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { Tabs } from "expo-router";
 import {
-  Calendar,
-  HeartPulse,
-  Home,
-  ListTodo,
-  Menu,
+    Calendar,
+    HeartPulse,
+    Home,
+    ListTodo,
+    Menu,
 } from "lucide-react-native";
 import { Platform } from "react-native";
 
@@ -102,7 +102,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="more/index"
+        name="more"
         options={{
           title: "More",
           tabBarAccessibilityLabel: "More tab",
@@ -115,18 +115,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
-      {/* Hide nested More routes from tab bar */}
-      <Tabs.Screen name="more/about" options={{ href: null }} />
-      <Tabs.Screen name="more/budget" options={{ href: null }} />
-      <Tabs.Screen name="more/cleaning" options={{ href: null }} />
-      <Tabs.Screen name="more/groceries" options={{ href: null }} />
-      <Tabs.Screen name="more/habits" options={{ href: null }} />
-      <Tabs.Screen name="more/meals" options={{ href: null }} />
-      <Tabs.Screen name="more/payments" options={{ href: null }} />
-      <Tabs.Screen name="more/settings" options={{ href: null }} />
-      <Tabs.Screen name="more/weight" options={{ href: null }} />
-      <Tabs.Screen name="more/workouts" options={{ href: null }} />
     </Tabs>
   );
 }
