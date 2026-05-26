@@ -20816,3 +20816,10 @@ COMMIT: chore(lumo): update migrationCleanup.ts
 FILES:
 src/features/auth/services/migrationCleanup.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:59:10
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/(tabs)/more/account.tsx
+src/features/auth/services/migrationCleanup.ts
+

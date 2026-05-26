@@ -82,6 +82,32 @@ function AccountContent() {
     setHarnessResult("Test data cleared");
   };
 
+  const handleRunCleanup = async () => {
+    if (!__DEV__) return;
+    setIsRunningCleanup(true);
+    setCleanupResult(null);
+
+    try {
+      const {
+        runControlledGuestCleanup,
+        TEST_GUEST_OWNER_ID,
+      } = require("@/features/auth/services/migrationCleanup");
+      const result = await runControlledGuestCleanup(
+        TEST_GUEST_OWNER_ID,
+        "CONFIRM_GUEST_CLEANUP",
+      );
+      setCleanupResult(
+        `Cleanup ${result.success ? "completed" : "failed"}: ${result.deletedKeyCount} keys deleted, ${result.failedKeyCount} failed`,
+      );
+    } catch (err) {
+      setCleanupResult(
+        `Error: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    } finally {
+      setIsRunningCleanup(false);
+    }
+  };
+
   return (
     <Screen scrollable>
       <View className="py-8">
