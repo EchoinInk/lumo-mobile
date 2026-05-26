@@ -19885,3 +19885,9 @@ FILES:
 src/services/storage/queue.types.ts
 src/services/storage/storagePartition.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:25:53
+COMMIT: chore(lumo): update queue.types.ts
+FILES:
+src/services/storage/queue.types.ts
+
