@@ -25,13 +25,17 @@ Migration correctness phase focusing on migration safety before destructive clea
 - `src/features/auth/services/migrationValidation.ts` — Migration validation utilities (validate copied data integrity, verify entity counts match, detect data corruption)
 - `src/features/auth/services/migrationConflictStrategy.ts` — Conflict strategy scaffolding (define conflict resolution strategies, detect conflict types, apply conflict resolution)
 - `src/features/auth/services/migrationRollback.ts` — Safe rollback path utilities (create rollback snapshot before migration, restore from rollback snapshot, validate rollback integrity)
+- `src/features/auth/services/migrationSyncQueueTransfer.ts` — Sync queue transfer preparation utilities (prepare guest-owned sync queue items for authenticated ownership, convert ownership metadata)
+- `src/features/auth/services/migrationOrphanedGuestTracking.ts` — Orphaned guest partition tracking utilities (track migrated/orphaned guest partitions, detect cleanup candidates, preserve rollback capability)
+
+**Documentation**
+
+- `docs/guest-migration-safety.md` — Guest migration safety documentation (orphaned partition model, rollback model, cleanup candidate rules, migration tracking lifecycle)
 
 ### Files Deferred
 
 The following utilities were planned but not created due to permission/tool limits:
 
-- Sync queue transfer preparation utilities
-- Orphaned guest partition tracking utilities
 - Integration of migration utilities into auth transition orchestrator
 - Migration orchestration service
 - Destructive guest partition cleanup

@@ -20312,3 +20312,9 @@ COMMIT: chore(lumo): update migrationOrphanedGuestTracking.ts
 FILES:
 src/features/auth/services/migrationOrphanedGuestTracking.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:42:14
+COMMIT: chore(lumo): update guest-migration-safety.md
+FILES:
+docs/guest-migration-safety.md
+
