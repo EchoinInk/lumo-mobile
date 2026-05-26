@@ -1,5 +1,130 @@
 # Changelog
 
+## Phase 13.2 — Supabase Auth Integration Core
+
+### Overview
+
+Infrastructure-first phase implementing actual auth/session infrastructure using Supabase Auth without introducing auth debt, UI coupling, or breaking local-first behavior. This phase wires Supabase Auth into Lumo while preserving the architecture established in Phase 13.1.
+
+### Core Principles
+
+- UI never talks directly to Supabase — Flow remains: Screen → Feature Hook → Repository → API Service
+- Local-first UX is mandatory — User actions remain instant and sync in the background
+- Ownership is explicit — Repositories receive ownership via RepositoryContext, never from global state
+- Storage is partitioned — Guest and authenticated user data are isolated
+- Migration is safe — Guest → account migration is planned and tracked before execution
+- Offline-safe behavior — App remains usable offline, expired sessions gracefully fallback
+
+### Files Created
+
+**Auth Layer (src/services/api/auth/)**
+
+- `supabaseAuth.types.ts` — Internal Supabase auth types (SupabaseAuthSession, SupabaseAuthError, SupabaseAuthResult)
+- `supabaseAuth.client.ts` — Supabase client initialization with SecureStore persistence adapter
+- `supabaseAuth.session.ts` — Session management (getCurrentSession, refreshSession, signOutSession, restorePersistedSession, subscribeToAuthChanges)
+- `supabaseAuth.mapper.ts` — Type mapping (Supabase → canonical types: mapSupabaseUserToAuthUser, mapSupabaseSessionToRepositoryContext)
+- `auth.config.ts` — Environment validation (getSupabaseConfig, isSupabaseConfigured, EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY)
+- `index.ts` — Public API exports
+
+**Auth Services (src/features/auth/services/)**
+
+- `authTransitionOrchestrator.ts` — Transition coordination (beginGuestUpgrade, finalizeGuestUpgrade, beginLogoutTransition, finalizeLogoutTransition)
+
+**Auth Hooks (src/features/auth/hooks/)**
+
+- `useSessionBootstrap.ts` — Offline-safe session restoration (useSessionBootstrap, useSessionReady, useSessionRestoring, useSessionError)
+
+**Auth Utils (src/features/auth/utils/)**
+
+- `authDiagnostics.ts` — Development-only state validation (validateOwnershipConsistency, validateStoragePartitionConsistency, validateRepositoryContextIntegrity, validateMigrationState, detectOrphanedSyncQueueOwnership)
+
+**Sync Ownership (src/services/sync/ownership/)**
+
+- `syncOwnership.ts` — Sync queue ownership validation and enforcement (validateSyncOwnership, assertSyncOwnership, syncItemBelongsToContext, isSyncItemEligibleForUpload, filterUploadEligibleItems)
+
+**Storage Isolation (src/services/storage/)**
+
+- `storageIsolation.ts` — Auth-aware storage clearing utilities (clearGuestPartitions, clearAuthenticatedPartitions, clearSyncPartitions, clearOwnershipScopedData, clearCloudOwnerDataPreserveGuest)
+
+**Documentation**
+
+- `docs/supabase-auth-core-architecture.md` — Comprehensive auth architecture documentation
+
+### Files Modified
+
+**Auth Store (src/features/auth/store/)**
+
+- `useAuthSessionStore.ts` — Added session lifecycle methods (hydrateSession, restoreSession, signOut, setSessionHydrating, setSessionReady, setSessionError), added auth state (authUser, lastSessionRestoreAt, authHydrationStatus, authError)
+
+**Repository Context (src/services/repositories/)**
+
+- `repositoryContext.ts` — Added authenticated context factories (createRepositoryContextFromSession, createRepositoryContextFromAuthUser)
+
+**Sync Queue Compatibility (Phase 13.1 cleanup)**
+
+- `src/features/tasks/services/taskSyncRepository.ts` — Updated to use new ownership metadata with TODOs for Phase 13.2
+- `src/services/storage/syncQueue.ts` — Updated recordQueueItem to use new ownership fields
+- `src/services/sync/deadLetter/index.ts` — Added compatibility layer for userId migration
+- `src/services/sync/queue/queue.validation.ts` — Updated validation with ownership metadata
+- `src/services/sync/testing/index.ts` — Updated test utilities to use new ownership fields
+
+### Architecture Decisions
+
+1. **Separate Auth Layer** — Supabase code isolated in `src/services/api/auth/` to prevent direct imports from UI
+2. **Type Mapping** — Supabase types mapped immediately to canonical types to maintain single source of truth
+3. **SecureStore Persistence** — Supabase tokens stored in SecureStore for security
+4. **Offline-First Session Restoration** — App remains usable offline, expired sessions gracefully fallback
+5. **Explicit Repository Context** — Repositories receive ownership via context, never from global state
+6. **Sync Ownership Enforcement** — Guest sync items never upload, migration items pause safely
+7. **Storage Isolation** — Deterministic partition clearing using known keys, no global MMKV wipe
+8. **Transition Orchestrator** — Centralized transition coordination to prevent ownership corruption
+
+### Storage Key Patterns
+
+- **Guest entities**: `guest:{localOwnerId}:tasks`, `guest:{localOwnerId}:habits`, `guest:{localOwnerId}:meals`, `guest:{localOwnerId}:budget`, `guest:{localOwnerId}:workouts`, `guest:{localOwnerId}:calendar`
+- **Authenticated entities**: `user:{cloudOwnerId}:tasks`, `user:{cloudOwnerId}:habits`, `user:{cloudOwnerId}:meals`, `user:{cloudOwnerId}:budget`, `user:{cloudOwnerId}:workouts`, `user:{cloudOwnerId}:calendar`
+- **Guest sync queue**: `guest:{localOwnerId}:syncQueue`
+- **Authenticated sync queue**: `user:{cloudOwnerId}:syncQueue`
+- **Migration metadata**: `guest:{localOwnerId}:migration`, `user:{cloudOwnerId}:migration`
+
+### What Phase 13.2 Does NOT Do
+
+- No polished auth UI (login/signup screens)
+- No social login providers
+- No onboarding rewrite
+- No analytics integration
+- No push notification setup
+- No destructive migration execution
+- No guest data deletion
+- No conflict resolution
+- No full repository migration (only tasks as reference)
+- No automatic sync replay
+
+### Verification
+
+- TypeScript passes with no errors
+- App boots successfully
+- Offline launch still works
+- Guest mode still works
+- No auth UI exists yet
+- No repositories directly use Supabase SDK
+- No screens directly use Supabase SDK
+- Ownership metadata survives hydration
+- Storage partitions remain isolated
+- Logout does not corrupt local data
+- Sync queue respects ownership rules
+
+### Deferred Work
+
+Recommended next phases:
+
+- Phase 13.3 — Build polished auth UI (login/signup screens)
+- Phase 13.4 — Implement destructive guest → account migration
+- Phase 13.5 — Migrate all features to RepositoryContext pattern
+- Phase 13.6 — Add social login providers
+- Phase 13.7 — Integrate analytics with auth
+- Phase 13.8 — Add push notifications with auth
+
 ## Phase 13.1 — Auth Readiness Architecture
 
 ### Overview

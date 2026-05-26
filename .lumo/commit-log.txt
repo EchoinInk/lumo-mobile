@@ -20119,3 +20119,9 @@ COMMIT: chore(lumo): update authDiagnostics.ts
 FILES:
 src/features/auth/utils/authDiagnostics.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:55:00
+COMMIT: chore(lumo): update supabase-auth-core-architecture.md
+FILES:
+docs/supabase-auth-core-architecture.md
+
