@@ -19,10 +19,7 @@
  * - UI logic (handled by screens/hooks)
  */
 
-import type {
-    CloudOwnerId,
-    LocalOwnerId
-} from "../types/auth.types";
+import type { CloudOwnerId, LocalOwnerId } from "../types/auth.types";
 
 // ── Transition State ─────────────────────────────────────────────────────────────
 
@@ -111,6 +108,71 @@ export function finalizeGuestUpgrade(): TransitionState {
   // TODO: Clear migration state from sync queue
 
   return currentTransition;
+}
+
+/**
+ * Prepare guest upgrade safety pass.
+ * Runs the migration safety pass without executing destructive operations.
+ * Does NOT run automatically on login - must be called explicitly.
+ *
+ * @param sourceContext - Source guest repository context
+ * @param targetContext - Target authenticated repository context
+ * @returns Migration safety result
+ */
+export async function prepareGuestUpgradeSafety(
+  sourceContext: RepositoryContext,
+  targetContext: RepositoryContext,
+) {
+  console.log(
+    "[AuthTransitionOrchestrator] Preparing guest upgrade safety pass",
+  );
+
+  const result = await runGuestMigrationSafetyPass(
+    sourceContext,
+    targetContext,
+  );
+
+  console.log(
+    `[AuthTransitionOrchestrator] Guest upgrade safety pass ${result.success ? "completed" : "failed"}`,
+  );
+
+  return result;
+}
+
+/**
+ * Complete guest upgrade safety pass.
+ * Validates the safety pass and marks it as complete.
+ * Does NOT delete guest data or replay sync queue.
+ *
+ * @param migrationId - Migration ID to complete
+ * @returns Whether completion was successful
+ */
+export function completeGuestUpgradeSafety(migrationId: string): boolean {
+  console.log(
+    "[AuthTransitionOrchestrator] Completing guest upgrade safety pass",
+  );
+
+  const migrationStatus = getGuestMigrationStatus();
+
+  if (migrationStatus.report?.migrationId !== migrationId) {
+    console.warn(
+      "[AuthTransitionOrchestrator] Migration ID mismatch, cannot complete",
+    );
+    return false;
+  }
+
+  if (migrationStatus.status !== "completed") {
+    console.warn(
+      "[AuthTransitionOrchestrator] Migration not completed, cannot finalize",
+    );
+    return false;
+  }
+
+  console.log(
+    "[AuthTransitionOrchestrator] Guest upgrade safety pass finalized",
+  );
+
+  return true;
 }
 
 // ── Authenticated Logout ───────────────────────────────────────────────────────
