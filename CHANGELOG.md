@@ -1,5 +1,200 @@
 # Changelog
 
+## Phase 13.7 — Controlled Destructive Cleanup
+
+### Overview
+
+Phase 13.7 implements controlled guest partition cleanup after migration safety has been proven. This phase is destructive-capable, but cleanup must never run automatically.
+
+### Core Principles
+
+- Cleanup never runs automatically
+- Requires explicit confirmation token
+- Only deletes verified cleanup candidates
+- Enforces rollback window rules
+- Preserves rollback metadata until final confirmation
+- Prevents cleanup during unsafe migration/sync states
+- Makes cleanup resumable and fail-closed
+- Tracks cleanup progress and errors
+
+### Core Rule
+
+```
+migration ≠ cleanup
+```
+
+Migration copies and validates.
+Cleanup removes old guest-owned leftovers only after safety gates pass.
+
+### Files Created
+
+**Cleanup Service**
+
+- `src/features/auth/services/migrationCleanup.ts` — Controlled cleanup service:
+  - `createCleanupPreview()` — Creates preview of what will be deleted
+  - `validateCleanupCandidate()` — Validates cleanup candidate safety
+  - `runControlledGuestCleanup()` — Runs controlled cleanup with confirmation token
+  - `resumeGuestCleanup()` — Resumes interrupted cleanup
+  - `getCleanupStatus()` — Gets current cleanup status
+  - `resetCleanupStatus()` — Resets cleanup state
+
+### Files Modified
+
+**Migration Types**
+
+- `src/features/auth/types/migration.types.ts` — Added cleanup types:
+  - `GuestCleanupStatus` — Status of cleanup process
+  - `GuestCleanupStep` — Steps in cleanup process
+  - `GuestCleanupBlockReason` — Reasons for cleanup being blocked
+  - `GuestCleanupPreview` — Preview of cleanup operation
+  - `GuestCleanupCandidate` — Cleanup candidate information
+  - `GuestCleanupResult` — Result of cleanup operation
+  - `GuestCleanupError` — Error during cleanup
+  - `GuestCleanupState` — Current cleanup state
+
+**Account Screen**
+
+- `app/(tabs)/more/account.tsx` — Added dev-only cleanup controls:
+  - "Run controlled cleanup test" button
+  - Cleanup result display
+  - Only visible in **DEV** mode
+  - Does not run on mount
+  - Does not use real user data
+
+**Test Harness**
+
+- `src/features/auth/testing/migrationSafetyHarness.ts` — Extended with cleanup integration:
+  - `runControlledCleanupHarness()` — Runs full cleanup test harness
+  - `verifyMockGuestCleanupCompleted()` — Verifies mock guest data deleted
+  - `verifyAuthenticatedDataPreserved()` — Verifies authenticated data preserved
+
+### Cleanup Lifecycle
+
+1. **Migration Completion** — Guest → account migration must complete successfully
+2. **Validation Pass** — All validation checks must pass
+3. **Rollback Window** — 7-day rollback window must expire
+4. **Cleanup Preview** — Create preview of what will be deleted
+5. **Confirmation Token** — Explicit confirmation token required
+6. **Cleanup Execution** — Delete only verified cleanup candidates
+7. **Completion** — Verify authenticated data preserved
+
+### Cleanup Gates
+
+Cleanup is blocked if any of these conditions are not met:
+
+- Migration not completed
+- Validation not passed
+- Rollback window not expired
+- Pending sync transfer
+- Active guest ownership
+- Candidate not cleanup-safe
+- Missing confirmation token
+- Unknown owner
+- Storage key mismatch
+- Rollback snapshot missing
+
+### Confirmation Token Rule
+
+Cleanup must only run when passed:
+
+```ts
+confirmationToken: "CONFIRM_GUEST_CLEANUP";
+```
+
+If missing or invalid, cleanup returns blocked result. No UI button should call cleanup without this token.
+
+### Cleanup Behavior
+
+**Delete Only:**
+
+- Guest entity partitions already copied + validated
+- Guest sync partitions already transferred/prepared
+- Migration test partitions if explicitly marked test data
+- Orphaned guest partitions marked cleanup eligible
+
+**Never Delete:**
+
+- Active guest session data
+- Authenticated partitions
+- Rollback snapshot until final cleanup completion
+- Unrelated settings
+- Global storage
+
+### Fail-Closed Safety
+
+If any check is ambiguous:
+
+- Block cleanup
+- Return reason
+- Preserve all data
+
+### Resumable Cleanup
+
+Cleanup tracks:
+
+- `cleanupId` — Unique cleanup identifier
+- `startedAt` — Timestamp when cleanup started
+- `completedAt` — Timestamp when cleanup completed
+- `deletedKeys` — Keys successfully deleted
+- `skippedKeys` — Keys skipped during cleanup
+- `failedKeys` — Keys that failed to delete
+- `currentStep` — Current step if paused
+- `errors` — Errors encountered during cleanup
+
+If cleanup fails midway:
+
+- Do not retry automatically
+- Expose `resumeGuestCleanup()` for manual resume
+- Continue only from known safe candidates
+
+### What Phase 13.7 Does NOT Do
+
+- No automatic cleanup
+- No deletion of active guest partitions
+- No deletion of authenticated partitions
+- No sync replay
+- No Supabase upload
+- No production cleanup UI
+- No analytics
+- No notifications
+- No social login
+
+### Verification
+
+- TypeScript passes with no errors ✓
+- Web app boots successfully on http://localhost:8081 ✓
+- No import.meta error ✓
+- Account route does not spin forever ✓
+- Login/signup routes still render ✓
+- Guest mode still works ✓
+- Cleanup never runs on startup ✓
+- Cleanup blocks without confirmation token ✓
+- Cleanup blocks before rollback window expires ✓
+- Cleanup blocks if validation missing ✓
+- Cleanup only deletes mock cleanup candidates in dev harness ✓
+- Authenticated data remains ✓
+- Rollback metadata preserved until final cleanup step ✓
+- No Supabase upload ✓
+- No sync replay ✓
+- No active guest data deletion ✓
+
+### Risks
+
+1. **Guest Data Orphaning** — Logout generates new localOwnerId, orphaning old guest data. Cleanup needed in future phase.
+2. **Migration Record Loss** — If MMKV is cleared, migration tracking records are lost. Future phases should add backup to secure storage.
+3. **Rollback Window** — 7-day rollback window may be too short for some users. Future phases should make this configurable.
+4. **Partition Discovery** — Current implementation relies on migration tracking records for partition discovery. Future phases should add fallback discovery methods.
+
+### Recommended Phase 13.8
+
+Production Cleanup UI:
+
+- Add production cleanup UI with user confirmation
+- Add cleanup progress tracking
+- Add cleanup error recovery
+- Add cleanup cancellation capability
+- Add cleanup history and audit log
+
 ## Phase 13.6 — Migration Safety Test Harness
 
 ### Overview

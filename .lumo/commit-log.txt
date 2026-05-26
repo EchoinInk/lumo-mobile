@@ -20860,3 +20860,9 @@ COMMIT: chore(lumo): update migrationSafetyHarness.ts
 FILES:
 src/features/auth/testing/migrationSafetyHarness.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 07:00:50
+COMMIT: chore(lumo): update guest-migration-safety.md
+FILES:
+docs/guest-migration-safety.md
+
