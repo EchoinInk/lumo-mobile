@@ -19770,3 +19770,9 @@ COMMIT: chore(lumo): update useReducedMotion.ts
 FILES:
 src/hooks/useReducedMotion.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:02:06
+COMMIT: chore(lumo): update useSimplifiedMode.ts
+FILES:
+src/hooks/useSimplifiedMode.ts
+

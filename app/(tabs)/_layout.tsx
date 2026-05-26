@@ -45,6 +45,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Dashboard",
+          tabBarAccessibilityLabel: "Dashboard tab",
           tabBarIcon: ({ color, size, focused }) => (
             <Home
               size={focused ? 26 : 24}
@@ -59,6 +60,7 @@ export default function TabLayout() {
         name="tasks"
         options={{
           title: "Tasks",
+          tabBarAccessibilityLabel: "Tasks tab",
           tabBarIcon: ({ color, size, focused }) => (
             <ListTodo
               size={focused ? 26 : 24}
@@ -73,6 +75,7 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: "Calendar",
+          tabBarAccessibilityLabel: "Calendar tab",
           tabBarIcon: ({ color, size, focused }) => (
             <Calendar
               size={focused ? 26 : 24}
@@ -87,6 +90,7 @@ export default function TabLayout() {
         name="health"
         options={{
           title: "Health",
+          tabBarAccessibilityLabel: "Health tab",
           tabBarIcon: ({ color, size, focused }) => (
             <HeartPulse
               size={focused ? 26 : 24}
@@ -101,6 +105,7 @@ export default function TabLayout() {
         name="more/index"
         options={{
           title: "More",
+          tabBarAccessibilityLabel: "More tab",
           tabBarIcon: ({ color, size, focused }) => (
             <Menu
               size={focused ? 26 : 24}
