@@ -20150,3 +20150,9 @@ COMMIT: chore(lumo): update index.ts
 FILES:
 src/services/api/auth/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:02:09
+COMMIT: chore(lumo): update useAuthForm.ts
+FILES:
+src/features/auth/hooks/useAuthForm.ts
+

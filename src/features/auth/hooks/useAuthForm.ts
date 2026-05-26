@@ -90,7 +90,12 @@ export function useAuthForm() {
 
       // Successful sign in
       const session = result.data;
-      const cloudOwnerId = session.user.id;
+      const cloudOwnerId = session.user?.id;
+
+      if (!cloudOwnerId) {
+        setError("Sign in failed. Please try again.");
+        return;
+      }
 
       // Begin guest upgrade transition
       beginGuestUpgrade(localOwnerId || "guest", cloudOwnerId);
@@ -130,7 +135,12 @@ export function useAuthForm() {
 
       // Successful sign up
       const session = result.data;
-      const cloudOwnerId = session.user.id;
+      const cloudOwnerId = session.user?.id;
+
+      if (!cloudOwnerId) {
+        setError("Sign up failed. Please try again.");
+        return;
+      }
 
       // Begin guest upgrade transition
       beginGuestUpgrade(localOwnerId || "guest", cloudOwnerId);
