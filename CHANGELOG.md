@@ -1,5 +1,120 @@
 # Changelog
 
+## Phase 13.3 — Minimal Auth Screens + Guarded Entry
+
+### Overview
+
+UI-only phase adding minimal login/signup screens, guarded account route, and logout flow on top of Phase 13.2 auth infrastructure. This phase proves the auth flow works without overbuilding auth UX.
+
+### Core Principles
+
+- Screens remain thin and minimal
+- Auth logic lives in hooks/services, not screens
+- Calm, non-alarming feedback states
+- Guest mode preserved
+- Local-first behavior preserved
+- No onboarding rewrites
+- No destructive guest → account migration
+
+### Files Created
+
+**Auth Routes**
+
+- `src/app/auth/_layout.tsx` — Auth stack layout
+- `src/app/auth/login.tsx` — Login screen with email/password form
+- `src/app/auth/signup.tsx` — Signup screen with email/password form
+
+**Account Route**
+
+- `app/(tabs)/more/account.tsx` — Guarded account screen with logout
+
+**Auth Hook**
+
+- `src/features/auth/hooks/useAuthForm.ts` — Auth form state management (email, password, validation, error normalization)
+
+**Documentation**
+
+- `docs/minimal-auth-screens.md` — Auth screens architecture documentation
+
+### Files Modified
+
+**Auth Service**
+
+- `src/services/api/auth/supabaseAuth.session.ts` — Added `signInWithEmailPassword`, `signUpWithEmailPassword` methods
+- `src/services/api/auth/index.ts` — Re-exported new auth methods
+
+**More Screen**
+
+- `app/(tabs)/more/index.tsx` — Added account/sign-in entry with conditional icon (LogIn for guest, User for authenticated)
+
+### Architecture Decisions
+
+1. **Thin Screens** — Auth screens are minimal, using existing UI primitives (Screen, Input, Button, Text)
+2. **Auth Form Hook** — Form state and validation isolated in `useAuthForm` hook, not in screens
+3. **Error Normalization** — Supabase errors normalized into calm user-facing messages
+4. **Guarded Account** — Account screen uses `AuthGuard` with `requireAuthenticated` mode and calm fallback
+5. **Logout Flow** — Logout uses transition orchestrator, signs out from Supabase and session store, preserves guest mode
+6. **More Screen Entry** — Account entry conditionally shows "Sign in" or "Account" based on auth state
+
+### Auth Flow
+
+**Login Flow:**
+
+- User enters email/password → `useAuthForm.signIn()` → `signInWithEmailPassword()` → Supabase auth → On success: beginGuestUpgrade → setAuthenticatedSession → finalizeGuestUpgrade → Navigate to account
+
+**Signup Flow:**
+
+- User enters email/password → `useAuthForm.signUp()` → `signUpWithEmailPassword()` → Supabase auth → On success: beginGuestUpgrade → setAuthenticatedSession → finalizeGuestUpgrade → Navigate to account
+
+**Logout Flow:**
+
+- User taps sign out → beginLogoutTransition → signOutSession → signOut → finalizeLogoutTransition → Navigate back to More
+
+### Feedback States
+
+- **Loading:** Button shows ActivityIndicator when submitting
+- **Invalid Form:** Error message below form fields, red border on error
+- **Auth Error:** Calm error message (e.g., "We couldn't sign you in. Please check your email and password.")
+- **Logged-Out Fallback:** Calm message with login/signup actions
+
+### What Phase 13.3 Does NOT Do
+
+- No social login
+- No analytics
+- No push notifications
+- No onboarding redesign
+- No polished marketing auth screens
+- No destructive guest → account migration
+- No Supabase calls in screens
+- No giant auth store
+- No auth UI owning persistence
+- No profile editing
+- No complex account settings
+
+### Verification
+
+- TypeScript passes with no errors
+- App boots successfully
+- Guest mode still works
+- Login screen renders
+- Signup screen renders
+- Account screen is guarded
+- Logout returns to guest mode
+- Screens do not import Supabase SDK
+- Repositories do not import Supabase SDK
+- Auth UI does not delete guest data
+- More screen entry works
+
+### Deferred Work
+
+Recommended next phases:
+
+- Phase 13.4 — Implement destructive guest → account migration
+- Phase 13.5 — Migrate all features to RepositoryContext pattern
+- Phase 13.6 — Add social login providers
+- Phase 13.7 — Integrate analytics with auth
+- Phase 13.8 — Add push notifications with auth
+
 ## Phase 13.2 — Supabase Auth Integration Core
 
 ### Overview

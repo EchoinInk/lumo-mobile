@@ -20228,3 +20228,9 @@ COMMIT: chore(lumo): update index.tsx
 FILES:
 app/(tabs)/more/index.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:09:42
+COMMIT: chore(lumo): update minimal-auth-screens.md
+FILES:
+docs/minimal-auth-screens.md
+
