@@ -65,7 +65,7 @@ const settingsSections: SettingsSection[] = [
     title: "Accessibility",
     items: [
       {
-        icon: <Zap size={20} color={Colors.primary} />,
+        icon: <Activity size={20} color={Colors.primary} />,
         label: "Reduced Motion",
         hasToggle: true,
       },

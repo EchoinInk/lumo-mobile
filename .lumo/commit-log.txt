@@ -19794,3 +19794,9 @@ COMMIT: chore(lumo): update settings.tsx
 FILES:
 app/(tabs)/more/settings.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:03:16
+COMMIT: chore(lumo): update settings.tsx
+FILES:
+app/(tabs)/more/settings.tsx
+
