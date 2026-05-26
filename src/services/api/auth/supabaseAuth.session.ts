@@ -268,3 +268,131 @@ export function subscribeToAuthChanges(
     },
   };
 }
+
+/**
+ * Sign in with email and password.
+ *
+ * @param email - User email
+ * @param password - User password
+ * @returns Sign in result with session
+ */
+export async function signInWithEmailPassword(
+  email: string,
+  password: string,
+): Promise<SupabaseAuthResult<SupabaseAuthSession>> {
+  const client = getSupabaseClient();
+
+  if (!client) {
+    const error: SupabaseAuthError = {
+      type: "config_missing",
+      message: "Supabase client not available",
+    };
+    return { success: false, error };
+  }
+
+  try {
+    const { data, error: signInError } = await client.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      const error: SupabaseAuthError = {
+        type: "auth_error",
+        message: signInError.message,
+        code: signInError.status?.toString(),
+      };
+      return { success: false, error };
+    }
+
+    const session = data.session;
+    const user = session?.user ?? null;
+
+    const isValid =
+      session !== null &&
+      session.expires_at !== undefined &&
+      session.expires_at !== null
+        ? session.expires_at * 1000 > Date.now()
+        : session !== null;
+
+    const authSession: SupabaseAuthSession = {
+      session,
+      user,
+      isValid,
+      expiresAt: session?.expires_at ? session.expires_at * 1000 : null,
+    };
+
+    return { success: true, data: authSession };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const error: SupabaseAuthError = {
+      type: "unknown_error",
+      message: `Failed to sign in: ${message}`,
+    };
+    return { success: false, error };
+  }
+}
+
+/**
+ * Sign up with email and password.
+ *
+ * @param email - User email
+ * @param password - User password
+ * @returns Sign up result with session
+ */
+export async function signUpWithEmailPassword(
+  email: string,
+  password: string,
+): Promise<SupabaseAuthResult<SupabaseAuthSession>> {
+  const client = getSupabaseClient();
+
+  if (!client) {
+    const error: SupabaseAuthError = {
+      type: "config_missing",
+      message: "Supabase client not available",
+    };
+    return { success: false, error };
+  }
+
+  try {
+    const { data, error: signUpError } = await client.auth.signUp({
+      email,
+      password,
+    });
+
+    if (signUpError) {
+      const error: SupabaseAuthError = {
+        type: "auth_error",
+        message: signUpError.message,
+        code: signUpError.status?.toString(),
+      };
+      return { success: false, error };
+    }
+
+    const session = data.session;
+    const user = session?.user ?? null;
+
+    const isValid =
+      session !== null &&
+      session.expires_at !== undefined &&
+      session.expires_at !== null
+        ? session.expires_at * 1000 > Date.now()
+        : session !== null;
+
+    const authSession: SupabaseAuthSession = {
+      session,
+      user,
+      isValid,
+      expiresAt: session?.expires_at ? session.expires_at * 1000 : null,
+    };
+
+    return { success: true, data: authSession };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const error: SupabaseAuthError = {
+      type: "unknown_error",
+      message: `Failed to sign up: ${message}`,
+    };
+    return { success: false, error };
+  }
+}
