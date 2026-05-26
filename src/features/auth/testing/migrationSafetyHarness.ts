@@ -24,9 +24,7 @@
  * - No Supabase upload
  */
 
-import {
-    getEntityStorageKey
-} from "../../../services/storage/storagePartition";
+import { getEntityStorageKey } from "../../../services/storage/storagePartition";
 import { storageInstance as mmkvStorage } from "../../../store/storage";
 import {
     resetGuestMigrationSafetyState,
@@ -43,7 +41,7 @@ import {
     seedMockGuestMigrationData,
     seedMockGuestSyncQueue,
     verifyMockGuestDataExists,
-    verifyMockSyncQueueExists
+    verifyMockSyncQueueExists,
 } from "./migrationTestData";
 
 // ── Harness State ─────────────────────────────────────────────────────────────
@@ -325,4 +323,245 @@ export function resetMigrationSafetyHarness(): void {
  */
 export function getMigrationSafetyHarnessReport(): MigrationHarnessReport | null {
   return currentReport;
+}
+
+/**
+ * Run the controlled cleanup test harness.
+ * Tests the cleanup flow with mock test data only.
+ *
+ * Flow:
+ * 1. Verify mock guest data exists
+ * 2. Run safety pass first (required for cleanup)
+ * 3. Create cleanup preview
+ * 4. Run controlled cleanup with confirmation token
+ * 5. Verify mock guest data is deleted
+ * 6. Verify authenticated data is preserved
+ * 7. Return structured test report
+ *
+ * @returns Test harness result with report
+ */
+export async function runControlledCleanupHarness(): Promise<MigrationHarnessResult> {
+  if (!__DEV__) {
+    console.warn(
+      "[MigrationSafetyHarness] Cleanup harness only runs in __DEV__ mode",
+    );
+    return {
+      success: false,
+      report: initializeHarnessReport(),
+      summary: "Cleanup harness only runs in __DEV__ mode",
+    };
+  }
+
+  if (isRunning) {
+    console.warn("[MigrationSafetyHarness] Harness is already running");
+    return {
+      success: false,
+      report: currentReport || initializeHarnessReport(),
+      summary: "Harness is already running",
+    };
+  }
+
+  isRunning = true;
+  const startTime = Date.now();
+
+  let report = initializeHarnessReport();
+  const steps: MigrationHarnessStepResult[] = [];
+
+  try {
+    // Step 1: Verify mock guest data exists
+    report = updateHarnessStatus(report, "seeding_data");
+    const verifyStart = Date.now();
+    const guestDataExists = verifyMockGuestDataExists();
+    if (!guestDataExists) {
+      throw new Error("Mock guest data does not exist. Run safety pass first.");
+    }
+    steps.push(
+      createStepResult("verify_guest_data", true, Date.now() - verifyStart),
+    );
+
+    // Step 2: Run safety pass (required for cleanup)
+    report = updateHarnessStatus(report, "running_safety_pass");
+    const safetyPassStart = Date.now();
+    const { guestContext, authenticatedContext } = getMockMigrationContexts();
+    const safetyPassResult = await runGuestMigrationSafetyPass(
+      guestContext,
+      authenticatedContext,
+    );
+    steps.push(
+      createStepResult(
+        "run_safety_pass",
+        safetyPassResult.success,
+        Date.now() - safetyPassStart,
+        safetyPassResult.success ? undefined : "Safety pass failed",
+      ),
+    );
+
+    if (!safetyPassResult.success) {
+      throw new Error(`Safety pass failed: ${safetyPassResult.report.error}`);
+    }
+
+    // Step 3: Create cleanup preview
+    report = updateHarnessStatus(report, "validating_results");
+    const previewStart = Date.now();
+    const { createCleanupPreview } = require("../services/migrationCleanup");
+    const cleanupPreview = createCleanupPreview(TEST_GUEST_OWNER_ID);
+    steps.push(
+      createStepResult(
+        "create_cleanup_preview",
+        !cleanupPreview.isBlocked,
+        Date.now() - previewStart,
+        cleanupPreview.isBlocked
+          ? `Cleanup blocked: ${cleanupPreview.blockReason}`
+          : undefined,
+      ),
+    );
+
+    if (cleanupPreview.isBlocked) {
+      throw new Error(`Cleanup blocked: ${cleanupPreview.blockReason}`);
+    }
+
+    // Step 4: Run controlled cleanup
+    report = updateHarnessStatus(report, "deleting");
+    const cleanupStart = Date.now();
+    const cleanupResult = await runControlledGuestCleanup(
+      TEST_GUEST_OWNER_ID,
+      "CONFIRM_GUEST_CLEANUP",
+    );
+    steps.push(
+      createStepResult(
+        "run_cleanup",
+        cleanupResult.success,
+        Date.now() - cleanupStart,
+        cleanupResult.success ? undefined : "Cleanup failed",
+      ),
+    );
+
+    if (!cleanupResult.success) {
+      throw new Error(`Cleanup failed: ${cleanupResult.errors.join(", ")}`);
+    }
+
+    // Step 5: Verify mock guest data is deleted
+    const guestDataDeleted = !verifyMockGuestDataExists();
+    steps.push(
+      createStepResult(
+        "verify_guest_data_deleted",
+        guestDataDeleted,
+        0,
+        guestDataDeleted ? undefined : "Guest data still exists",
+      ),
+    );
+
+    // Step 6: Verify authenticated data is preserved
+    let authenticatedDataPreserved = false;
+    if (mmkvStorage) {
+      for (const entityName of [
+        "tasks",
+        "habits",
+        "meals",
+        "budget",
+        "workouts",
+        "calendar",
+      ]) {
+        const targetKey = getEntityStorageKey(entityName, authenticatedContext);
+        const targetData = mmkvStorage.getString(targetKey);
+        if (targetData) {
+          authenticatedDataPreserved = true;
+          break;
+        }
+      }
+    }
+    steps.push(
+      createStepResult(
+        "verify_authenticated_data_preserved",
+        authenticatedDataPreserved,
+        0,
+        authenticatedDataPreserved
+          ? undefined
+          : "Authenticated data not preserved",
+      ),
+    );
+
+    // Step 7: Complete
+    report = updateHarnessStatus(report, "completed");
+    report.completedAt = new Date().toISOString();
+    report.steps = steps;
+    currentReport = report;
+
+    const summary = [
+      `Cleanup harness completed in ${Date.now() - startTime}ms`,
+      `Guest data deleted: ${guestDataDeleted}`,
+      `Authenticated data preserved: ${authenticatedDataPreserved}`,
+      `Keys deleted: ${cleanupResult.deletedKeyCount}`,
+      `Keys failed: ${cleanupResult.failedKeyCount}`,
+    ].join("\n");
+
+    console.log("[MigrationSafetyHarness] Cleanup harness completed:", summary);
+
+    return {
+      success: true,
+      report,
+      summary,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[MigrationSafetyHarness] Cleanup harness failed:", err);
+
+    report = updateHarnessStatus(report, "failed");
+    report.completedAt = new Date().toISOString();
+    report.error = message;
+    report.steps = steps;
+    currentReport = report;
+
+    return {
+      success: false,
+      report,
+      summary: `Cleanup harness failed: ${message}`,
+    };
+  } finally {
+    isRunning = false;
+  }
+}
+
+/**
+ * Verify mock guest cleanup completed.
+ * Checks if mock guest data was deleted.
+ *
+ * @returns Whether mock guest data was deleted
+ */
+export function verifyMockGuestCleanupCompleted(): boolean {
+  if (!__DEV__) {
+    return false;
+  }
+  return !verifyMockGuestDataExists();
+}
+
+/**
+ * Verify authenticated data is preserved.
+ * Checks if authenticated partitions still exist after cleanup.
+ *
+ * @returns Whether authenticated data is preserved
+ */
+export function verifyAuthenticatedDataPreserved(): boolean {
+  if (!__DEV__ || !mmkvStorage) {
+    return false;
+  }
+
+  const { authenticatedContext } = getMockMigrationContexts();
+
+  for (const entityName of [
+    "tasks",
+    "habits",
+    "meals",
+    "budget",
+    "workouts",
+    "calendar",
+  ]) {
+    const targetKey = getEntityStorageKey(entityName, authenticatedContext);
+    const targetData = mmkvStorage.getString(targetKey);
+    if (targetData) {
+      return true;
+    }
+  }
+
+  return false;
 }

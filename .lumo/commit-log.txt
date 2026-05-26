@@ -20836,3 +20836,9 @@ FILES:
 app/(tabs)/more/account.tsx
 src/features/auth/services/migrationCleanup.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:59:48
+COMMIT: chore(lumo): update migrationSafetyHarness.ts
+FILES:
+src/features/auth/testing/migrationSafetyHarness.ts
+
