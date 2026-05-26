@@ -19917,3 +19917,9 @@ COMMIT: chore(lumo): update auth-readiness-architecture.md
 FILES:
 docs/auth-readiness-architecture.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:28:33
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+

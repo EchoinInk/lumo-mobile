@@ -48,11 +48,15 @@ class TaskSyncRepository implements ITaskRepository {
     const task = await taskLocalRepository.createTask(input);
 
     // 2. Resolve user ownership (tolerates anonymous mode)
-    const { userId } = await createOptionalRepositoryContext();
+    const context = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
     createQueueItem({
-      userId,
+      ownerType:
+        context.accountMode === "authenticated" ? "authenticated" : "guest",
+      localOwnerId: context.localOwnerId,
+      cloudOwnerId: context.cloudOwnerId,
+      syncPartitionKey: context.syncPartitionKey,
       entity: "task",
       operation: "create",
       entityId: task.id,
