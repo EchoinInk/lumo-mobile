@@ -298,7 +298,7 @@ export class TaskLocalRepository implements ITaskRepository {
    * Useful for testing or user-initiated data reset.
    */
   async clearAll(): Promise<void> {
-    deleteKey(this.STORAGE_KEY);
+    deleteKey(this.getStorageKey());
   }
 }
 
