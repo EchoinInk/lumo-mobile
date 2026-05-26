@@ -20282,3 +20282,9 @@ COMMIT: chore(lumo): update migrationRollback.ts
 FILES:
 src/features/auth/services/migrationRollback.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:30:31
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+
