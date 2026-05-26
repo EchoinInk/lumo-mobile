@@ -9,6 +9,8 @@ export interface AppSettings {
   soundEnabled: boolean;
   hapticFeedbackEnabled: boolean;
   onboardingCompleted: boolean;
+  reducedMotion: boolean;
+  simplifiedMode: boolean;
 }
 
 type SettingsState = {
@@ -33,6 +35,8 @@ const defaultSettings: AppSettings = {
   soundEnabled: true,
   hapticFeedbackEnabled: true,
   onboardingCompleted: false,
+  reducedMotion: false,
+  simplifiedMode: false,
 };
 
 type SettingsStore = SettingsState & SettingsActions;
