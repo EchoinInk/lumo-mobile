@@ -137,7 +137,12 @@ export function validateQueueItem(item: SyncQueueItem): void {
   }
 
   // Validate entity and operation
+  // TODO: Phase 13.2 - Update to use new ownership metadata validation
   validateQueueItemInput({
+    ownerType: item.ownerType || "guest",
+    localOwnerId: item.localOwnerId || "guest",
+    cloudOwnerId: item.cloudOwnerId,
+    syncPartitionKey: item.syncPartitionKey || "guest:syncQueue",
     entity: item.entity,
     operation: item.operation,
     entityId: item.entityId,

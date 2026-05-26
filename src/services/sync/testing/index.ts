@@ -73,6 +73,9 @@ export function generateFakeQueue(
       options.includePayload !== false ? randomPayload() : undefined;
 
     const item = recordQueueItem({
+      ownerType: "guest",
+      localOwnerId: "test-guest",
+      syncPartitionKey: "guest:test-guest:syncQueue",
       entity,
       operation,
       entityId: generateEntityId(),
