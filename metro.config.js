@@ -26,11 +26,38 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
-// Force transformer configuration
+// Force transformer configuration for web
 config.transformer = {
   ...config.transformer,
   hermesParser: false,
   unstable_transformProfile: "default",
+  minifierConfig: {
+    keep_fnames: true,
+    mangle: {
+      keep_fnames: true,
+    },
+  },
+};
+
+// Override getTransformOptions to force settings for web
+const originalGetTransformOptions = config.getTransformOptions;
+config.getTransformOptions = async (entryPoints, options) => {
+  const result =
+    (await originalGetTransformOptions?.(entryPoints, options)) || {};
+
+  if (options.platform === "web") {
+    return {
+      ...result,
+      transform: {
+        ...result.transform,
+        hermesParser: false,
+        unstable_transformProfile: "default",
+        minify: false,
+      },
+    };
+  }
+
+  return result;
 };
 
 module.exports = withNativeWind(config, {
