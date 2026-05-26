@@ -20476,3 +20476,9 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 15:36:46
+COMMIT: chore(lumo): update webpack.config.js
+FILES:
+webpack.config.js
+
