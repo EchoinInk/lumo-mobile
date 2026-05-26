@@ -12,6 +12,11 @@ import { signOutSession } from "@/services/api/auth/supabaseAuth.session";
 import { router } from "expo-router";
 import { View } from "react-native";
 
+// Dev-only imports
+if (__DEV__) {
+  require("@/features/auth/testing/migrationSafetyHarness");
+}
+
 function AccountContent() {
   const authUser = useAuthSessionStore((s) => s.authUser);
   const cloudOwnerId = useAuthSessionStore((s) => s.cloudOwnerId);
