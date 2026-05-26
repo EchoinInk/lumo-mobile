@@ -20666,3 +20666,9 @@ src/features/auth/services/migrationSyncQueueTransfer.ts
 src/features/auth/services/migrationValidation.ts
 src/services/storage/storageIsolation.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 03:26:44
+COMMIT: chore(lumo): update migration.types.ts
+FILES:
+src/features/auth/types/migration.types.ts
+
