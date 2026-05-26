@@ -20641,3 +20641,9 @@ COMMIT: chore(lumo): update useAuthSessionStore.ts
 FILES:
 src/features/auth/store/useAuthSessionStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 01:27:10
+COMMIT: chore(lumo): update account.tsx
+FILES:
+app/(tabs)/more/account.tsx
+
