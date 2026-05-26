@@ -36,25 +36,34 @@
  * - Add social login
  */
 
-import { getEntityStorageKey, getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
+import {
+    getEntityStorageKey,
+    getSyncQueueStorageKey,
+} from "../../../services/storage/storagePartition";
 import { storageInstance as mmkvStorage } from "../../../store/storage";
-import { getGuestMigrationStatus } from "./guestMigrationOrchestrator";
 import type {
-  GuestCleanupBlockReason,
-  GuestCleanupCandidate,
-  GuestCleanupPreview,
-  GuestCleanupResult,
-  GuestCleanupState,
-  GuestCleanupStatus,
-  GuestCleanupStep,
+    GuestCleanupBlockReason,
+    GuestCleanupCandidate,
+    GuestCleanupPreview,
+    GuestCleanupResult,
+    GuestCleanupState,
+    GuestCleanupStatus,
 } from "../types/migration.types";
+import { getGuestMigrationStatus } from "./guestMigrationOrchestrator";
 
 // ── Cleanup Constants ───────────────────────────────────────────────────────────
 
 const CONFIRMATION_TOKEN = "CONFIRM_GUEST_CLEANUP";
 const ROLLBACK_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-const SUPPORTED_ENTITIES = ["tasks", "habits", "meals", "budget", "workouts", "calendar"] as const;
+const SUPPORTED_ENTITIES = [
+  "tasks",
+  "habits",
+  "meals",
+  "budget",
+  "workouts",
+  "calendar",
+] as const;
 
 // ── Cleanup State ───────────────────────────────────────────────────────────────
 
@@ -99,7 +108,9 @@ function setCleanupBlocked(blockReason: GuestCleanupBlockReason): void {
  * @param localOwnerId - Local owner ID of the guest partition
  * @returns Cleanup preview
  */
-export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview {
+export function createCleanupPreview(
+  localOwnerId: string,
+): GuestCleanupPreview {
   const migrationStatus = getGuestMigrationStatus();
   const report = migrationStatus.report;
 
@@ -127,8 +138,11 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
   }
 
   // Validate rollback window expired
-  const migrationCompletedAt = report.completedAt ? new Date(report.completedAt).getTime() : 0;
-  const rollbackWindowExpired = Date.now() - migrationCompletedAt > ROLLBACK_WINDOW_MS;
+  const migrationCompletedAt = report.completedAt
+    ? new Date(report.completedAt).getTime()
+    : 0;
+  const rollbackWindowExpired =
+    Date.now() - migrationCompletedAt > ROLLBACK_WINDOW_MS;
 
   if (!rollbackWindowExpired) {
     return {
@@ -136,7 +150,8 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
         localOwnerId,
         cloudOwnerId: report.targetContext.cloudOwnerId || null,
         migrationCompleted: true,
-        validationPassed: report.validationResults?.every((r) => r.passed) === true,
+        validationPassed:
+          report.validationResults?.every((r) => r.passed) === true,
         rollbackWindowExpired: false,
         isCleanupSafe: false,
         migrationCompletedAt: report.completedAt,
@@ -160,7 +175,7 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
     const guestKey = getEntityStorageKey(entityName, {
       accountMode: "guest",
       localOwnerId,
-      cloudOwnerId: null,
+      cloudOwnerId: undefined,
       storagePartitionKey: `guest:${localOwnerId}`,
       syncPartitionKey: `guest:${localOwnerId}:syncQueue`,
       isMigrating: false,
@@ -171,7 +186,7 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
   const syncKey = getSyncQueueStorageKey({
     accountMode: "guest",
     localOwnerId,
-    cloudOwnerId: null,
+    cloudOwnerId: undefined,
     storagePartitionKey: `guest:${localOwnerId}`,
     syncPartitionKey: `guest:${localOwnerId}:syncQueue`,
     isMigrating: false,
@@ -183,7 +198,8 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
       localOwnerId,
       cloudOwnerId: report.targetContext.cloudOwnerId || null,
       migrationCompleted: true,
-      validationPassed: report.validationResults?.every((r) => r.passed) === true,
+      validationPassed:
+        report.validationResults?.every((r) => r.passed) === true,
       rollbackWindowExpired: true,
       isCleanupSafe: true,
       migrationCompletedAt: report.completedAt,
@@ -206,7 +222,9 @@ export function createCleanupPreview(localOwnerId: string): GuestCleanupPreview 
  * @param candidate - Cleanup candidate to validate
  * @returns Whether the candidate is valid for cleanup
  */
-export function validateCleanupCandidate(candidate: GuestCleanupCandidate): boolean {
+export function validateCleanupCandidate(
+  candidate: GuestCleanupCandidate,
+): boolean {
   // Migration must be completed
   if (!candidate.migrationCompleted) {
     return false;
@@ -393,9 +411,11 @@ export async function runControlledGuestCleanup(
       },
     };
 
-    console.log(`[MigrationCleanup] Cleanup completed: ${deletedKeys.length} keys deleted`);
+    console.log(
+      `[MigrationCleanup] Cleanup completed: ${deletedKeys.length} keys deleted`,
+    );
 
-    return currentCleanupState.latestResult;
+    return currentCleanupState.latestResult!;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[MigrationCleanup] Cleanup failed:", err);
@@ -434,7 +454,9 @@ export async function runControlledGuestCleanup(
  * @param cleanupId - Cleanup ID to resume
  * @returns Cleanup result
  */
-export async function resumeGuestCleanup(cleanupId: string): Promise<GuestCleanupResult> {
+export async function resumeGuestCleanup(
+  cleanupId: string,
+): Promise<GuestCleanupResult> {
   if (!__DEV__) {
     console.warn("[MigrationCleanup] Resume only runs in __DEV__ mode");
     return {
@@ -475,21 +497,23 @@ export async function resumeGuestCleanup(cleanupId: string): Promise<GuestCleanu
   // Resume from current state
   // For now, just return the current result
   // In a full implementation, this would continue from the last successful step
-  return currentCleanupState.latestResult || {
-    success: false,
-    cleanupId,
-    status: "failed",
-    deletedKeyCount: 0,
-    skippedKeyCount: 0,
-    failedKeyCount: 0,
-    deletedKeys: [],
-    skippedKeys: [],
-    failedKeys: [],
-    currentStep: null,
-    errors: ["No cleanup result to resume"],
-    startedAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-  };
+  return (
+    currentCleanupState.latestResult || {
+      success: false,
+      cleanupId,
+      status: "failed",
+      deletedKeyCount: 0,
+      skippedKeyCount: 0,
+      failedKeyCount: 0,
+      deletedKeys: [],
+      skippedKeys: [],
+      failedKeys: [],
+      currentStep: null,
+      errors: ["No cleanup result to resume"],
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+    }
+  );
 }
 
 /**

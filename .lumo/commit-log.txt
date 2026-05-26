@@ -20804,3 +20804,9 @@ COMMIT: chore(lumo): update migration.types.ts
 FILES:
 src/features/auth/types/migration.types.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:58:45
+COMMIT: chore(lumo): update migrationCleanup.ts
+FILES:
+src/features/auth/services/migrationCleanup.ts
+
