@@ -46,5 +46,8 @@
     "babel-preset-expo": "~55.0.8",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "zustand": "^5.0.13"
+  }
 }
