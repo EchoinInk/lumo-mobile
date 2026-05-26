@@ -51,7 +51,6 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
-    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
       ownerType: userId ? "authenticated" : "guest",
       localOwnerId: userId || "guest", // Fallback for guest mode
@@ -94,7 +93,6 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
-    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
       ownerType: userId ? "authenticated" : "guest",
       localOwnerId: userId || "guest",
@@ -127,7 +125,6 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
-    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
       ownerType: userId ? "authenticated" : "guest",
       localOwnerId: userId || "guest",
@@ -173,7 +170,6 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
-    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
       ownerType: userId ? "authenticated" : "guest",
       localOwnerId: userId || "guest",

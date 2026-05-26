@@ -20131,3 +20131,9 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:55:35
+COMMIT: chore(lumo): update index.ts
+FILES:
+src/services/sync/deadLetter/index.ts
+
