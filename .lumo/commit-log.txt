@@ -20538,3 +20538,9 @@ COMMIT: chore(lumo): update mmkv.ts
 FILES:
 src/services/storage/mmkv.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 16:09:10
+COMMIT: chore(lumo): update storage.ts
+FILES:
+src/store/storage.ts
+
