@@ -132,6 +132,30 @@ function AccountContent() {
                 Last Validation: {migrationStatus.latestReport.status}
               </Text>
             )}
+            <View className="mt-4 border-t border-border pt-4">
+              <Text variant="subheading" className="mb-2">
+                Migration Test Harness
+              </Text>
+              <Button
+                onPress={handleRunHarness}
+                disabled={isRunningHarness}
+                className="mb-2"
+              >
+                {isRunningHarness ? "Running..." : "Run migration safety test"}
+              </Button>
+              <Button
+                variant="ghost"
+                onPress={handleResetHarness}
+                className="mb-2"
+              >
+                Reset migration test data
+              </Button>
+              {harnessResult && (
+                <Text variant="small" color="textTertiary" className="mt-2">
+                  {harnessResult}
+                </Text>
+              )}
+            </View>
           </View>
         )}
 
