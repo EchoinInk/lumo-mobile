@@ -70,16 +70,18 @@ export function mapSupabaseSessionToRepositoryContext(
  * Map Supabase session to canonical AuthUser.
  *
  * @param session - Supabase auth session
+ * @param localOwnerId - Local owner ID (preserved from guest mode or generated)
  * @returns Canonical AuthUser or null if no user
  */
 export function mapSupabaseSessionToAuthUser(
   session: SupabaseAuthSession,
+  localOwnerId: LocalOwnerId,
 ): AuthUser | null {
   if (!session.user || !session.isValid) {
     return null;
   }
 
-  return mapSupabaseUserToAuthUser(session.user);
+  return mapSupabaseUserToAuthUser(session.user, localOwnerId);
 }
 
 /**
