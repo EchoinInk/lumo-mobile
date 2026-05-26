@@ -11,7 +11,7 @@
       "typedRoutes": true
     },
     "web": {
-      "jsEngine": "jsc"
+      "bundler": "webpack"
     }
   }
 }
