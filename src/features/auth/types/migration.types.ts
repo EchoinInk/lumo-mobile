@@ -27,7 +27,12 @@ export type GuestMigrationStep =
 /**
  * Status of an individual migration step.
  */
-export type GuestMigrationStepStatus = "pending" | "in_progress" | "completed" | "failed" | "skipped";
+export type GuestMigrationStepStatus =
+  | "pending"
+  | "in_progress"
+  | "completed"
+  | "failed"
+  | "skipped";
 
 // ── Migration Status ─────────────────────────────────────────────────────────────
 
@@ -153,7 +158,7 @@ export interface ValidationResult {
   /** Source key */
   sourceKey: string;
   /** Target key */
-  targetKey;
+  targetKey: string;
   /** Whether validation passed */
   passed: boolean;
   /** Error message if validation failed */
