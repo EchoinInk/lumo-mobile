@@ -1,5 +1,111 @@
 # Changelog
 
+## Phase 13.1 — Auth Readiness Architecture
+
+### Overview
+
+Architecture-only phase preparing Lumo for Supabase Auth integration without rewriting stores, repositories, sync logic, or local persistence. This phase establishes identity-safe ownership boundaries for guest and authenticated users.
+
+### Core Principles
+
+- UI never talks directly to Supabase — Flow remains: Screen → Feature Hook → Repository → API Service
+- Local-first UX is mandatory — User actions remain instant and sync in the background
+- Ownership is explicit — Repositories receive ownership via RepositoryContext, never from global state
+- Storage is partitioned — Guest and authenticated user data are isolated
+- Migration is safe — Guest → account migration is planned and tracked before execution
+
+### Files Created
+
+**Auth Types**
+
+- `src/features/auth/types/auth.types.ts` — Canonical identity types (AccountMode, UserIdentity, RepositoryContext, AccountMigrationPlan)
+
+**Auth Store**
+
+- `src/features/auth/store/useAuthSessionStore.ts` — Auth session store shell with MMKV persistence (accountMode, localOwnerId, cloudOwnerId, sessionStatus, transitionStatus)
+
+**Repository Context**
+
+- `src/services/repositories/repositoryContext.ts` — Repository context provider (getRepositoryContext, createGuestRepositoryContext, createAuthenticatedRepositoryContext, assertRepositoryContext)
+
+**Storage Partitioning**
+
+- `src/services/storage/storagePartition.ts` — Storage partition helpers (getStoragePartitionKey, getEntityStorageKey, getSyncQueueStorageKey, getMigrationStorageKey, validation utilities)
+
+**Sync Queue Ownership**
+
+- `src/services/storage/queue.types.ts` — Updated with ownership metadata (ownerType, localOwnerId, cloudOwnerId, syncPartitionKey, createdDuringMigration)
+
+**Migration Planning**
+
+- `src/features/auth/services/accountMigrationPlan.ts` — Migration plan utilities (createAccountMigrationPlan, validateAccountMigrationPlan, markMigrationStarted, markMigrationComplete)
+
+**Auth Guards**
+
+- `src/features/auth/components/AuthGuard.tsx` — Auth guard component (requireGuest, requireAuthenticated, allowGuest, allowDuringMigration modes)
+- `src/features/auth/hooks/useAuthGuard.ts` — Auth guard hook for programmatic access control
+
+### Files Modified
+
+**Tasks Feature (Reference Implementation)**
+
+- `src/features/tasks/services/taskLocalRepository.ts` — Added RepositoryContext support with setRepositoryContext() method and partitioned storage keys
+
+**Sync Queue Types**
+
+- `src/services/storage/queue.types.ts` — Added SyncOwnerType, updated SyncQueueItem and CreateQueueItemInput with ownership metadata
+
+### Architecture Decisions
+
+1. **Separate Auth Session Store** — Created `useAuthSessionStore` separate from existing `useAuthStore` to avoid conflicts and allow gradual migration
+2. **RepositoryContext Instead of Global State** — Repositories receive ownership via RepositoryContext for explicit dependencies and easier testing
+3. **Storage Partitioning by Owner** — Storage keys include owner ID to prevent data leakage between users
+4. **Sync Queue Ownership at Creation Time** — Sync items carry ownership metadata stamped at creation for clear audit trail
+5. **Non-Destructive Migration Planning** — Migration plan is created and validated before execution to prevent data loss
+
+### Storage Key Patterns
+
+- **Guest entities**: `guest:{localOwnerId}:tasks`, `guest:{localOwnerId}:habits`
+- **Authenticated entities**: `user:{cloudOwnerId}:tasks`, `user:{cloudOwnerId}:habits`
+- **Guest sync queue**: `guest:{localOwnerId}:syncQueue`
+- **Authenticated sync queue**: `user:{cloudOwnerId}:syncQueue`
+
+### What Phase 13.1 Does NOT Do
+
+- No Supabase Auth wiring
+- No polished auth UI (login/signup screens)
+- No social login providers
+- No onboarding rewrite
+- No analytics integration
+- No push notification setup
+- No destructive migration execution
+- No conflict resolution
+- No full repository migration (only tasks as reference)
+- No guest data deletion
+
+### Verification
+
+- TypeScript passes with no errors
+- App still starts
+- No auth UI introduced
+- No Supabase auth wired yet
+- Repositories remain local-first
+- Task behavior still works
+- Storage keys are ownership-safe where implemented
+- Sync queue types can carry ownership metadata
+
+### Deferred Work
+
+Recommended next phases:
+
+- Phase 13.2 — Wire Supabase Auth, implement real login/logout
+- Phase 13.3 — Build polished auth UI (login/signup screens)
+- Phase 13.4 — Implement destructive guest → account migration
+- Phase 13.5 — Migrate all features to RepositoryContext pattern
+- Phase 13.6 — Add social login providers
+- Phase 13.7 — Integrate analytics with auth
+- Phase 13.8 — Add push notifications with auth
+
 ## Phase 12.3 — Production QA + Regression Pass
 
 ### QA Audits Completed
