@@ -24,23 +24,27 @@
  * - No Supabase upload
  */
 
-import { getEntityStorageKey, getSyncQueueStorageKey } from "../../../services/storage/storagePartition";
-import { storageInstance as mmkvStorage } from "../../../store/storage";
-import { runGuestMigrationSafetyPass, resetGuestMigrationSafetyState } from "../services/guestMigrationOrchestrator";
 import {
-  clearMockMigrationTestData,
-  getMockMigrationContexts,
-  seedMockGuestMigrationData,
-  seedMockGuestSyncQueue,
-  verifyMockGuestDataExists,
-  verifyMockSyncQueueExists,
-} from "./migrationTestData";
+    getEntityStorageKey
+} from "../../../services/storage/storagePartition";
+import { storageInstance as mmkvStorage } from "../../../store/storage";
+import {
+    resetGuestMigrationSafetyState,
+    runGuestMigrationSafetyPass,
+} from "../services/guestMigrationOrchestrator";
 import type {
-  MigrationHarnessReport,
-  MigrationHarnessResult,
-  MigrationHarnessStatus,
-  MigrationHarnessStepResult,
+    MigrationHarnessReport,
+    MigrationHarnessResult,
+    MigrationHarnessStatus,
+    MigrationHarnessStepResult,
 } from "../types/migrationTest.types";
+import {
+    getMockMigrationContexts,
+    seedMockGuestMigrationData,
+    seedMockGuestSyncQueue,
+    verifyMockGuestDataExists,
+    verifyMockSyncQueueExists
+} from "./migrationTestData";
 
 // ── Harness State ─────────────────────────────────────────────────────────────
 
@@ -197,7 +201,14 @@ export async function runMigrationSafetyHarness(): Promise<MigrationHarnessResul
     // Verify target partitions were copied
     let targetPartitionsCopied = false;
     if (mmkvStorage) {
-      for (const entityName of ["tasks", "habits", "meals", "budget", "workouts", "calendar"]) {
+      for (const entityName of [
+        "tasks",
+        "habits",
+        "meals",
+        "budget",
+        "workouts",
+        "calendar",
+      ]) {
         const targetKey = getEntityStorageKey(entityName, authenticatedContext);
         const targetData = mmkvStorage.getString(targetKey);
         if (targetData) {
@@ -208,13 +219,16 @@ export async function runMigrationSafetyHarness(): Promise<MigrationHarnessResul
     }
 
     // Verify rollback snapshot was created
-    const rollbackSnapshotCreated = safetyPassResult.report.rollbackSnapshot?.isAvailable === true;
+    const rollbackSnapshotCreated =
+      safetyPassResult.report.rollbackSnapshot?.isAvailable === true;
 
     // Verify sync transfer was prepared
-    const syncTransferPrepared = safetyPassResult.report.syncTransferPreview?.success === true;
+    const syncTransferPrepared =
+      safetyPassResult.report.syncTransferPreview?.success === true;
 
     // Verify orphan tracking record exists
-    const orphanTrackingRecordExists = safetyPassResult.report.orphanedGuestTracking?.success === true;
+    const orphanTrackingRecordExists =
+      safetyPassResult.report.orphanedGuestTracking?.success === true;
 
     // Verify guest data is untouched (still exists)
     const guestDataUntouched = verifyMockGuestDataExists();
