@@ -19,7 +19,10 @@
  * - UI logic (handled by screens/hooks)
  */
 
-import type { CloudOwnerId, LocalOwnerId } from "../types/auth.types";
+import type {
+    CloudOwnerId,
+    LocalOwnerId
+} from "../types/auth.types";
 
 // ── Transition State ─────────────────────────────────────────────────────────────
 
