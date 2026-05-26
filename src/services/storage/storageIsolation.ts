@@ -12,10 +12,8 @@
  * - Do not fully wipe all app data automatically
  */
 
-import { createPersistStorage } from "@/store/createPersistStorage";
+import { storage as mmkvStorage } from "@/store/storage";
 import type { LocalOwnerId, CloudOwnerId } from "@/features/auth/types/auth.types";
-
-const storage = createPersistStorage();
 
 // ── Storage Key Patterns ─────────────────────────────────────────────────────────
 

@@ -20077,3 +20077,9 @@ COMMIT: chore(lumo): update syncOwnership.ts
 FILES:
 src/services/sync/ownership/syncOwnership.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:50:50
+COMMIT: chore(lumo): update storageIsolation.ts
+FILES:
+src/services/storage/storageIsolation.ts
+
