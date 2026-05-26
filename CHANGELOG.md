@@ -1,5 +1,69 @@
 # Changelog
 
+## Phase 12.2 — Accessibility + Reduced Motion Settings
+
+### Added
+
+- **Accessibility Settings** (`src/store/useSettingsStore.ts`):
+  - `reducedMotion` — user preference for reduced motion
+  - `simplifiedMode` — foundation for simplified UI mode
+  - Settings persist via MMKV storage
+
+- **useReducedMotion Hook** (`src/hooks/useReducedMotion.ts`):
+  - Combines system reduce-motion preference with user setting
+  - Returns single boolean for animation control
+  - Safe for future animation systems
+
+- **useSimplifiedMode Hook** (`src/hooks/useSimplifiedMode.ts`):
+  - Foundation hook for simplified UI mode
+  - Returns boolean indicating simplified mode state
+  - Ready for future UI simplification
+
+- **Accessibility Section in Settings** (`app/(tabs)/more/settings.tsx`):
+  - Reduced Motion toggle
+  - Haptics toggle
+  - Simplified Mode toggle
+  - All toggles wired to settings store
+  - Accessibility labels on all switches
+
+### Accessibility Improvements
+
+- **Tab Buttons** (`app/(tabs)/_layout.tsx`):
+  - Added `tabBarAccessibilityLabel` to all tabs (Dashboard, Tasks, Calendar, Health, More)
+
+- **Task Actions** (`app/(tabs)/tasks.tsx`):
+  - Task complete: `accessibilityLabel` with status and title
+  - Edit button: `accessibilityLabel` with task title
+  - Delete button: `accessibilityLabel` with task title
+  - Add FAB: `accessibilityLabel` for "Add new task"
+
+- **Habit Actions** (`app/(tabs)/more/habits.tsx`):
+  - Add FAB: `accessibilityLabel` for "Add new habit"
+
+- **Onboarding Actions** (`src/features/onboarding/components/OnboardingShell.tsx`):
+  - Continue button: `accessibilityLabel` with next label
+  - Back button: `accessibilityLabel` for "Go back"
+  - ChoiceChip: `accessibilityLabel` with option label, `accessibilityState` for selected/disabled
+
+- **Settings Toggles** (`app/(tabs)/more/settings.tsx`):
+  - All switches: `accessibilityLabel` with setting name
+  - `accessibilityRole="switch"` for proper screen reader behavior
+
+### Design
+
+- Calm, low-stimulation UX
+- Predictable interactions
+- Accessible touch targets maintained
+- Token-backed design system
+- No noisy motion or animation-heavy transitions
+
+### Technical
+
+- Preserved local-first architecture
+- Screen → Hook → Store → Repository → Storage flow maintained
+- No backend, Supabase, auth, analytics, notifications, or React Query added
+- Typography already supports dynamic font scaling (uses `allowFontScaling` defaults)
+
 ## Phase 12.1 — Production Hardening Foundation
 
 ### Added
