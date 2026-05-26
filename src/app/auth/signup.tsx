@@ -1,11 +1,11 @@
-import { router } from "expo-router";
-import { useEffect } from "react";
-import { View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Screen } from "@/components/ui/Screen";
 import { Text } from "@/components/ui/Text";
 import { useAuthForm } from "@/features/auth/hooks/useAuthForm";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { View } from "react-native";
 
 export default function SignupScreen() {
   const {
@@ -38,7 +38,7 @@ export default function SignupScreen() {
   return (
     <Screen keyboardAvoiding scrollable>
       <View className="flex-1 justify-center py-12">
-        <Text variant="h1" className="mb-2">
+        <Text variant="heading" className="mb-2">
           Create an account
         </Text>
         <Text variant="body" color="textSecondary" className="mb-8">
@@ -91,11 +91,7 @@ export default function SignupScreen() {
           Already have an account? Sign in
         </Button>
 
-        <Button
-          variant="ghost"
-          onPress={handleBack}
-          disabled={isSubmitting}
-        >
+        <Button variant="ghost" onPress={handleBack} disabled={isSubmitting}>
           Back
         </Button>
       </View>
