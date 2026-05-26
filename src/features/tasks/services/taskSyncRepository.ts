@@ -127,8 +127,12 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
+    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
-      userId,
+      ownerType: userId ? "authenticated" : "guest",
+      localOwnerId: userId || "guest",
+      cloudOwnerId: userId || undefined,
+      syncPartitionKey: userId ? `user:${userId}:syncQueue` : "guest:syncQueue",
       entity: "task",
       operation: "delete",
       entityId: id,
@@ -169,8 +173,12 @@ class TaskSyncRepository implements ITaskRepository {
     const { userId } = await createOptionalRepositoryContext();
 
     // 3. Enqueue sync operation stamped with owner
+    // TODO: Phase 13.2 - Update to use new RepositoryContext with ownership metadata
     createQueueItem({
-      userId,
+      ownerType: userId ? "authenticated" : "guest",
+      localOwnerId: userId || "guest",
+      cloudOwnerId: userId || undefined,
+      syncPartitionKey: userId ? `user:${userId}:syncQueue` : "guest:syncQueue",
       entity: "task",
       operation: "update",
       entityId: id,
