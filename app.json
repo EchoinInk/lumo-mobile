@@ -12,8 +12,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "server",
-      "jsEngine": "hermes"
+      "jsEngine": "jsc"
     }
   }
 }
