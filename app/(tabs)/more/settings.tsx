@@ -6,21 +6,21 @@ import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import {
-    Bell,
-    ChevronRight,
-    Moon,
-    RefreshCw,
-    Shield,
-    User,
+  Bell,
+  ChevronRight,
+  Moon,
+  RefreshCw,
+  Shield,
+  User,
 } from "lucide-react-native";
 import React from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 type SettingsItem = {
