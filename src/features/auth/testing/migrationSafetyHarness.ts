@@ -427,7 +427,7 @@ export async function runControlledCleanupHarness(): Promise<MigrationHarnessRes
     // Step 4: Run controlled cleanup
     report = updateHarnessStatus(report, "validating_results");
     const cleanupStart = Date.now();
-    const cleanupResult = await runControlledGuestCleanup(
+    const cleanupResult = runControlledGuestCleanup(
       TEST_GUEST_OWNER_ID,
       "CONFIRM_GUEST_CLEANUP",
     );
