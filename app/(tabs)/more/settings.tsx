@@ -65,7 +65,7 @@ const settingsSections: SettingsSection[] = [
     title: "Accessibility",
     items: [
       {
-        icon: <Minus size={20} color={Colors.primary} />,
+        icon: <Moon size={20} color={Colors.primary} />,
         label: "Reduced Motion",
         hasToggle: true,
       },
