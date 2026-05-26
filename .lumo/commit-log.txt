@@ -20544,3 +20544,9 @@ COMMIT: chore(lumo): update storage.ts
 FILES:
 src/store/storage.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 16:09:22
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/_layout.tsx
+
