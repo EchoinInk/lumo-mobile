@@ -10,6 +10,7 @@ import {
 import { useAuthSessionStore } from "@/features/auth/store/useAuthSessionStore";
 import { signOutSession } from "@/services/api/auth/supabaseAuth.session";
 import { router } from "expo-router";
+import { useState } from "react";
 import { View } from "react-native";
 
 // Dev-only imports
