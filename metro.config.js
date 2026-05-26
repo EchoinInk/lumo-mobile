@@ -22,17 +22,6 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
-// Ensure all files are treated as ES modules for web
-config.transformer = {
-  ...config.transformer,
-  getTransformOptions: async () => ({
-    transform: {
-      experimentalImportSupport: false,
-      inlineRequires: true,
-    },
-  }),
-};
-
 module.exports = withNativeWind(config, {
   input: "./src/global.css",
 });
