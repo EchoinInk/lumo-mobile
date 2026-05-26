@@ -19758,3 +19758,9 @@ FILES:
 app/(tabs)/more/habits.tsx
 app/(tabs)/tasks.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:01:39
+COMMIT: chore(lumo): update useSettingsStore.ts
+FILES:
+src/store/useSettingsStore.ts
+

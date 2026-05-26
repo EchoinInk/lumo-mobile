@@ -1,15 +1,19 @@
 /**
  * useReducedMotion Hook
- * 
+ *
  * React hook for detecting and responding to reduced motion preferences.
- * Provides accessibility-first animation control.
+ * Combines system preference with user setting for accessibility-first animation control.
  */
 
-import { AccessibilityInfo } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { useEffect, useState } from "react";
+import { AccessibilityInfo } from "react-native";
 
 export function useReducedMotion() {
-  const [reducedMotionEnabled, setReducedMotionEnabled] = useState(false);
+  const [systemReducedMotion, setSystemReducedMotion] = useState(false);
+  const userReducedMotion = useSettingsStore(
+    (state) => state.settings.reducedMotion,
+  );
 
   useEffect(() => {
     // Check initial reduced motion preference
@@ -19,12 +23,12 @@ export function useReducedMotion() {
       try {
         const isEnabled = await AccessibilityInfo.isReduceMotionEnabled();
         if (isMounted) {
-          setReducedMotionEnabled(isEnabled);
+          setSystemReducedMotion(isEnabled);
         }
       } catch (error) {
-        console.error('Error checking reduced motion preference:', error);
+        console.error("Error checking reduced motion preference:", error);
         if (isMounted) {
-          setReducedMotionEnabled(false);
+          setSystemReducedMotion(false);
         }
       }
     };
@@ -33,12 +37,12 @@ export function useReducedMotion() {
 
     // Listen for changes in reduced motion preference
     const subscription = AccessibilityInfo.addEventListener(
-      'reduceMotionChanged',
+      "reduceMotionChanged",
       (isEnabled: boolean) => {
         if (isMounted) {
-          setReducedMotionEnabled(isEnabled);
+          setSystemReducedMotion(isEnabled);
         }
-      }
+      },
     );
 
     return () => {
@@ -47,5 +51,6 @@ export function useReducedMotion() {
     };
   }, []);
 
-  return reducedMotionEnabled;
+  // Return true if either system or user preference is enabled
+  return systemReducedMotion || userReducedMotion;
 }
