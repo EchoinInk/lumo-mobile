@@ -6,14 +6,6 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.alias = {
   "@": path.resolve(__dirname, "src"),
-  // Force Zustand to use CommonJS builds instead of ESM (which uses import.meta)
-  zustand: path.resolve(__dirname, "node_modules/zustand/index.js"),
-  "zustand/react": path.resolve(__dirname, "node_modules/zustand/react"),
-  "zustand/middleware": path.resolve(
-    __dirname,
-    "node_modules/zustand/middleware.js",
-  ),
-  "zustand/vanilla": path.resolve(__dirname, "node_modules/zustand/vanilla.js"),
 };
 
 // expo-glass-effect ships no .web.js files — redirect all imports to a stub
