@@ -20294,3 +20294,9 @@ COMMIT: chore(lumo): update migrationSyncQueueTransfer.ts
 FILES:
 src/features/auth/services/migrationSyncQueueTransfer.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:32:28
+COMMIT: chore(lumo): update settings.tsx
+FILES:
+app/(tabs)/more/settings.tsx
+
