@@ -63,7 +63,9 @@ export async function clearAuthenticatedPartitions(cloudOwnerId: CloudOwnerId): 
   // Perform deletion
   for (const key of keysToDelete) {
     try {
-      await storage.delete(key);
+      if (mmkvStorage) {
+        mmkvStorage.remove(key);
+      }
     } catch (err) {
       console.error(`[StorageIsolation] Failed to delete ${key}:`, err);
     }
