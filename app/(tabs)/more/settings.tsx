@@ -105,6 +105,7 @@ const settingsSections: SettingsSection[] = [
 
 export default function SettingsScreen() {
   const { resetOnboarding } = useOnboarding();
+  const { settings, updateSettings } = useSettingsStore();
 
   const handleResetOnboarding = () => {
     Alert.alert(
@@ -127,6 +128,47 @@ export default function SettingsScreen() {
   const handleSettingPress = (label: string) => {
     if (label === "Reset Onboarding") {
       handleResetOnboarding();
+    }
+  };
+
+  const handleToggle = (label: string) => {
+    switch (label) {
+      case "Reduced Motion":
+        updateSettings({ reducedMotion: !settings.reducedMotion });
+        break;
+      case "Haptics":
+        updateSettings({
+          hapticFeedbackEnabled: !settings.hapticFeedbackEnabled,
+        });
+        break;
+      case "Simplified Mode":
+        updateSettings({ simplifiedMode: !settings.simplifiedMode });
+        break;
+      case "Notifications":
+        updateSettings({
+          notificationsEnabled: !settings.notificationsEnabled,
+        });
+        break;
+      case "Dark Mode":
+        // TODO: Implement dark mode toggle
+        break;
+    }
+  };
+
+  const getToggleValue = (label: string): boolean => {
+    switch (label) {
+      case "Reduced Motion":
+        return settings.reducedMotion;
+      case "Haptics":
+        return settings.hapticFeedbackEnabled;
+      case "Simplified Mode":
+        return settings.simplifiedMode;
+      case "Notifications":
+        return settings.notificationsEnabled;
+      case "Dark Mode":
+        return settings.theme === "dark";
+      default:
+        return false;
     }
   };
 
