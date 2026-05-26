@@ -19764,3 +19764,9 @@ COMMIT: chore(lumo): update useSettingsStore.ts
 FILES:
 src/store/useSettingsStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:01:52
+COMMIT: chore(lumo): update useReducedMotion.ts
+FILES:
+src/hooks/useReducedMotion.ts
+
