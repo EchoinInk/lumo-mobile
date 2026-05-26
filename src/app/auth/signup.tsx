@@ -1,0 +1,104 @@
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { View } from "react-native";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Screen } from "@/components/ui/Screen";
+import { Text } from "@/components/ui/Text";
+import { useAuthForm } from "@/features/auth/hooks/useAuthForm";
+
+export default function SignupScreen() {
+  const {
+    email,
+    password,
+    setEmail,
+    setPassword,
+    isSubmitting,
+    error,
+    success,
+    signUp,
+    reset,
+  } = useAuthForm();
+
+  useEffect(() => {
+    if (success) {
+      // Navigate to account screen after successful signup
+      router.replace("/account");
+    }
+  }, [success]);
+
+  const handleSignIn = () => {
+    router.push("/auth/login");
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  return (
+    <Screen keyboardAvoiding scrollable>
+      <View className="flex-1 justify-center py-12">
+        <Text variant="h1" className="mb-2">
+          Create an account
+        </Text>
+        <Text variant="body" color="textSecondary" className="mb-8">
+          Get started with Lumo
+        </Text>
+
+        <Input
+          label="Email"
+          placeholder="your@email.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoComplete="email"
+          className="mb-4"
+        />
+
+        <Input
+          label="Password"
+          placeholder="••••••••"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoComplete="password-new"
+          helperText="Must be at least 6 characters"
+          className="mb-4"
+        />
+
+        {error && (
+          <Text variant="small" color="danger" className="mb-4">
+            {error}
+          </Text>
+        )}
+
+        <Button
+          onPress={signUp}
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          className="mb-4"
+        >
+          Create account
+        </Button>
+
+        <Button
+          variant="ghost"
+          onPress={handleSignIn}
+          disabled={isSubmitting}
+          className="mb-4"
+        >
+          Already have an account? Sign in
+        </Button>
+
+        <Button
+          variant="ghost"
+          onPress={handleBack}
+          disabled={isSubmitting}
+        >
+          Back
+        </Button>
+      </View>
+    </Screen>
+  );
+}
