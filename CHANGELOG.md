@@ -1,5 +1,68 @@
 # Changelog
 
+## Phase 12.3 — Production QA + Regression Pass
+
+### QA Audits Completed
+
+- **Navigation Audit**:
+  - Onboarding redirects verified (first-run flow works correctly)
+  - Tab navigation verified (all 5 tabs accessible)
+  - Nested More routes hidden from tab bar (href: null)
+  - No duplicate headers (headerShown: false on all layouts)
+  - No "(tabs)" title regression
+  - Back navigation consistent across nested routes
+
+- **Hydration Audit**:
+  - Onboarding persistence verified (useOnboardingStore with MMKV)
+  - Tasks persistence verified (useTaskStore with error handling)
+  - Habits persistence verified (useHabitStore with streak logic)
+  - Settings persistence verified (useSettingsStore with new accessibility settings)
+
+- **Feedback States Audit**:
+  - Loading states: Tasks, Health, Habits all use LoadingState
+  - Empty states: Dashboard, Tasks, Habits have appropriate empty handling
+  - Retry states: Tasks uses RetryView with calm error messaging
+  - Error boundary: Wrapped root layout, calm fallback UI with retry button
+
+- **Accessibility Audit**:
+  - Tab buttons: All have tabBarAccessibilityLabel
+  - Task actions: Complete, edit, delete have accessibility labels
+  - Habit actions: Add FAB has accessibility label
+  - Onboarding actions: Continue/Back buttons have accessibility labels
+  - Settings toggles: All switches have accessibilityLabel and accessibilityRole="switch"
+  - Touch targets: Maintained at 44px minimum
+  - Reduced motion: useReducedMotion hook combines system + user preference
+  - Typography: Uses React Native defaults for dynamic font scaling
+
+### Added
+
+- **QA Utilities** (`src/utils/dev/`):
+  - `triggerTestError.ts` — Development utility for triggering test errors to verify ErrorBoundary
+  - `qaChecks.ts` — Development utility for running basic QA checks on app state
+  - Both utilities only run in `__DEV__` mode, no production analytics
+
+### Design Verification
+
+- Calm, low-stimulation UX maintained
+- Predictable interactions preserved
+- Accessible touch targets maintained (44px minimum)
+- Token-backed design system consistent
+- No noisy motion or animation-heavy transitions
+- Spacing rhythm consistent (using Spacing tokens)
+- Section padding consistent (Spacing.xl between sections)
+
+### Technical
+
+- Preserved local-first architecture
+- Screen → Hook → Store → Repository → Storage flow maintained
+- No backend, Supabase, auth, analytics, notifications, or React Query added
+- TypeScript passes with no errors
+- No regressions found in navigation, hydration, or feedback states
+
+### Remaining Known Issues
+
+- None identified during this QA pass
+
 ## Phase 12.2 — Accessibility + Reduced Motion Settings
 
 ### Added
