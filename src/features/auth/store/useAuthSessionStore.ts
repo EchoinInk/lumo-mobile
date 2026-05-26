@@ -90,11 +90,11 @@ interface AuthSessionActions {
   resetAuthSession: () => void;
 }
 
-type AuthSessionStore = AuthSessionState & AuthSessionActions;
+type AuthSessionStore = AuthSessionStoreState & AuthSessionActions;
 
 // ── Initial State ─────────────────────────────────────────────────────────────
 
-const initialState: AuthSessionState = {
+const initialState: AuthSessionStoreState = {
   accountMode: "guest",
   localOwnerId: null,
   cloudOwnerId: null,

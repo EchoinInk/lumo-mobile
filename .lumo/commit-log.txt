@@ -19860,3 +19860,9 @@ COMMIT: chore(lumo): update auth.types.ts
 FILES:
 src/features/auth/types/auth.types.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:24:40
+COMMIT: chore(lumo): update useAuthSessionStore.ts
+FILES:
+src/features/auth/store/useAuthSessionStore.ts
+
