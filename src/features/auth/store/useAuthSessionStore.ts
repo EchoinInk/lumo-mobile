@@ -21,6 +21,7 @@
  * Follows existing storage patterns from createPersistStorage.
  */
 
+import { isSupabaseConfigured } from "@/services/api/auth/auth.config";
 import { mapSupabaseSessionToAuthUser } from "@/services/api/auth/supabaseAuth.mapper";
 import {
     restorePersistedSession,
