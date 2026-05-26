@@ -91,18 +91,10 @@ export function getDeadLettersByEntity(entity: string): DeadLetterEntry[] {
 }
 
 /**
- * Get dead letter entries for a specific user.
- * TODO: Phase 13.2 - Update to use new ownership metadata (localOwnerId/cloudOwnerId)
+ * Get dead letter entries for a specific user by local owner ID.
  */
-export function getDeadLettersByUser(userId: string): DeadLetterEntry[] {
-  // Temporary compatibility: check both old userId and new ownership fields
-  return loadDeadLetters().filter(
-    (e) =>
-      // @ts-ignore - Temporary compatibility for userId during migration
-      (e.item as any).userId === userId ||
-      e.item.localOwnerId === userId ||
-      e.item.cloudOwnerId === userId,
-  );
+export function getDeadLettersByUser(localOwnerId: string): DeadLetterEntry[] {
+  return loadDeadLetters().filter((e) => e.item.localOwnerId === localOwnerId);
 }
 
 /**
