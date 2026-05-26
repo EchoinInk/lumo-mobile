@@ -1,11 +1,11 @@
-import { router } from "expo-router";
-import { useEffect } from "react";
-import { View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Screen } from "@/components/ui/Screen";
 import { Text } from "@/components/ui/Text";
 import { useAuthForm } from "@/features/auth/hooks/useAuthForm";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { View } from "react-native";
 
 export default function LoginScreen() {
   const {
@@ -38,7 +38,7 @@ export default function LoginScreen() {
   return (
     <Screen keyboardAvoiding scrollable>
       <View className="flex-1 justify-center py-12">
-        <Text variant="h1" className="mb-2">
+        <Text variant="heading" className="mb-2">
           Welcome back
         </Text>
         <Text variant="body" color="textSecondary" className="mb-8">
@@ -90,11 +90,7 @@ export default function LoginScreen() {
           Create an account
         </Button>
 
-        <Button
-          variant="ghost"
-          onPress={handleBack}
-          disabled={isSubmitting}
-        >
+        <Button variant="ghost" onPress={handleBack} disabled={isSubmitting}>
           Back
         </Button>
       </View>
