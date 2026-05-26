@@ -231,3 +231,153 @@ export interface GuestMigrationState {
   /** Error message if migration failed */
   error: string | null;
 }
+
+// ── Cleanup Types ───────────────────────────────────────────────────────────────
+
+/**
+ * Status of guest cleanup process.
+ */
+export type GuestCleanupStatus =
+  | "idle"
+  | "previewing"
+  | "awaiting_confirmation"
+  | "deleting"
+  | "paused"
+  | "completed"
+  | "failed"
+  | "blocked";
+
+/**
+ * Steps in the guest cleanup process.
+ */
+export type GuestCleanupStep =
+  | "validating_candidate"
+  | "checking_rollback_window"
+  | "checking_sync_transfer"
+  | "deleting_guest_partitions"
+  | "deleting_sync_partitions"
+  | "deleting_orphaned_partitions"
+  | "cleanup_rollback_metadata"
+  | "completed"
+  | "failed";
+
+/**
+ * Reasons for cleanup being blocked.
+ */
+export type GuestCleanupBlockReason =
+  | "migration_not_completed"
+  | "validation_not_passed"
+  | "rollback_window_not_expired"
+  | "pending_sync_transfer"
+  | "active_guest_ownership"
+  | "candidate_not_cleanup_safe"
+  | "missing_confirmation_token"
+  | "unknown_owner"
+  | "storage_key_mismatch"
+  | "rollback_snapshot_missing";
+
+/**
+ * Preview of guest cleanup operation.
+ */
+export interface GuestCleanupPreview {
+  /** Cleanup candidate information */
+  candidate: GuestCleanupCandidate;
+  /** Estimated number of keys to delete */
+  estimatedKeyCount: number;
+  /** Estimated size of data to delete in bytes */
+  estimatedSize: number;
+  /** Whether cleanup is blocked */
+  isBlocked: boolean;
+  /** Reason if blocked */
+  blockReason: GuestCleanupBlockReason | null;
+  /** Keys that will be deleted */
+  keysToDelete: string[];
+  /** Keys that will be skipped */
+  keysToSkip: string[];
+}
+
+/**
+ * A guest partition candidate for cleanup.
+ */
+export interface GuestCleanupCandidate {
+  /** Local owner ID of the guest partition */
+  localOwnerId: string;
+  /** Cloud owner ID if migrated */
+  cloudOwnerId: string | null;
+  /** Whether migration was completed */
+  migrationCompleted: boolean;
+  /** Whether validation passed */
+  validationPassed: boolean;
+  /** Whether rollback window has expired */
+  rollbackWindowExpired: boolean;
+  /** Whether candidate is marked cleanup-safe */
+  isCleanupSafe: boolean;
+  /** Timestamp when migration completed */
+  migrationCompletedAt: string | null;
+  /** Partition keys to delete */
+  partitionKeys: string[];
+  /** Sync partition keys to delete */
+  syncPartitionKeys: string[];
+}
+
+/**
+ * Result of a guest cleanup operation.
+ */
+export interface GuestCleanupResult {
+  /** Whether cleanup was successful */
+  success: boolean;
+  /** Cleanup ID */
+  cleanupId: string;
+  /** Status of cleanup */
+  status: GuestCleanupStatus;
+  /** Number of keys deleted */
+  deletedKeyCount: number;
+  /** Number of keys skipped */
+  skippedKeyCount: number;
+  /** Number of keys that failed to delete */
+  failedKeyCount: number;
+  /** Keys that were deleted */
+  deletedKeys: string[];
+  /** Keys that were skipped */
+  skippedKeys: string[];
+  /** Keys that failed to delete */
+  failedKeys: string[];
+  /** Current step if paused */
+  currentStep: GuestCleanupStep | null;
+  /** Errors encountered */
+  errors: string[];
+  /** Timestamp when cleanup started */
+  startedAt: string;
+  /** Timestamp when cleanup completed (null if not completed) */
+  completedAt: string | null;
+}
+
+/**
+ * Error during guest cleanup.
+ */
+export interface GuestCleanupError {
+  /** Step where error occurred */
+  step: GuestCleanupStep;
+  /** Error message */
+  message: string;
+  /** Key that caused error (if applicable) */
+  key: string | null;
+  /** Timestamp */
+  timestamp: string;
+}
+
+/**
+ * Current status of guest cleanup.
+ */
+export interface GuestCleanupState {
+  /** Current cleanup status */
+  status: GuestCleanupStatus;
+  /** Current cleanup result (null if no cleanup has run) */
+  latestResult: GuestCleanupResult | null;
+  /** Whether cleanup is blocked */
+  isBlocked: boolean;
+  /** Block reason if blocked */
+  blockReason: GuestCleanupBlockReason | null;
+  /** Error message if cleanup failed */
+  error: string | null;
+}
