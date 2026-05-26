@@ -20427,3 +20427,10 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 15:31:28
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app.json
+package.json
+
