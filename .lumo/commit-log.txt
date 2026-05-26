@@ -19974,3 +19974,9 @@ COMMIT: chore(lumo): update auth.config.ts
 FILES:
 src/services/api/auth/auth.config.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:44:05
+COMMIT: chore(lumo): update supabaseAuth.client.ts
+FILES:
+src/services/api/auth/supabaseAuth.client.ts
+
