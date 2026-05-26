@@ -1,8 +1,8 @@
 # Guest Migration Safety
 
-## Phase 13.4 — Guest Account Migration Safety
+## Phase 13.4 — Guest Account Migration Safety Integration
 
-Migration correctness phase focusing on migration safety before destructive cleanup. This phase implements safety and observability layers for guest → account migration without performing any destructive operations.
+Migration correctness phase focusing on migration safety before destructive cleanup. This phase implements safety and observability layers for guest → account migration without performing any destructive operations, and integrates the migration utilities into a coherent orchestration flow.
 
 ## Overview
 
@@ -35,6 +35,39 @@ Migration Preview
             → Rollback Safety
 ```
 
+### Orchestration Flow
+
+The guest migration orchestrator integrates all safety utilities into a deterministic safety pass:
+
+1. **Previewing** — Scan guest partitions and calculate migration size/complexity
+2. **Checking Conflicts** — Identify potential conflicts (skipped in current implementation)
+3. **Copying** — Copy guest partitions to authenticated partitions
+4. **Validating** — Validate copied data integrity
+5. **Preparing Rollback** — Create rollback snapshot metadata
+6. **Preparing Sync Transfer** — Prepare sync queue for ownership transfer
+7. **Tracking Orphaned Guest** — Track migrated guest partitions
+8. **Completed** — Safety pass complete
+
+### Safety Pass Lifecycle
+
+```
+Idle → Previewing → Checking Conflicts → Copying → Validating → Preparing Rollback → Preparing Sync Transfer → Tracking Orphaned Guest → Completed
+                                    ↓
+                                 Failed
+```
+
+### Failure Behavior
+
+If any step fails:
+
+- Stop immediately
+- Preserve rollback metadata if already created
+- Source guest data remains untouched
+- Target authenticated data not corrupted
+- Error message captured in report
+- Failure reason recorded
+- Rollback remains available if snapshot exists
+
 ### Never
 
 ```
@@ -42,6 +75,7 @@ Direct Supabase calls from migration utilities
 Automatic deletion of guest partitions
 Global MMKV wipe
 Sync queue replay
+Automatic migration on login
 ```
 
 ## Files Created
@@ -69,6 +103,7 @@ Sync queue replay
 ### Orphaned Partition Detection
 
 A partition is orphaned when:
+
 - `localOwnerId` no longer matches active guest session
 - No authenticated ownership exists
 - Migration incomplete or abandoned
@@ -77,6 +112,7 @@ A partition is orphaned when:
 ### Cleanup Candidate Rules
 
 Cleanup candidates are NOT auto-deleted. They are only marked as candidates. Cleanup requires:
+
 - Successful validation
 - Rollback window elapsed (7 days)
 - Migration completed
@@ -88,6 +124,7 @@ Cleanup candidates are NOT auto-deleted. They are only marked as candidates. Cle
 ### Rollback Snapshot
 
 Rollback snapshots capture the state of authenticated partitions before migration:
+
 - Snapshot ID: `rollback_{timestamp}_{random}`
 - Timestamp: When snapshot was created
 - Target context: Authenticated repository context
@@ -96,6 +133,7 @@ Rollback snapshots capture the state of authenticated partitions before migratio
 ### Rollback Restoration
 
 Rollback restoration:
+
 - Restores target partitions from snapshot
 - Deletes keys created during migration
 - Validates rollback integrity
@@ -104,6 +142,7 @@ Rollback restoration:
 ### Rollback Safety
 
 Rollback safety checks:
+
 - Cannot rollback if no snapshot exists
 - Cannot rollback if migration already rolled back
 - Cannot rollback if cleanup has occurred
@@ -114,6 +153,7 @@ Rollback safety checks:
 ### Tracking Record Creation
 
 Tracking records are created when migration starts:
+
 - `localOwnerId` — Guest local owner ID
 - `cloudOwnerId` — Authenticated cloud owner ID (optional)
 - `migrationStartedAt` — Migration start timestamp
@@ -129,6 +169,7 @@ Tracking records are created when migration starts:
 ### Tracking Record Updates
 
 Tracking records are updated when:
+
 - Migration completes (`migrationCompletedAt` set)
 - Validation passes (`validationPassed` set to true)
 - Rollback performed (`rollbackAvailable` set to false)
