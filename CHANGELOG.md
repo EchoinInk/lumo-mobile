@@ -59,8 +59,6 @@ The following utilities were planned but not created due to permission/tool limi
 
 Recommended next steps to complete Phase 13.4:
 
-- Create sync queue transfer preparation utilities
-- Create orphaned guest partition tracking utilities
 - Integrate migration utilities into auth transition orchestrator
 - Create migration orchestration service
 - Implement destructive guest partition cleanup (only after validation passes)

@@ -20318,3 +20318,9 @@ COMMIT: chore(lumo): update guest-migration-safety.md
 FILES:
 docs/guest-migration-safety.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:42:26
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+
