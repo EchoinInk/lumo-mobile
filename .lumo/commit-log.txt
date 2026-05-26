@@ -20780,3 +20780,9 @@ COMMIT: chore(lumo): update account.tsx
 FILES:
 app/(tabs)/more/account.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 06:00:52
+COMMIT: chore(lumo): update account.tsx
+FILES:
+app/(tabs)/more/account.tsx
+

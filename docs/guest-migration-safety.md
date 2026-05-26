@@ -491,3 +491,116 @@ Recommended next phases:
 - Phase 13.6 — Destructive Guest Partition Cleanup
 - Phase 13.7 — Migration Backup to Secure Storage
 - Phase 13.8 — Configurable Rollback Window
+
+## Migration Test Harness (Phase 13.6)
+
+### Purpose
+
+The migration test harness is a development-only tool for proving the guest → account migration safety pass works with disposable local data before destructive cleanup is introduced. This is testing + verification only.
+
+### How to Run
+
+1. Open the app in development mode (`__DEV__` is true)
+2. Navigate to the Account screen (requires authentication)
+3. In the "Migration Diagnostics (Dev Only)" section, click "Run migration safety test"
+4. View the test results in the harness result text
+5. Click "Reset migration test data" to clear mock test data
+
+### What It Verifies
+
+The test harness validates the complete migration safety pass flow:
+
+1. **Mock Guest Data Seeding** — Seeds mock guest partitions with test data (tasks, habits, meals, budget, workouts, calendar)
+2. **Mock Sync Queue Seeding** — Seeds mock guest sync queue items with pending operations
+3. **Safety Pass Execution** — Runs the full `runGuestMigrationSafetyPass()` with test contexts
+4. **Guest Source Partitions Exist** — Verifies guest source partitions still exist after safety pass
+5. **Target Partitions Copied** — Verifies authenticated target partitions were copied
+6. **Rollback Snapshot Created** — Verifies rollback snapshot metadata was created
+7. **Sync Transfer Prepared** — Verifies sync queue transfer was prepared
+8. **Orphan Tracking Record Exists** — Verifies orphaned guest tracking record exists
+9. **Guest Data Untouched** — Confirms guest data remains untouched (no deletion)
+
+### What It Intentionally Does NOT Test
+
+- No destructive cleanup of guest partitions
+- No sync queue replay
+- No Supabase upload
+- No automatic migration on login
+- No production migration UI
+- No analytics
+- No notifications
+- No social login
+
+### Why Destructive Cleanup Is Deferred
+
+Destructive cleanup is intentionally deferred to a future phase because:
+
+1. **Safety First** — We must prove the safety pass works correctly before any deletion occurs
+2. **Rollback Capability** — Guest partitions must remain available for rollback until rollback window expires
+3. **User Control** — Users should have visibility into what will be deleted before deletion occurs
+4. **Debugging** — Orphaned partitions provide debugging information for migration issues
+5. **Recovery** — Preserves ability to recover from migration failures
+
+### Test Data Rules
+
+- Only runs in `__DEV__` mode
+- Never runs automatically
+- Never touches real active user partitions unless explicitly passed test context
+- Uses deterministic test IDs (`test-guest-owner`, `test-cloud-owner`)
+- Clears only mock test data when reset is clicked
+
+### Test Harness API
+
+```typescript
+// Run the full test harness
+runMigrationSafetyHarness()
+  → Promise<MigrationHarnessResult>
+
+// Reset the test harness state
+resetMigrationSafetyHarness()
+  → void
+
+// Get the current test harness report
+getMigrationSafetyHarnessReport()
+  → MigrationHarnessReport | null
+
+// Clear mock test data
+clearMockMigrationTestData()
+  → void
+
+// Get test repository contexts
+getMockMigrationContexts()
+  → { guestContext, authenticatedContext }
+
+// Verify mock data exists
+verifyMockGuestDataExists()
+  → boolean
+
+verifyMockSyncQueueExists()
+  → boolean
+```
+
+### Test Harness Report Structure
+
+```typescript
+interface MigrationHarnessReport {
+  status: MigrationHarnessStatus;
+  startedAt: string;
+  completedAt: string | null;
+  testContext: {
+    localOwnerId: string;
+    cloudOwnerId: string;
+  };
+  steps: MigrationHarnessStepResult[];
+  safetyPassReport: GuestMigrationSafetyReport | null;
+  validationResults: {
+    guestSourcePartitionsExist: boolean;
+    targetPartitionsCopied: boolean;
+    rollbackSnapshotCreated: boolean;
+    syncTransferPrepared: boolean;
+    orphanTrackingRecordExists: boolean;
+    guestDataUntouched: boolean;
+  };
+  error: string | null;
+}
+```
