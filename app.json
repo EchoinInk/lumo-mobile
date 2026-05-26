@@ -11,7 +11,7 @@
       "typedRoutes": true
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "webpack"
     }
   }
 }
