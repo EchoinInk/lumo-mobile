@@ -11,7 +11,7 @@ import {
     Moon,
     RefreshCw,
     Shield,
-    User
+    User,
 } from "lucide-react-native";
 import React from "react";
 import {
@@ -57,6 +57,26 @@ const settingsSections: SettingsSection[] = [
       {
         icon: <Moon size={20} color={Colors.purple} />,
         label: "Dark Mode",
+        hasToggle: true,
+      },
+    ],
+  },
+  {
+    title: "Accessibility",
+    items: [
+      {
+        icon: <Zap size={20} color={Colors.primary} />,
+        label: "Reduced Motion",
+        hasToggle: true,
+      },
+      {
+        icon: <Bell size={20} color={Colors.warning} />,
+        label: "Haptics",
+        hasToggle: true,
+      },
+      {
+        icon: <User size={20} color={Colors.purple} />,
+        label: "Simplified Mode",
         hasToggle: true,
       },
     ],

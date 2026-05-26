@@ -19788,3 +19788,9 @@ COMMIT: chore(lumo): update OnboardingShell.tsx
 FILES:
 src/features/onboarding/components/OnboardingShell.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:03:04
+COMMIT: chore(lumo): update settings.tsx
+FILES:
+app/(tabs)/more/settings.tsx
+
