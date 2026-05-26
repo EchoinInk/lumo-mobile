@@ -20162,3 +20162,9 @@ COMMIT: chore(lumo): update useAuthForm.ts
 FILES:
 src/features/auth/hooks/useAuthForm.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:04:21
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+src/app/auth/_layout.tsx
+
