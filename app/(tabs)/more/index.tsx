@@ -14,7 +14,7 @@ import {
     ShoppingCart,
     Sparkles,
     Utensils,
-    Wallet
+    Wallet,
 } from "lucide-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -48,58 +48,74 @@ function FeatureCard({ title, icon, color, onPress }: FeatureCardProps) {
   );
 }
 
-const features = [
-  {
-    title: "Budget Tracker",
-    icon: <Wallet size={22} color={Colors.success} />,
-    color: Colors.success,
-    route: "/more/budget",
-  },
-  {
-    title: "Payment Logs",
-    icon: <CreditCard size={22} color={Colors.blue} />,
-    color: Colors.blue,
-    route: "/more/payments",
-  },
-  {
-    title: "Weekly Groceries",
-    icon: <ShoppingCart size={22} color={Colors.purple} />,
-    color: Colors.purple,
-    route: "/more/groceries",
-  },
-  {
-    title: "My Meals",
-    icon: <Utensils size={22} color={Colors.pink} />,
-    color: Colors.pink,
-    route: "/more/meals",
-  },
-  {
-    title: "Cleaning Schedule",
-    icon: <Home size={22} color={Colors.warning} />,
-    color: Colors.warning,
-    route: "/more/cleaning",
-  },
-  {
-    title: "Weight Loss Tracker",
-    icon: <Scale size={22} color={Colors.primary} />,
-    color: Colors.primary,
-    route: "/more/weight",
-  },
-  {
-    title: "My Workout Log",
-    icon: <Dumbbell size={22} color={Colors.pink} />,
-    color: Colors.pink,
-    route: "/more/workouts",
-  },
-  {
-    title: "Settings",
-    icon: <Settings size={22} color={Colors.textSecondary} />,
-    color: Colors.textSecondary,
-    route: "/more/settings",
-  },
-];
-
 export default function MoreScreen() {
+  const accountMode = useAuthSessionStore((s) => s.accountMode);
+  const authUser = useAuthSessionStore((s) => s.authUser);
+
+  // Account feature - conditionally shown based on auth state
+  const accountFeature = {
+    title: accountMode === "authenticated" ? "Account" : "Sign in",
+    icon:
+      accountMode === "authenticated" ? (
+        <User size={22} color={Colors.primary} />
+      ) : (
+        <LogIn size={22} color={Colors.primary} />
+      ),
+    color: Colors.primary,
+    route: "/more/account",
+  };
+
+  const features = [
+    accountFeature,
+    {
+      title: "Budget Tracker",
+      icon: <Wallet size={22} color={Colors.success} />,
+      color: Colors.success,
+      route: "/more/budget",
+    },
+    {
+      title: "Payment Logs",
+      icon: <CreditCard size={22} color={Colors.blue} />,
+      color: Colors.blue,
+      route: "/more/payments",
+    },
+    {
+      title: "Weekly Groceries",
+      icon: <ShoppingCart size={22} color={Colors.purple} />,
+      color: Colors.purple,
+      route: "/more/groceries",
+    },
+    {
+      title: "My Meals",
+      icon: <Utensils size={22} color={Colors.pink} />,
+      color: Colors.pink,
+      route: "/more/meals",
+    },
+    {
+      title: "Cleaning Schedule",
+      icon: <Home size={22} color={Colors.warning} />,
+      color: Colors.warning,
+      route: "/more/cleaning",
+    },
+    {
+      title: "Weight Loss Tracker",
+      icon: <Scale size={22} color={Colors.primary} />,
+      color: Colors.primary,
+      route: "/more/weight",
+    },
+    {
+      title: "My Workout Log",
+      icon: <Dumbbell size={22} color={Colors.pink} />,
+      color: Colors.pink,
+      route: "/more/workouts",
+    },
+    {
+      title: "Settings",
+      icon: <Settings size={22} color={Colors.textSecondary} />,
+      color: Colors.textSecondary,
+      route: "/more/settings",
+    },
+  ];
   return (
     <Screen scrollable padded>
       <SectionHeader title="More" subtitle="All your features" />
