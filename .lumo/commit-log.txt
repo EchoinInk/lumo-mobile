@@ -20714,3 +20714,9 @@ COMMIT: chore(lumo): update authTransitionOrchestrator.ts
 FILES:
 src/features/auth/services/authTransitionOrchestrator.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 03:29:08
+COMMIT: chore(lumo): update guest-migration-safety.md
+FILES:
+docs/guest-migration-safety.md
+

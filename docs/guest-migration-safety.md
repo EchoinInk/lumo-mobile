@@ -90,6 +90,17 @@ Automatic migration on login
 - `src/features/auth/services/migrationSyncQueueTransfer.ts` — Sync queue transfer preparation utilities (prepare guest-owned sync queue items for authenticated ownership, convert ownership metadata)
 - `src/features/auth/services/migrationOrphanedGuestTracking.ts` — Orphaned guest partition tracking utilities (track migrated/orphaned guest partitions, detect cleanup candidates, preserve rollback capability)
 
+**Migration Orchestration (Phase 13.4 Integration)**
+
+- `src/features/auth/types/migration.types.ts` — Migration type definitions (steps, statuses, reports, results)
+- `src/features/auth/services/guestMigrationOrchestrator.ts` — Migration orchestration service (integrates safety utilities into deterministic flow)
+- `src/features/auth/hooks/useGuestMigrationStatus.ts` — Migration status hook (exposes migration state and safe action methods)
+
+**Integration Updates**
+
+- `src/features/auth/services/authTransitionOrchestrator.ts` — Added `prepareGuestUpgradeSafety()` and `completeGuestUpgradeSafety()` methods
+- `app/(tabs)/more/account.tsx` — Added debug-only migration diagnostics section
+
 ## Orphaned Partition Model
 
 ### Partition Statuses
@@ -206,6 +217,70 @@ Deletion is deferred for safety reasons:
 - Add cleanup progress tracking
 - Add cleanup error recovery
 - Delete orphaned guest partitions after rollback window expires
+
+## Migration Orchestration API
+
+### Guest Migration Orchestrator
+
+```typescript
+// Create migration preview
+createGuestMigrationPreview(sourceContext, targetContext)
+  → Promise<MigrationPreview>
+
+// Run full safety pass
+runGuestMigrationSafetyPass(sourceContext, targetContext)
+  → Promise<GuestMigrationSafetyResult>
+
+// Validate safety pass
+validateGuestMigrationSafetyPass(migrationId)
+  → boolean
+
+// Prepare rollback
+prepareGuestMigrationRollback(migrationId)
+  → boolean
+
+// Get migration status
+getGuestMigrationStatus()
+  → { status, report, isRunning }
+
+// Reset migration state
+resetGuestMigrationSafetyState()
+  → void
+```
+
+### Auth Transition Orchestrator Integration
+
+```typescript
+// Prepare guest upgrade safety (explicit call only)
+prepareGuestUpgradeSafety(sourceContext, targetContext)
+  → Promise<GuestMigrationSafetyResult>
+
+// Complete guest upgrade safety
+completeGuestUpgradeSafety(migrationId)
+  → boolean
+```
+
+### Migration Status Hook
+
+```typescript
+useGuestMigrationStatus()
+  → {
+      status,
+      latestReport,
+      rollbackAvailable,
+      cleanupEligible,
+      error,
+      prepareRollback,
+      validateMigration,
+      resetState
+    }
+
+useIsMigrationRunning()
+  → boolean
+
+useMigrationStatus()
+  → GuestMigrationStatus
+```
 
 ## Migration Utilities API
 
