@@ -176,8 +176,8 @@ function validateEntityData(
     }
 
     // Validate item count match
-    const sourceItemCount = parseItemCount(sourceData);
-    const targetItemCount = parseItemCount(targetData);
+    const sourceItemCount = sourceData ? parseItemCount(sourceData) : 0;
+    const targetItemCount = targetData ? parseItemCount(targetData) : 0;
     const itemCountMatch = sourceItemCount === targetItemCount;
 
     // Validate data integrity (simple length check for now)
@@ -266,8 +266,8 @@ function validateSyncQueue(
     }
 
     // Validate item count match
-    const sourceItemCount = parseItemCount(sourceData);
-    const targetItemCount = parseItemCount(targetData);
+    const sourceItemCount = sourceData ? parseItemCount(sourceData) : 0;
+    const targetItemCount = targetData ? parseItemCount(targetData) : 0;
     const itemCountMatch = sourceItemCount === targetItemCount;
 
     // Validate data integrity
