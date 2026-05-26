@@ -13,9 +13,9 @@
  * - No data deletion
  */
 
-import type { RepositoryContext } from "../../types/auth.types";
 import { getEntityStorageKey } from "../../../services/storage/storagePartition";
 import { storage as mmkvStorage } from "../../../store/storage";
+import type { RepositoryContext } from "../types/auth.types";
 
 // ── Migration Preview Types ─────────────────────────────────────────────────────
 
@@ -71,9 +71,7 @@ export function generateMigrationPreview(
   targetContext: RepositoryContext,
 ): MigrationPreview {
   if (sourceContext.accountMode !== "guest") {
-    throw new Error(
-      "[MigrationPreview] Source context must be in guest mode",
-    );
+    throw new Error("[MigrationPreview] Source context must be in guest mode");
   }
 
   if (targetContext.accountMode !== "authenticated") {
@@ -117,7 +115,8 @@ export function generateMigrationPreview(
     totalItemCount,
     estimatedDuration,
     potentialConflicts,
-    canMigrate: potentialConflicts.filter((c) => c.includes("high")).length === 0,
+    canMigrate:
+      potentialConflicts.filter((c) => c.includes("high")).length === 0,
   };
 }
 
@@ -228,7 +227,9 @@ function identifyConflicts(
   }
 
   // Check if target sync queue has items
-  const targetSyncQueueData = mmkvStorage?.getString(targetContext.syncPartitionKey);
+  const targetSyncQueueData = mmkvStorage?.getString(
+    targetContext.syncPartitionKey,
+  );
   if (targetSyncQueueData) {
     conflicts.push("medium: Target sync queue already has items");
   }
