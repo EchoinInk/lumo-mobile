@@ -21,6 +21,11 @@
  * Follows existing storage patterns from createPersistStorage.
  */
 
+import {
+    mapSupabaseSessionToAuthUser,
+    restorePersistedSession,
+    signOutSession
+} from "@/services/api/auth";
 import { createPersistStorage } from "@/store/createPersistStorage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -28,9 +33,20 @@ import type {
     AccountMode,
     AuthSessionState,
     AuthTransitionState,
+    AuthUser,
     CloudOwnerId,
     LocalOwnerId,
 } from "../types/auth.types";
+
+// ── Helpers ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Generate a stable local owner ID.
+ * In production, this should be preserved from storage or generated once.
+ */
+function generateLocalOwnerId(): LocalOwnerId {
+  return `local-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+}
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
