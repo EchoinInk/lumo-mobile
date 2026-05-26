@@ -195,6 +195,155 @@ export const useAuthSessionStore = create<AuthSessionStore>()(
           ...initialState,
           sessionStatus: "signed_out",
         }),
+
+      hydrateSession: async () => {
+        set({
+          authHydrationStatus: "hydrating",
+          sessionStatus: "initializing",
+        });
+
+        try {
+          const result = await restorePersistedSession();
+
+          if (!result.success || !result.data) {
+            // No session or failed to restore - initialize guest mode
+            const localOwnerId = generateLocalOwnerId();
+            set({
+              accountMode: "guest",
+              localOwnerId,
+              cloudOwnerId: null,
+              sessionStatus: "guest",
+              authHydrationStatus: "hydrated",
+              authError: null,
+            });
+            return;
+          }
+
+          const session = result.data;
+
+          if (!session.isValid || !session.user) {
+            // Session expired or invalid - initialize guest mode
+            const localOwnerId = generateLocalOwnerId();
+            set({
+              accountMode: "guest",
+              localOwnerId,
+              cloudOwnerId: null,
+              sessionStatus: "guest",
+              authHydrationStatus: "hydrated",
+              authError: null,
+            });
+            return;
+          }
+
+          // Valid session - set authenticated mode
+          const localOwnerId = generateLocalOwnerId(); // TODO: Preserve from guest state
+          const cloudOwnerId = session.user.id as CloudOwnerId;
+          const authUser = mapSupabaseSessionToAuthUser(session, localOwnerId);
+
+          set({
+            accountMode: "authenticated",
+            localOwnerId,
+            cloudOwnerId,
+            sessionStatus: "authenticated",
+            authUser,
+            lastSessionRestoreAt: new Date().toISOString(),
+            authHydrationStatus: "hydrated",
+            authError: null,
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("[AuthSessionStore] Failed to hydrate session:", err);
+          set({
+            authHydrationStatus: "failed",
+            authError: message,
+            sessionStatus: "guest",
+          });
+        }
+      },
+
+      restoreSession: async () => {
+        set({ authHydrationStatus: "hydrating" });
+
+        try {
+          const result = await restorePersistedSession();
+
+          if (!result.success || !result.data) {
+            set({
+              authHydrationStatus: "hydrated",
+              sessionStatus: "guest",
+            });
+            return;
+          }
+
+          const session = result.data;
+
+          if (!session.isValid || !session.user) {
+            set({
+              authHydrationStatus: "hydrated",
+              sessionStatus: "guest",
+            });
+            return;
+          }
+
+          const localOwnerId = generateLocalOwnerId();
+          const cloudOwnerId = session.user.id as CloudOwnerId;
+          const authUser = mapSupabaseSessionToAuthUser(session, localOwnerId);
+
+          set({
+            accountMode: "authenticated",
+            localOwnerId,
+            cloudOwnerId,
+            sessionStatus: "authenticated",
+            authUser,
+            lastSessionRestoreAt: new Date().toISOString(),
+            authHydrationStatus: "hydrated",
+          });
+        } catch (err) {
+          console.error("[AuthSessionStore] Failed to restore session:", err);
+          set({
+            authHydrationStatus: "failed",
+            sessionStatus: "guest",
+          });
+        }
+      },
+
+      signOut: async () => {
+        try {
+          await signOutSession();
+        } catch (err) {
+          console.error("[AuthSessionStore] Failed to sign out:", err);
+        }
+
+        // Reset to guest mode
+        const localOwnerId = generateLocalOwnerId();
+        set({
+          accountMode: "guest",
+          localOwnerId,
+          cloudOwnerId: null,
+          sessionStatus: "guest",
+          authUser: null,
+          transitionStatus: "idle",
+          authError: null,
+        });
+      },
+
+      setSessionHydrating: () =>
+        set({
+          authHydrationStatus: "hydrating",
+          sessionStatus: "initializing",
+        }),
+
+      setSessionReady: () =>
+        set({
+          authHydrationStatus: "hydrated",
+          sessionStatus: "authenticated",
+        }),
+
+      setSessionError: (error) =>
+        set({
+          authError: error,
+          authHydrationStatus: "failed",
+        }),
     }),
     {
       name: "auth-session-storage",
