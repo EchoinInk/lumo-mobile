@@ -22,22 +22,6 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
-// Disable Hermes for web to avoid import.meta issues
-const originalGetTransformOptions = config.transformer.getTransformOptions;
-config.transformer.getTransformOptions = async (args) => {
-  const options = await originalGetTransformOptions(args);
-  if (args.platform === "web") {
-    options.transform = {
-      ...options.transform,
-      minify: false,
-      hermesParser: false,
-      inlineRequires: false,
-      unstable_transformProfile: undefined,
-    };
-  }
-  return options;
-};
-
 module.exports = withNativeWind(config, {
   input: "./src/global.css",
 });
