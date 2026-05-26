@@ -1,5 +1,104 @@
 # Changelog
 
+## Phase 13.5 — Migration Safety Real Implementation Wiring
+
+### Overview
+
+Phase 13.5 wires the real migration utility implementations into the guest migration orchestrator, replacing stubbed placeholder logic with actual calls to preview, conflict, copy, validation, rollback, sync transfer, and orphaned tracking utilities.
+
+### Core Principles
+
+- Preserve all safety guarantees from Phase 13.4
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No Supabase upload
+- No automatic migration on login
+- Explicit method calls only for safety pass
+
+### Files Modified
+
+**Guest Migration Orchestrator**
+
+- `src/features/auth/services/guestMigrationOrchestrator.ts` — Wired real implementations:
+  - `generateMigrationPreview()` from `migrationPreview.ts`
+  - `detectConflicts()` and `resolveAllConflicts()` from `migrationConflictStrategy.ts`
+  - `copyGuestToAuthenticated()` from `migrationCopy.ts`
+  - `validateMigrationCopy()` from `migrationValidation.ts`
+  - `createRollbackSnapshot()` from `migrationRollback.ts`
+  - `createSyncQueueTransferPreview()` and `prepareSyncQueueTransfer()` from `migrationSyncQueueTransfer.ts`
+  - `discoverGuestPartitions()` from `migrationOrphanedGuestTracking.ts`
+
+### Implementation Details
+
+**Safety Pass Flow (Now Real)**
+
+1. **Previewing** — Calls `generateMigrationPreview()` to scan guest partitions and calculate migration size/complexity
+2. **Checking Conflicts** — Calls `detectConflicts()` and `resolveAllConflicts()` with "overwrite" strategy
+3. **Copying** — Calls `copyGuestToAuthenticated()` to copy guest partitions to authenticated partitions
+4. **Validating** — Calls `validateMigrationCopy()` to validate copied data integrity
+5. **Preparing Rollback** — Calls `createRollbackSnapshot()` to create rollback snapshot metadata
+6. **Preparing Sync Transfer** — Calls `createSyncQueueTransferPreview()` and `prepareSyncQueueTransfer()` to prepare sync queue for ownership transfer
+7. **Tracking Orphaned Guest** — Calls `discoverGuestPartitions()` to track migrated guest partitions
+8. **Completed** — Safety pass complete with real results
+
+### Safety Guarantees Preserved
+
+- If any step fails, stop immediately
+- Rollback metadata preserved if already created
+- Source guest data remains untouched
+- Target authenticated data not corrupted
+- Sync queue never replayed
+- Migration does NOT run automatically on login
+- Explicit method calls only
+
+### What Phase 13.5 Does NOT Do
+
+- No automatic deletion
+- No silent destructive migration
+- No sync replay
+- No social login
+- No analytics
+- No notifications
+- No guest partition deletion
+- No global MMKV wipe
+- No Supabase calls from migration utilities
+- No repository mutation
+- No polished migration UI
+- No destructive cleanup
+- No sync queue replay
+
+### Verification
+
+- TypeScript passes with no errors ✓
+- Web app boots successfully on http://localhost:8081 ✓
+- No import.meta error ✓
+- Account route does not spin forever ✓
+- Login/signup routes still render ✓
+- Guest mode still works ✓
+- Migration utilities do not run on startup ✓
+- No guest data is deleted ✓
+- No sync queue replay occurs ✓
+- No Supabase upload occurs ✓
+- Missing Supabase env vars still fail open to guest mode ✓
+
+### Risks
+
+1. **Guest Data Orphaning** — Logout generates new localOwnerId, orphaning old guest data. Cleanup needed in Phase 13.6.
+2. **Migration Record Loss** — If MMKV is cleared, migration tracking records are lost. Future phases should add backup to secure storage.
+3. **Rollback Window** — 7-day rollback window may be too short for some users. Future phases should make this configurable.
+4. **Partition Discovery** — Current implementation relies on migration tracking records for partition discovery. Future phases should add fallback discovery methods.
+
+### Recommended Phase 13.6
+
+Destructive Guest Partition Cleanup (only after validation passes):
+
+- Implement actual guest partition deletion after rollback window expires
+- Add user confirmation for cleanup
+- Add cleanup progress tracking
+- Add cleanup error recovery
+- Delete orphaned guest partitions after validation passes
+
 ## Phase 13.4 — Guest Account Migration Safety Integration
 
 ### Overview
