@@ -20518,3 +20518,11 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 16:01:38
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+app/auth/_layout.tsx
+app/auth/login.tsx
+app/auth/signup.tsx
+
