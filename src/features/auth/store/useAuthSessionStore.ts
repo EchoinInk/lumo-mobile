@@ -169,25 +169,25 @@ export const useAuthSessionStore = create<AuthSessionStore>()(
 // ── Selectors ─────────────────────────────────────────────────────────────────
 
 /** True when the user is in guest mode. */
-export const selectIsGuest = (state: AuthSessionState): boolean =>
+export const selectIsGuest = (state: AuthSessionStoreState): boolean =>
   state.accountMode === "guest";
 
 /** True when the user is authenticated. */
-export const selectIsAuthenticated = (state: AuthSessionState): boolean =>
+export const selectIsAuthenticated = (state: AuthSessionStoreState): boolean =>
   state.accountMode === "authenticated" && state.cloudOwnerId !== null;
 
 /** True when a migration is in progress. */
-export const selectIsMigrating = (state: AuthSessionState): boolean =>
+export const selectIsMigrating = (state: AuthSessionStoreState): boolean =>
   state.transitionStatus !== "idle" &&
   state.transitionStatus !== "completed" &&
   state.transitionStatus !== "failed";
 
 /** True when the session has not yet hydrated from storage. */
-export const selectIsLoading = (state: AuthSessionState): boolean =>
+export const selectIsLoading = (state: AuthSessionStoreState): boolean =>
   !state.hasHydrated || state.sessionStatus === "initializing";
 
 /** True when the session is settled (not loading or transitioning). */
-export const selectIsSettled = (state: AuthSessionState): boolean =>
+export const selectIsSettled = (state: AuthSessionStoreState): boolean =>
   state.hasHydrated &&
   state.sessionStatus !== "initializing" &&
   state.sessionStatus !== "transitioning";
