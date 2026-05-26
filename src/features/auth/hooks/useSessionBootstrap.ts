@@ -29,6 +29,8 @@ interface SessionBootstrapState {
   error?: string;
 }
 
+const HYDRATION_TIMEOUT_MS = 5000; // 5 second safety timeout
+
 /**
  * Hook for bootstrapping auth session on app startup.
  * Call this in your root component or app entry point.
@@ -48,13 +50,34 @@ export function useSessionBootstrap(): SessionBootstrapState {
 
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     async function bootstrapSession() {
       try {
         setState({ isRestoring: true, isReady: false, hasError: false });
 
+        // Set safety timeout to prevent infinite loading
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.warn(
+              "[useSessionBootstrap] Hydration timeout, forcing ready state",
+            );
+            setState({
+              isRestoring: false,
+              isReady: true,
+              hasError: true,
+              error: "Session hydration timed out",
+            });
+          }
+        }, HYDRATION_TIMEOUT_MS);
+
         // Hydrate session from Supabase or initialize guest mode
         await hydrateSession();
+
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
 
         if (isMounted) {
           setState({
@@ -66,6 +89,11 @@ export function useSessionBootstrap(): SessionBootstrapState {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         console.error("[useSessionBootstrap] Session restoration failed:", err);
+
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
 
         if (isMounted) {
           setState({
@@ -82,6 +110,9 @@ export function useSessionBootstrap(): SessionBootstrapState {
 
     return () => {
       isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
   }, [hydrateSession]);
 
@@ -126,7 +157,9 @@ export function useSessionReady(): boolean {
  */
 export function useSessionRestoring(): boolean {
   const authHydrationStatus = useAuthSessionStore((s) => s.authHydrationStatus);
-  return authHydrationStatus === "hydrating" || authHydrationStatus === "pending";
+  return (
+    authHydrationStatus === "hydrating" || authHydrationStatus === "pending"
+  );
 }
 
 /**
