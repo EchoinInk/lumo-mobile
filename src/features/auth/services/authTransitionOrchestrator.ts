@@ -19,7 +19,15 @@
  * - UI logic (handled by screens/hooks)
  */
 
-import type { CloudOwnerId, LocalOwnerId } from "../types/auth.types";
+import type {
+    CloudOwnerId,
+    LocalOwnerId,
+    RepositoryContext,
+} from "../types/auth.types";
+import {
+    getGuestMigrationStatus,
+    runGuestMigrationSafetyPass,
+} from "./guestMigrationOrchestrator";
 
 // ── Transition State ─────────────────────────────────────────────────────────────
 
