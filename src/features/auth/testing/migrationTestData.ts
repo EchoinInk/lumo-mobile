@@ -122,7 +122,7 @@ export function getMockMigrationContexts(): {
   const guestContext: RepositoryContext = {
     accountMode: "guest",
     localOwnerId: TEST_GUEST_OWNER_ID,
-    cloudOwnerId: null,
+    cloudOwnerId: undefined,
     storagePartitionKey: `guest:${TEST_GUEST_OWNER_ID}`,
     syncPartitionKey: `guest:${TEST_GUEST_OWNER_ID}:syncQueue`,
     isMigrating: false,
