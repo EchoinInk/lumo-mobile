@@ -20204,3 +20204,9 @@ COMMIT: chore(lumo): update signup.tsx
 FILES:
 src/app/auth/signup.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 13:07:03
+COMMIT: chore(lumo): update account.tsx
+FILES:
+app/(tabs)/more/account.tsx
+

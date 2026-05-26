@@ -14,7 +14,7 @@ import {
     ShoppingCart,
     Sparkles,
     Utensils,
-    Wallet,
+    Wallet
 } from "lucide-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
