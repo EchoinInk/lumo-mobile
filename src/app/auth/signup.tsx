@@ -23,12 +23,12 @@ export default function SignupScreen() {
   useEffect(() => {
     if (success) {
       // Navigate to account screen after successful signup
-      router.replace("/account");
+      router.replace("/(tabs)/more/account" as any);
     }
   }, [success]);
 
   const handleSignIn = () => {
-    router.push("/auth/login");
+    router.push("/auth/login" as any);
   };
 
   const handleBack = () => {
