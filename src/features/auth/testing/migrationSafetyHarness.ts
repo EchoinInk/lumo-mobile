@@ -403,7 +403,11 @@ export async function runControlledCleanupHarness(): Promise<MigrationHarnessRes
     // Step 3: Create cleanup preview
     report = updateHarnessStatus(report, "validating_results");
     const previewStart = Date.now();
-    const { createCleanupPreview } = require("../services/migrationCleanup");
+    const {
+      createCleanupPreview,
+      TEST_GUEST_OWNER_ID,
+      runControlledGuestCleanup,
+    } = require("../services/migrationCleanup");
     const cleanupPreview = createCleanupPreview(TEST_GUEST_OWNER_ID);
     steps.push(
       createStepResult(
@@ -421,7 +425,7 @@ export async function runControlledCleanupHarness(): Promise<MigrationHarnessRes
     }
 
     // Step 4: Run controlled cleanup
-    report = updateHarnessStatus(report, "deleting");
+    report = updateHarnessStatus(report, "validating_results");
     const cleanupStart = Date.now();
     const cleanupResult = await runControlledGuestCleanup(
       TEST_GUEST_OWNER_ID,
