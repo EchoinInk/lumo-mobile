@@ -22,19 +22,6 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
-// Use Babel for web instead of Hermes to avoid import.meta issues
-const originalGetTransformOptions = config.transformer.getTransformOptions;
-config.transformer.getTransformOptions = async (args) => {
-  const options = await originalGetTransformOptions(args);
-  if (args.platform === "web") {
-    options.transform = {
-      ...options.transform,
-      hermesParser: false,
-    };
-  }
-  return options;
-};
-
 module.exports = withNativeWind(config, {
   input: "./src/global.css",
 });
