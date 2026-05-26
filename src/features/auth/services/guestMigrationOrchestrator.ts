@@ -37,6 +37,19 @@ import type {
     GuestMigrationStep,
     GuestMigrationStepStatus,
 } from "../types/migration.types";
+import {
+    detectConflicts,
+    resolveAllConflicts,
+} from "./migrationConflictStrategy";
+import { copyGuestToAuthenticated } from "./migrationCopy";
+import { discoverGuestPartitions } from "./migrationOrphanedGuestTracking";
+import { generateMigrationPreview } from "./migrationPreview";
+import { createRollbackSnapshot } from "./migrationRollback";
+import {
+    createSyncQueueTransferPreview,
+    prepareSyncQueueTransfer,
+} from "./migrationSyncQueueTransfer";
+import { validateMigrationCopy } from "./migrationValidation";
 
 // ── Orchestrator State ───────────────────────────────────────────────────────────
 
@@ -102,18 +115,8 @@ function updateStepStatus(
 export async function createGuestMigrationPreview(
   sourceContext: RepositoryContext,
   targetContext: RepositoryContext,
-): Promise<any> {
-  // TODO: Integrate with migrationPreview.ts
-  return {
-    sourceContext,
-    targetContext,
-    entities: [],
-    totalDataSize: 0,
-    totalItemCount: 0,
-    estimatedDuration: 0,
-    potentialConflicts: [],
-    canMigrate: true,
-  };
+) {
+  return generateMigrationPreview(sourceContext, targetContext);
 }
 
 /**
@@ -187,76 +190,110 @@ export async function runGuestMigrationSafetyPass(
     };
     report = updateStepStatus(report, "previewing", "completed");
 
-    // Step 2: Checking conflicts (simplified - skip for now)
+    // Step 2: Checking conflicts
     report = updateStepStatus(report, "checking_conflicts", "in_progress");
     report.status = "checking_conflicts";
-    report = updateStepStatus(report, "checking_conflicts", "skipped");
+    currentReport = report;
 
-    // Step 3: Copying (stub for now)
+    const conflicts = detectConflicts(sourceContext, targetContext);
+    const conflictResolution = resolveAllConflicts(conflicts, "keep_target");
+    report = {
+      ...report,
+      conflicts: conflictResolution.results.map((r) => ({
+        entityName: r.entityName,
+        strategy: r.strategy,
+        success: r.success,
+      })),
+    };
+    report = updateStepStatus(report, "checking_conflicts", "completed");
+
+    // Step 3: Copying
     report = updateStepStatus(report, "copying", "in_progress");
     report.status = "copying";
     currentReport = report;
 
-    // TODO: Integrate with migrationCopy.ts
+    const copyReport = copyGuestToAuthenticated(sourceContext, targetContext);
     report = {
       ...report,
-      copyResults: [],
+      copyResults: copyReport.results.map((r) => ({
+        entityName: r.entityName,
+        sourceKey: r.sourceKey,
+        targetKey: r.targetKey,
+        success: r.success,
+        bytesCopied: r.bytesCopied,
+        itemsCopied: r.itemsCopied,
+      })),
     };
     report = updateStepStatus(report, "copying", "completed");
 
-    // Step 4: Validating (stub for now)
+    // Step 4: Validating
     report = updateStepStatus(report, "validating", "in_progress");
     report.status = "validating";
     currentReport = report;
 
-    // TODO: Integrate with migrationValidation.ts
+    const validationReport = validateMigrationCopy(
+      sourceContext,
+      targetContext,
+    );
     report = {
       ...report,
-      validationResults: [],
+      validationResults: validationReport.results.map((r) => ({
+        entityName: r.entityName,
+        sourceKey: r.sourceKey,
+        targetKey: r.targetKey,
+        passed: r.dataIntegrityValid,
+        error: r.error || null,
+      })),
     };
     report = updateStepStatus(report, "validating", "completed");
 
-    // Step 5: Preparing rollback (stub for now)
+    // Step 5: Preparing rollback
     report = updateStepStatus(report, "preparing_rollback", "in_progress");
     report.status = "preparing_rollback";
     currentReport = report;
 
-    // TODO: Integrate with migrationRollback.ts
+    const rollbackSnapshot = createRollbackSnapshot(targetContext);
     report = {
       ...report,
       rollbackSnapshot: {
-        snapshotId: migrationId,
-        createdAt: new Date().toISOString(),
+        snapshotId: rollbackSnapshot.id,
+        createdAt: rollbackSnapshot.timestamp.toString(),
         isAvailable: true,
       },
     };
     report = updateStepStatus(report, "preparing_rollback", "completed");
 
-    // Step 6: Preparing sync transfer (stub for now)
+    // Step 6: Preparing sync transfer
     report = updateStepStatus(report, "preparing_sync_transfer", "in_progress");
     report.status = "preparing_sync_transfer";
     currentReport = report;
 
-    // TODO: Integrate with migrationSyncQueueTransfer.ts
+    const syncPreview = createSyncQueueTransferPreview(
+      sourceContext,
+      targetContext,
+    );
+    const syncTransferResult = prepareSyncQueueTransfer(syncPreview);
     report = {
       ...report,
       syncTransferPreview: {
-        itemsToTransfer: 0,
-        success: true,
+        itemsToTransfer: syncTransferResult.itemsTransferred,
+        success: syncTransferResult.success,
       },
     };
     report = updateStepStatus(report, "preparing_sync_transfer", "completed");
 
-    // Step 7: Tracking orphaned guest (stub for now)
+    // Step 7: Tracking orphaned guest
     report = updateStepStatus(report, "tracking_orphaned_guest", "in_progress");
     report.status = "tracking_orphaned_guest";
     currentReport = report;
 
-    // TODO: Integrate with migrationOrphanedGuestTracking.ts
+    const orphanedPartitions = discoverGuestPartitions(
+      sourceContext.localOwnerId,
+    );
     report = {
       ...report,
       orphanedGuestTracking: {
-        status: "active",
+        status: "tracked",
         success: true,
       },
     };
