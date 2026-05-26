@@ -97,6 +97,39 @@ interface AuthSessionActions {
    * Used for sign-out or testing.
    */
   resetAuthSession: () => void;
+
+  /**
+   * Hydrate auth session from Supabase.
+   * Restores persisted session or initializes guest mode.
+   */
+  hydrateSession: () => Promise<void>;
+
+  /**
+   * Restore auth session from storage.
+   * Called on app startup.
+   */
+  restoreSession: () => Promise<void>;
+
+  /**
+   * Sign out current session.
+   * Clears Supabase session and resets to guest mode.
+   */
+  signOut: () => Promise<void>;
+
+  /**
+   * Set session hydrating status.
+   */
+  setSessionHydrating: () => void;
+
+  /**
+   * Set session ready status.
+   */
+  setSessionReady: () => void;
+
+  /**
+   * Set session error.
+   */
+  setSessionError: (error: string) => void;
 }
 
 type AuthSessionStore = AuthSessionStoreState & AuthSessionActions;
@@ -111,6 +144,10 @@ const initialState: AuthSessionStoreState = {
   transitionStatus: "idle",
   hasCompletedGuestMigration: false,
   hasHydrated: false,
+  authUser: null,
+  lastSessionRestoreAt: null,
+  authHydrationStatus: "pending",
+  authError: null,
 };
 
 // ── Store ─────────────────────────────────────────────────────────────────────
