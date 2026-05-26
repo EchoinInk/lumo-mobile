@@ -85,8 +85,10 @@ export function OnboardingShell({
               variant="primary"
               size="lg"
               style={styles.nextButton}
+              accessibilityLabel={nextLabel}
+              accessibilityRole="button"
             >
-              n {nextLabel}
+              {nextLabel}
             </Button>
             {onBack && (
               <Button
@@ -94,6 +96,8 @@ export function OnboardingShell({
                 variant="ghost"
                 size="md"
                 style={styles.backButton}
+                accessibilityLabel="Go back"
+                accessibilityRole="button"
               >
                 Back
               </Button>

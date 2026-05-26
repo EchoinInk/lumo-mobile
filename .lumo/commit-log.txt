@@ -19776,3 +19776,9 @@ COMMIT: chore(lumo): update useSimplifiedMode.ts
 FILES:
 src/hooks/useSimplifiedMode.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:02:28
+COMMIT: chore(lumo): update _layout.tsx
+FILES:
+app/(tabs)/_layout.tsx
+
