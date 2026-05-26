@@ -21,10 +21,13 @@
  */
 
 import type {
+    AuthUser,
     CloudOwnerId,
     LocalOwnerId,
-    RepositoryContext,
+    RepositoryContext
 } from "@/features/auth/types/auth.types";
+import { mapSupabaseSessionToRepositoryContext } from "@/services/api/auth/supabaseAuth.mapper";
+import type { SupabaseAuthSession } from "@/services/api/auth/supabaseAuth.types";
 
 // ── Context Creation ───────────────────────────────────────────────────────────
 
