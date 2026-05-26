@@ -138,6 +138,9 @@ export function simulateDeadLetterQueue(count: number = 50): string[] {
 
   for (let i = 0; i < count; i++) {
     const item = recordQueueItem({
+      ownerType: "guest",
+      localOwnerId: "test-guest",
+      syncPartitionKey: "guest:test-guest:syncQueue",
       entity: randomEntity(),
       operation: randomOperation(),
       entityId: generateEntityId(),

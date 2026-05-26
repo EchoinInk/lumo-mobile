@@ -19948,3 +19948,10 @@ FILES:
 src/services/storage/syncQueue.ts
 src/services/sync/deadLetter/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-26 12:33:19
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/services/sync/queue/queue.validation.ts
+src/services/sync/testing/index.ts
+
