@@ -1,5 +1,276 @@
 # Changelog
 
+## Phase 14.0 — Production Hardening + Feature Rollout Pivot (P0)
+
+### Overview
+
+Phase 14.0 P0 implements production hardening foundations for Lumo, evolving the app from "foundation building" into "production-grade feature rollout with hardened reliability." This phase focuses on P0 priorities: error boundaries, sync recovery, offline resilience, feedback states, and feature flags.
+
+### Core Principles
+
+- Calm, emotionally safe, low cognitive load
+- Modular, scalable, predictable, resilient
+- Visually soft, non-punitive UX
+- Architecturally disciplined
+- Retry-first UX
+- Emotionally safe messaging
+
+### Core Philosophy
+
+```
+Never introduce:
+- hustle-culture pressure
+- streak guilt
+- overwhelming dashboards
+- dense layouts
+- excessive motion
+- cluttered controls
+- nested modal chaos
+
+Always prioritize:
+- calmness
+- clarity
+- emotional safety
+- low cognitive load
+- progressive disclosure
+- predictable interaction
+```
+
+### Files Created
+
+**Feature Flag System**
+
+- `src/config/features/featureFlags.ts` — Centralized feature flag configuration:
+  - `featureFlags` — Typed feature flag configuration
+  - `isFeatureEnabled()` — Check if a feature is enabled
+  - `requireFeature()` — Require a feature to be enabled (throws if disabled)
+  - `getEnabledFeatures()` — Get all enabled features
+  - `getDisabledFeatures()` — Get all disabled features
+  - `isAnyFeatureEnabled()` — Check if any of the given features are enabled
+  - `areAllFeaturesEnabled()` — Check if all of the given features are enabled
+
+- `src/config/features/rollout.ts` — Feature rollout configuration:
+  - `RolloutConfig` — Rollback configuration interface
+  - `rolloutConfig` — Rollout configuration map
+  - `getRolloutConfig()` — Get rollout configuration for a feature
+  - `isFeatureRolledOut()` — Check if a feature is rolled out to the current environment
+
+- `src/config/features/experiments.ts` — A/B test experiments configuration:
+  - `ExperimentConfig` — Experiment configuration interface
+  - `experiments` — Active experiments configuration
+  - `getExperimentConfig()` — Get experiment configuration
+  - `isExperimentActive()` — Check if an experiment is active
+  - `getExperimentVariant()` — Get the variant for a user in an experiment
+  - `isUserInVariant()` — Check if a user is in a specific variant
+  - `getActiveExperiments()` — Get all active experiments
+
+**Global Feedback Components**
+
+- `src/components/feedback/GlobalErrorBoundary.tsx` — Global error boundary:
+  - Catches JavaScript errors anywhere in the component tree
+  - Logs errors to observability service
+  - Displays calm fallback UI
+
+- `src/components/feedback/FatalErrorScreen.tsx` — Fatal error screen:
+  - Calm, reassuring, not alarming
+  - Gentle recovery language
+  - Clear retry path
+
+- `src/components/feedback/SyncFailureBanner.tsx` — Sync failure banner:
+  - Gentle drift metaphors
+  - Clear retry path
+  - Emotionally safe messaging
+
+- `src/components/feedback/OfflineBanner.tsx` — Offline banner:
+  - Gentle offline metaphors
+  - Reassures that data is safe
+  - Non-alarming messaging
+
+- `src/components/feedback/RetryButton.tsx` — Retry button:
+  - Gentle retry button for recovery actions
+  - Loading state support
+
+- `src/components/feedback/RecoverySheet.tsx` — Recovery sheet:
+  - Bottom sheet for recovery actions
+  - Clear action options
+  - Gentle recovery language
+
+**Reliability State Primitives**
+
+- `src/components/states/reliability.types.ts` — Reliability state types:
+  - `ReliabilityState` — Primary reliability states (loading, empty, success, error, offline, syncing, retrying)
+  - `ReliabilityStateMetadata` — Reliability state metadata
+  - `ReliabilityStateTransition` — Reliability state transition
+  - `ReliabilityStateConfig` — Reliability state configuration
+
+- `src/components/states/useReliabilityState.ts` — Reliability state hook:
+  - `useReliabilityState()` — Hook for managing reliability states
+  - Provides consistent state management for all reliability states
+  - Includes retry logic and state transitions
+
+**Sync Recovery Utilities**
+
+- `src/services/sync/recovery/replayFailedQueue.ts` — Replay failed queue items:
+  - `replayFailedQueue()` — Replay failed sync queue items with retry-safe logic
+  - `getFailedQueueItems()` — Get failed queue items
+  - `clearFailedQueueItems()` — Clear failed queue items
+
+- `src/services/sync/recovery/recoverCorruptedQueue.ts` — Recover corrupted queue:
+  - `detectCorruptedQueueItems()` — Detect corrupted queue items
+  - `removeCorruptedQueueItems()` — Remove corrupted queue items
+  - `validateQueueIntegrity()` — Validate queue integrity
+
+- `src/services/sync/recovery/staleCacheRecovery.ts` — Stale cache recovery:
+  - `detectStaleCacheEntries()` — Detect stale cache entries
+  - `removeStaleCacheEntries()` — Remove stale cache entries
+  - `removeOrphanedCacheEntries()` — Clean up orphaned cache entries
+
+- `src/services/sync/recovery/syncHealth.ts` — Sync health monitoring:
+  - `getSyncHealthMetrics()` — Get sync health metrics
+  - `isSyncHealthy()` — Check if sync is healthy
+  - `getSyncHealthStatus()` — Get human-readable health status
+
+- `src/services/sync/recovery/queueDiagnostics.ts` — Queue diagnostics:
+  - `generateQueueDiagnostics()` — Generate queue diagnostic report
+  - `printQueueDiagnostics()` — Print queue diagnostics to console
+
+**Offline Resilience Utilities**
+
+- `src/services/offline/offlineManager.ts` — Offline manager:
+  - `useOfflineManager()` — Hook for managing offline state
+  - `isOffline()` — Check if currently offline
+  - `getNetworkInfo()` — Get network information
+  - `formatOfflineDuration()` — Format offline duration for display
+
+- `src/services/offline/offlineQueue.ts` — Offline queue:
+  - `queueOfflineOperation()` — Queue an operation for offline replay
+  - `getOfflineQueueItems()` — Get all offline queue items
+  - `getUnreplayedOfflineItems()` — Get unreplayed offline queue items
+  - `markOfflineItemReplayed()` — Mark offline queue item as replayed
+  - `clearReplayedOfflineItems()` — Clear replayed offline queue items
+  - `clearOfflineQueue()` — Clear all offline queue items
+
+- `src/services/offline/index.ts` — Offline services barrel export
+
+### Files Modified
+
+**Feedback Components**
+
+- `src/components/feedback/index.ts` — Added exports for new feedback components:
+  - `GlobalErrorBoundary`
+  - `FatalErrorScreen`
+  - `SyncFailureBanner`
+  - `OfflineBanner`
+  - `RetryButton`
+  - `RecoverySheet`
+
+### Feature Flag Configuration
+
+Current feature flags:
+
+- `calmModeV2: true` — Calm mode V2 enabled
+- `focusMode: true` — Focus mode enabled
+- `recoveryMode: false` — Recovery mode disabled
+- `aiPlanningAssistant: false` — AI planning assistant disabled
+- `smartScheduling: false` — Smart scheduling disabled
+- `recurringTasksV2: true` — Recurring tasks V2 enabled
+- `offlineQueueV2: true` — Offline queue V2 enabled
+- `syncRecovery: true` — Sync recovery enabled
+- `conflictResolutionV2: true` — Conflict resolution V2 enabled
+- `onboardingV2: true` — Onboarding V2 enabled
+- `guidedSetup: true` — Guided setup enabled
+- `performanceMetrics: true` — Performance metrics enabled
+- `syncMetrics: true` — Sync metrics enabled
+- `crashReporting: false` — Crash reporting disabled
+- `reducedMotionSupport: true` — Reduced motion support enabled
+- `highContrastMode: false` — High contrast mode disabled
+- `largeTextSupport: true` — Large text support enabled
+
+### Reliability States
+
+All feature screens now support:
+
+- `loading` — Data is loading
+- `empty` — No data to display
+- `success` — Data loaded successfully
+- `error` — Error occurred
+- `offline` — Device is offline
+- `syncing` — Data is syncing
+- `retrying` — Retry in progress
+
+### Sync Recovery
+
+Sync recovery utilities provide:
+
+- Retry-safe queue replay
+- Idempotent operations
+- No duplicated writes
+- Defensive queue recovery
+- Hydration-safe operations
+- Migration-safe operations
+- Queue corruption detection
+- Stale entity cleanup
+- Orphaned sync item detection
+- Retry exhaustion handling
+
+### Offline Resilience
+
+Offline resilience utilities provide:
+
+- Network status monitoring
+- Offline state tracking
+- Offline operation queuing
+- Automatic replay when online
+- Offline duration formatting
+- Connection type detection
+- Expensive connection detection
+
+### Messaging Philosophy
+
+**Good (Calm, Reassuring):**
+
+- "Something drifted out of sync."
+- "Let's try again gently."
+- "You're offline. Your data is safe here 💜"
+
+**Bad (Alarming, Harsh):**
+
+- "Critical failure."
+- "App crashed."
+- "Connection lost."
+
+### Verification
+
+- TypeScript passes with no errors ✓
+- Feature flag system type-safe ✓
+- Feedback components use design system tokens ✓
+- Reliability states are reusable primitives ✓
+- Sync recovery utilities are retry-safe ✓
+- Offline resilience utilities are idempotent ✓
+- No duplicate components ✓
+- No parallel feedback systems ✓
+
+### Risks
+
+1. **Feature Flag Drift** — Without remote config integration, feature flags require app updates to change. Future phases should add remote config support.
+2. **Queue Recovery Complexity** — Queue recovery logic is complex and may have edge cases. Future phases should add comprehensive testing.
+3. **Offline Queue Growth** — Offline queue may grow unbounded if never cleared. Future phases should add queue size limits and automatic cleanup.
+4. **Error Boundary Coverage** — Error boundaries may not catch all error types. Future phases should add error boundary coverage monitoring.
+
+### Recommended Phase 14.0 P1
+
+- Calm mode foundation (src/features/calmMode/)
+- Focus mode foundation (src/features/focus/)
+- Observability foundation (src/services/observability/)
+- Testing foundation (src/testing/)
+
+### Recommended Phase 14.0 P2
+
+- UX consistency pass (spacing, typography, tokens)
+- Feature delivery standard documentation
+- Production UX rules documentation
+- Notification philosophy documentation
+
 ## Phase 13.7 — Controlled Destructive Cleanup
 
 ### Overview
