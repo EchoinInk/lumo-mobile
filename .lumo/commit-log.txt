@@ -20971,3 +20971,9 @@ FILES:
 src/services/sync/recovery/recoverCorruptedQueue.ts
 src/services/sync/recovery/replayFailedQueue.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 20:30:25
+COMMIT: chore(lumo): update staleCacheRecovery.ts
+FILES:
+src/services/sync/recovery/staleCacheRecovery.ts
+
