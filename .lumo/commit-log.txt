@@ -20984,3 +20984,9 @@ FILES:
 src/services/sync/recovery/queueDiagnostics.ts
 src/services/sync/recovery/syncHealth.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 20:30:52
+COMMIT: chore(lumo): update offlineManager.ts
+FILES:
+src/services/offline/offlineManager.ts
+
