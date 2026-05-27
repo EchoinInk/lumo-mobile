@@ -20945,3 +20945,10 @@ COMMIT: chore(lumo): update experiments.ts
 FILES:
 src/config/features/experiments.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 20:29:31
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/components/states/reliability.types.ts
+src/components/states/useReliabilityState.ts
+
