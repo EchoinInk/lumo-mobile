@@ -21038,3 +21038,9 @@ postcss.config.js
 src/features/focus/utils/focusSelectors.ts
 webpack.config.js
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-28 02:11:57
+COMMIT: chore(lumo): update FocusModeBanner.tsx
+FILES:
+src/features/focus/components/FocusModeBanner.tsx
+
