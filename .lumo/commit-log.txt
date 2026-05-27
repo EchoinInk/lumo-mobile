@@ -20884,3 +20884,9 @@ COMMIT: chore(lumo): update rollout.ts
 FILES:
 src/config/features/rollout.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:10:20
+COMMIT: chore(lumo): update experiments.ts
+FILES:
+src/config/features/experiments.ts
+
