@@ -21056,3 +21056,9 @@ COMMIT: chore(lumo): update FocusModeBanner.tsx
 FILES:
 src/features/focus/components/FocusModeBanner.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-28 02:17:59
+COMMIT: chore(lumo): update FocusTaskCard.tsx
+FILES:
+src/features/focus/components/FocusTaskCard.tsx
+
