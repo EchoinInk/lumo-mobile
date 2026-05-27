@@ -20896,3 +20896,9 @@ COMMIT: chore(lumo): update GlobalErrorBoundary.tsx
 FILES:
 src/components/feedback/GlobalErrorBoundary.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:11:16
+COMMIT: chore(lumo): update FatalErrorScreen.tsx
+FILES:
+src/components/feedback/FatalErrorScreen.tsx
+
