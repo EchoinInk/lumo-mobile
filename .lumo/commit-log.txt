@@ -21024,3 +21024,9 @@ src/features/focus/services/cognitiveLoadRules.ts
 src/features/focus/services/focusModeService.ts
 src/features/focus/store/useFocusModeStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-28 02:11:30
+COMMIT: chore(lumo): update useCognitiveLoad.ts
+FILES:
+src/features/focus/hooks/useCognitiveLoad.ts
+
