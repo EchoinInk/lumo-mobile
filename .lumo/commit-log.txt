@@ -20933,3 +20933,9 @@ COMMIT: chore(lumo): update index.ts
 FILES:
 src/components/feedback/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 20:27:23
+COMMIT: chore(lumo): update SyncFailureBanner.tsx
+FILES:
+src/components/feedback/SyncFailureBanner.tsx
+

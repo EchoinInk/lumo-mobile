@@ -16,7 +16,11 @@
 /**
  * Experiment variant type.
  */
-export type ExperimentVariant = "control" | "variant_a" | "variant_b" | "variant_c";
+export type ExperimentVariant =
+  | "control"
+  | "variant_a"
+  | "variant_b"
+  | "variant_c";
 
 /**
  * Experiment configuration.
@@ -30,8 +34,8 @@ export interface ExperimentConfig {
   variants: ExperimentVariant[];
   /** Default variant (fallback) */
   defaultVariant: ExperimentVariant;
-  /** Percentage allocation per variant */
-  allocation: Record<ExperimentVariant, number>;
+  /** Percentage allocation per variant (partial record allowed) */
+  allocation: Partial<Record<ExperimentVariant, number>>;
   /** Start date (ISO string) */
   startDate?: string;
   /** End date (ISO string) */
@@ -95,7 +99,9 @@ export const experiments: Record<string, ExperimentConfig> = {
  * @param experimentKey - Experiment key
  * @returns Experiment configuration or null
  */
-export function getExperimentConfig(experimentKey: string): ExperimentConfig | null {
+export function getExperimentConfig(
+  experimentKey: string,
+): ExperimentConfig | null {
   return experiments[experimentKey] || null;
 }
 
@@ -141,7 +147,10 @@ export function getExperimentVariant(
 
   // Deterministic variant assignment based on user ID
   const hash = simpleHash(userId);
-  const totalAllocation = Object.values(config.allocation).reduce((sum, val) => sum + val, 0);
+  const totalAllocation = Object.values(config.allocation).reduce(
+    (sum, val) => sum + val,
+    0,
+  );
   const normalizedHash = (hash % totalAllocation) / totalAllocation;
 
   let cumulative = 0;
