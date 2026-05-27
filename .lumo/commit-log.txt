@@ -20909,3 +20909,9 @@ FILES:
 src/components/feedback/FatalErrorScreen.tsx
 src/components/feedback/SyncFailureBanner.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:11:57
+COMMIT: chore(lumo): update OfflineBanner.tsx
+FILES:
+src/components/feedback/OfflineBanner.tsx
+
