@@ -20872,3 +20872,9 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:09:16
+COMMIT: chore(lumo): update featureFlags.ts
+FILES:
+src/config/features/featureFlags.ts
+
