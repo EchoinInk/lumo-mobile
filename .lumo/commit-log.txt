@@ -20890,3 +20890,9 @@ COMMIT: chore(lumo): update experiments.ts
 FILES:
 src/config/features/experiments.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:11:01
+COMMIT: chore(lumo): update GlobalErrorBoundary.tsx
+FILES:
+src/components/feedback/GlobalErrorBoundary.tsx
+
