@@ -20952,3 +20952,9 @@ FILES:
 src/components/states/reliability.types.ts
 src/components/states/useReliabilityState.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 20:29:45
+COMMIT: chore(lumo): update replayFailedQueue.ts
+FILES:
+src/services/sync/recovery/replayFailedQueue.ts
+

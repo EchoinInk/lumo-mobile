@@ -6,7 +6,7 @@
  */
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
-import type { SyncQueueItem } from "../../types/sync.types";
+import type { SyncQueueItem } from "../../storage/queue.types";
 
 const SYNC_QUEUE_KEY = "sync_queue";
 
@@ -16,7 +16,9 @@ const SYNC_QUEUE_KEY = "sync_queue";
  * @param maxRetries - Maximum number of retries per item (default: 3)
  * @returns Number of items successfully replayed
  */
-export async function replayFailedQueue(maxRetries: number = 3): Promise<number> {
+export async function replayFailedQueue(
+  maxRetries: number = 3,
+): Promise<number> {
   if (!mmkvStorage) {
     console.warn("[replayFailedQueue] MMKV storage not available");
     return 0;
@@ -50,11 +52,14 @@ export async function replayFailedQueue(maxRetries: number = 3): Promise<number>
       // Increment retry count
       item.retryCount = (item.retryCount || 0) + 1;
       item.status = "pending";
-      item.updatedAt = new Date().toISOString();
+      item.lastAttemptAt = Date.now();
 
       successCount++;
     } catch (err) {
-      console.error(`[replayFailedQueue] Failed to replay item ${item.id}:`, err);
+      console.error(
+        `[replayFailedQueue] Failed to replay item ${item.id}:`,
+        err,
+      );
       item.status = "failed";
       item.error = err instanceof Error ? err.message : String(err);
     }
