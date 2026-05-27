@@ -123,7 +123,7 @@ export function clearFailedQueueItems(olderThanMs?: number): number {
       }
 
       if (olderThanMs) {
-        const itemAge = now - new Date(item.updatedAt).getTime();
+        const itemAge = now - (item.lastAttemptAt || 0);
         return itemAge < olderThanMs;
       }
 
