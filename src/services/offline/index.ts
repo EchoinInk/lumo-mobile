@@ -5,19 +5,15 @@
  */
 
 export {
-  useOfflineManager,
-  isOffline,
-  getNetworkInfo,
-  formatOfflineDuration,
+    formatOfflineDuration, getNetworkInfo, isOffline, useOfflineManager
 } from "./offlineManager";
 
 export {
-  queueOfflineOperation,
-  getOfflineQueueItems,
-  getUnreplayedOfflineItems,
-  markOfflineItemReplayed,
-  clearReplayedOfflineItems,
-  clearOfflineQueue,
+    clearOfflineQueue, clearReplayedOfflineItems, getOfflineQueueItems,
+    getUnreplayedOfflineItems,
+    markOfflineItemReplayed, queueOfflineOperation
 } from "./offlineQueue";
 
-export type { OfflineState, OfflineManagerConfig, OfflineQueueItem } from "./offlineManager";
+export type { OfflineManagerConfig, OfflineState } from "./offlineManager";
+export type { OfflineQueueItem } from "./offlineQueue";
+
