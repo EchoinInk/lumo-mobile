@@ -11,16 +11,19 @@
  */
 
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Text } from "../ui/Text";
-import { RetryButton } from "./RetryButton";
+import { RetryButton } from "./index";
 
 interface Props {
   onRetry: () => void;
   isRetrying?: boolean;
 }
 
-export function SyncFailureBanner({ onRetry, isRetrying = false }: Props): React.JSX.Element {
+export function SyncFailureBanner({
+  onRetry,
+  isRetrying = false,
+}: Props): React.JSX.Element {
   return (
     <View style={styles.container}>
       <Text variant="body" style={styles.message}>
