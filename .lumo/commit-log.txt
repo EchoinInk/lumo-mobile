@@ -20921,3 +20921,9 @@ COMMIT: chore(lumo): update RetryButton.tsx
 FILES:
 src/components/feedback/RetryButton.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-27 13:12:26
+COMMIT: chore(lumo): update RecoverySheet.tsx
+FILES:
+src/components/feedback/RecoverySheet.tsx
+
