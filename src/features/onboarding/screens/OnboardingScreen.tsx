@@ -136,7 +136,7 @@ export const OnboardingScreen: React.FC = () => {
     if (currentStep === 3) {
       // Complete onboarding
       setFocusAreas(focusAreas);
-      router.replace("/(tabs)");
+      router.replace({ pathname: "/(tabs)" as const } as any);
     } else {
       // Move to next step is handled by PreferenceSelector
     }
