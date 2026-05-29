@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
 
 export default function RootIndex() {
-  return <Redirect href="/(tabs)" as const />;
+  return <Redirect href={{ pathname: "/(tabs)" as const } as any} />;
 }

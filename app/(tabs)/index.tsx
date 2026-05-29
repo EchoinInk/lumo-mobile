@@ -21,25 +21,27 @@ function QuickActions() {
       label: "Add Task",
       icon: Plus,
       color: Colors.blue,
-      onPress: () => router.push("/(tabs)/tasks" as const),
+      onPress: () => router.push({ pathname: "/(tabs)/tasks" as const } as any),
     },
     {
       label: "Add Habit",
       icon: Flame,
       color: Colors.purple,
-      onPress: () => router.push("/(tabs)/more/habits" as const),
+      onPress: () =>
+        router.push({ pathname: "/(tabs)/more/habits" as const } as any),
     },
     {
       label: "Calendar",
       icon: Calendar,
       color: Colors.pink,
-      onPress: () => router.push("/(tabs)/calendar" as const),
+      onPress: () =>
+        router.push({ pathname: "/(tabs)/calendar" as const } as any),
     },
     {
       label: "More",
       icon: Menu,
       color: Colors.success,
-      onPress: () => router.push("/(tabs)/more" as const),
+      onPress: () => router.push({ pathname: "/(tabs)/more" as const } as any),
     },
   ];
 
@@ -146,7 +148,9 @@ export default function DashboardScreen() {
       <TodayFocusCard
         tasks={focusTasks}
         onToggle={toggleTask}
-        onAddPress={() => router.push("/(tabs)/tasks" as const)}
+        onAddPress={() =>
+          router.push({ pathname: "/(tabs)/tasks" as const } as any)
+        }
       />
 
       {/* Today's Routines */}
@@ -154,7 +158,9 @@ export default function DashboardScreen() {
         habits={todayHabits.slice(0, 4)}
         completedIds={completedHabits.map((h) => h.id)}
         onToggle={toggleHabit}
-        onAddPress={() => router.push("/(tabs)/more/habits" as const)}
+        onAddPress={() =>
+          router.push({ pathname: "/(tabs)/more/habits" as const } as any)
+        }
       />
 
       {/* Quick Actions */}
