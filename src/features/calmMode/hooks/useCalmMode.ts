@@ -8,6 +8,7 @@
 import { useCallback } from 'react';
 import { useCalmModeStore } from '../store/useCalmModeStore';
 import { isFeatureEnabled } from '@/src/config/features/featureFlags';
+import { observability } from '@/src/services/observability';
 
 export function useCalmMode() {
   const calmModeEnabled = isFeatureEnabled('calmModeV2');
@@ -32,12 +33,14 @@ export function useCalmMode() {
   const enableCalmMode = useCallback(() => {
     if (calmModeEnabled) {
       storeEnableCalmMode();
+      observability.analytics.track('calm_mode_enabled');
     }
   }, [calmModeEnabled, storeEnableCalmMode]);
 
   const disableCalmMode = useCallback(() => {
     if (calmModeEnabled) {
       storeDisableCalmMode();
+      observability.analytics.track('calm_mode_disabled');
     }
   }, [calmModeEnabled, storeDisableCalmMode]);
 

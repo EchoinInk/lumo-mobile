@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
+import { observability } from "@/src/services/observability";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -18,6 +19,7 @@ export default function OnboardingCompleteScreen() {
 
   const handleEnterLumo = () => {
     completeOnboarding();
+    observability.analytics.track("onboarding_completed");
     router.replace({ pathname: "/(tabs)" as const } as any);
   };
 

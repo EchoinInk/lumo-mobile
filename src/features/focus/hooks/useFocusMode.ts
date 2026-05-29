@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 import { useFocusModeStore } from '../store/useFocusModeStore';
 import { getCognitiveLoadProfile } from '../services/cognitiveLoadRules';
 import { isFeatureEnabled } from '@/src/config/features/featureFlags';
+import { observability } from '@/src/services/observability';
 
 export function useFocusMode() {
   const focusModeEnabled = isFeatureEnabled('focusMode');
@@ -32,6 +33,9 @@ export function useFocusMode() {
     (taskId?: string) => {
       if (focusModeEnabled) {
         storeEnableFocusMode(taskId);
+        observability.analytics.track('focus_mode_enabled', {
+          hasActiveTask: Boolean(taskId),
+        });
       }
     },
     [focusModeEnabled, storeEnableFocusMode]
@@ -40,6 +44,7 @@ export function useFocusMode() {
   const disableFocusMode = useCallback(() => {
     if (focusModeEnabled) {
       storeDisableFocusMode();
+      observability.analytics.track('focus_mode_disabled');
     }
   }, [focusModeEnabled, storeDisableFocusMode]);
 

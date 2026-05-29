@@ -4,9 +4,28 @@
  */
 
 import { Stack } from "expo-router";
-import React from "react";
+import { useEffect } from "react";
+import { observability } from "@/src/services/observability";
+import { useOnboardingStore } from "@/src/features/onboarding/store/useOnboardingStore";
 
 export default function OnboardingLayout() {
+  useEffect(() => {
+    observability.analytics.track("onboarding_started");
+    const measurementId = observability.performance.startMeasurement(
+      "onboarding.completion_duration",
+    );
+
+    return () => {
+      const { isComplete } = useOnboardingStore.getState();
+      if (isComplete) {
+        observability.performance.endMeasurement(measurementId);
+        return;
+      }
+
+      observability.analytics.track("onboarding_abandoned");
+    };
+  }, []);
+
   return (
     <Stack
       screenOptions={{

@@ -8,7 +8,7 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { View, Text, Button } from "react-native";
+import { observability } from "@/services/observability";
 import { FatalErrorScreen } from "./FatalErrorScreen";
 
 interface Props {
@@ -31,11 +31,12 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error to observability service
-    console.error("[GlobalErrorBoundary] Caught error:", error, errorInfo);
-
-    // Future: send to crash reporting service
-    // crashReporting.logError(error, errorInfo);
+    observability.crashes.captureException(error, {
+      feature: "global_error_boundary",
+      metadata: {
+        componentStack: errorInfo.componentStack,
+      },
+    });
   }
 
   handleReset = (): void => {

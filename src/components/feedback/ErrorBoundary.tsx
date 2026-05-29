@@ -6,6 +6,7 @@
  */
 
 import { useTheme } from "@/hooks/use-theme";
+import { observability } from "@/services/observability";
 import { Colors } from "@/theme/colors";
 import React, { Component, ReactNode } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -41,13 +42,14 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error for debugging (console only - no analytics)
-    console.warn("[ErrorBoundary] Render error:", error, {
-      componentStack: errorInfo.componentStack,
-      errorBoundary: true,
+    observability.crashes.captureException(error, {
+      feature: "error_boundary",
+      metadata: {
+        componentStack: errorInfo.componentStack,
+        errorBoundary: true,
+      },
     });
 
-    // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
   }
 
