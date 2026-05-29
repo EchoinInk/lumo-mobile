@@ -251,10 +251,25 @@ export async function processSyncQueue(): Promise<SyncResult> {
     }
 
     const duration = Date.now() - processingStart;
+    const processingProperties = {
+      processed: result.processed,
+      failed: result.failed,
+      deadLetter: result.deadLetter,
+      skipped: result.skipped,
+    };
+
     if (result.failed > 0 || result.deadLetter > 0) {
-      observability.sync.recordSyncFailure("queue_processing", duration, result);
+      observability.sync.recordSyncFailure(
+        "queue_processing",
+        duration,
+        processingProperties,
+      );
     } else {
-      observability.sync.recordSyncSuccess("queue_processing", duration, result);
+      observability.sync.recordSyncSuccess(
+        "queue_processing",
+        duration,
+        processingProperties,
+      );
     }
   } catch (error) {
     observability.crashes.captureException(error, {
