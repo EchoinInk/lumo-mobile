@@ -21105,3 +21105,9 @@ FILES:
 app/onboarding/planning.tsx
 src/components/app-tabs.web.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 00:00:49
+COMMIT: chore(lumo): update app-tabs.web.tsx
+FILES:
+src/components/app-tabs.web.tsx
+

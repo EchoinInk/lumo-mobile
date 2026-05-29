@@ -107,7 +107,9 @@ export default function DashboardScreen() {
         <TodayFocusCard
           tasks={focusTasks}
           onToggle={toggleTask}
-          onAddPress={() => router.push("/(tabs)/tasks")}
+          onAddPress={() =>
+            router.push({ pathname: "/(tabs)/tasks" as const } as any)
+          }
         />
       </DashboardSection>
 
@@ -118,7 +120,9 @@ export default function DashboardScreen() {
             habits={todayHabits.slice(0, 4)}
             completedIds={completedHabits.map((h) => h.id)}
             onToggle={toggleHabit}
-            onAddPress={() => router.push("/(tabs)/more/habits")}
+            onAddPress={() =>
+              router.push({ pathname: "/(tabs)/more/habits" as const })
+            }
           />
         </DashboardSection>
       )}
