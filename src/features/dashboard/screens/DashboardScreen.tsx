@@ -121,7 +121,7 @@ export default function DashboardScreen() {
             completedIds={completedHabits.map((h) => h.id)}
             onToggle={toggleHabit}
             onAddPress={() =>
-              router.push({ pathname: "/(tabs)/more/habits" as const })
+              router.push({ pathname: "/(tabs)/more/habits" as const } as any)
             }
           />
         </DashboardSection>
