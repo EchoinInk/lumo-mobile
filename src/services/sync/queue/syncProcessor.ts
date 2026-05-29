@@ -22,6 +22,7 @@
  */
 
 import type { SyncQueueItem } from "../../storage/queue.types";
+import { observability } from "../../observability";
 import { getPendingItems, removeItem } from "../../storage/syncQueue";
 import { isSupabaseConfigured } from "../adapters/supabase/supabase.client";
 import { supabaseSyncAdapter } from "../adapters/supabase/sync.adapter";
@@ -91,8 +92,12 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
   // 1. INVARIANT GUARD: reject malformed items
   const invariantCheck = checkInvariants(item);
   if (!invariantCheck.valid) {
-    console.error(
-      `[SyncProcessor] Invariant violations for ${item.id}: ${invariantCheck.violations.join(", ")}`,
+    observability.logger.error(
+      "[SyncProcessor] Invariant violations",
+      {
+        itemId: item.id,
+        violations: invariantCheck.violations.join(", "),
+      },
     );
     archiveDeadLetter(
       item,
@@ -104,17 +109,17 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
 
   // 2. LIFECYCLE GUARD: skip items that cannot be processed
   if (!canProcess(item)) {
-    console.warn(
-      `[SyncProcessor] Cannot process item ${item.id} (status: ${item.status}, retries: ${item.retryCount})`,
-    );
+    observability.logger.warn("[SyncProcessor] Cannot process item", {
+      itemId: item.id,
+      status: item.status,
+      retries: item.retryCount,
+    });
     return false;
   }
 
   // 3. IDEMPOTENCY GUARD: skip if already synced (replay protection)
   if (isEventProcessed(item)) {
-    console.log(
-      `[SyncProcessor] Duplicate replay skipped: ${item.idempotencyKey}`,
-    );
+    observability.sync.recordQueueReplay(1, { skippedDuplicate: true });
     markQueueItemSynced(item.id);
     removeItem(item.id);
     return true;
@@ -123,7 +128,10 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
   // 4. RETRY EXHAUSTION: send straight to dead letter
   if (!canRetryAttempt(attempt)) {
     const reason = "Max retries exceeded";
-    console.error(`[SyncProcessor] Dead letter: ${item.id} — ${reason}`);
+    observability.logger.error("[SyncProcessor] Dead letter", {
+      itemId: item.id,
+      reason,
+    });
     markQueueItemDeadLetter(item.id, reason);
     archiveDeadLetter(item, reason);
     return false;
@@ -140,19 +148,20 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
     markEventProcessed(item);
     markQueueItemSynced(item.id);
     removeItem(item.id);
-    console.log(
-      `[SyncProcessor] Synced: ${item.entity}:${item.operation} (${item.entityId})`,
-    );
+    observability.sync.recordSyncSuccess(`${item.entity}.${item.operation}`);
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
     // NON-RETRYABLE: dead letter immediately
     if (!isRetryableError(error)) {
-      console.error(
-        `[SyncProcessor] Non-retryable error for ${item.id}:`,
+      observability.sync.recordSyncFailure(`${item.entity}.${item.operation}`, 0, {
+        retryable: false,
+      });
+      observability.logger.error("[SyncProcessor] Non-retryable error", {
+        itemId: item.id,
         message,
-      );
+      });
       markQueueItemDeadLetter(item.id, message);
       archiveDeadLetter(item, message);
       return false;
@@ -160,9 +169,13 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
 
     // RETRYABLE: backoff and recurse
     const delay = getRetryDelay(attempt);
-    console.warn(
-      `[SyncProcessor] Retry ${attempt + 1} for ${item.id} in ${delay}ms: ${message}`,
-    );
+    observability.sync.recordQueueFailure(1, { retryable: true });
+    observability.logger.warn("[SyncProcessor] Retry scheduled", {
+      itemId: item.id,
+      attempt: attempt + 1,
+      delay,
+      message,
+    });
     markQueueItemFailed(item.id, message);
     await sleep(delay);
     return processItem(item, attempt + 1);
@@ -190,12 +203,12 @@ export async function processSyncQueue(): Promise<SyncResult> {
   // Acquire processing lock
   const lockId = acquireLock();
   if (!lockId) {
-    console.log("[SyncProcessor] Already processing, skipping");
+    observability.logger.debug("[SyncProcessor] Already processing, skipping");
     return { processed: 0, failed: 0, deadLetter: 0, skipped: 0 };
   }
 
   if (!isSupabaseConfigured()) {
-    console.log("[SyncProcessor] Supabase not configured, skipping sync");
+    observability.logger.info("[SyncProcessor] Supabase not configured");
     releaseLock();
     return { processed: 0, failed: 0, deadLetter: 0, skipped: 0 };
   }
@@ -211,14 +224,13 @@ export async function processSyncQueue(): Promise<SyncResult> {
     const pendingItems = getPendingItems();
 
     if (pendingItems.length === 0) {
-      console.log("[SyncProcessor] No pending items to sync");
+      observability.logger.debug("[SyncProcessor] No pending items to sync");
       releaseLock();
       return result;
     }
 
-    console.log(
-      `[SyncProcessor] Processing ${pendingItems.length} pending items (lock: ${lockId})`,
-    );
+    const processingStart = Date.now();
+    observability.sync.recordQueueReplay(pendingItems.length, { lockId });
 
     for (const item of pendingItems) {
       // Dead letter items (exhausted retries) — counted but not retried
@@ -238,11 +250,16 @@ export async function processSyncQueue(): Promise<SyncResult> {
       }
     }
 
-    console.log(
-      `[SyncProcessor] Completed: ${result.processed} synced, ${result.failed} failed, ${result.deadLetter} dead-letter, ${result.skipped} skipped`,
-    );
+    const duration = Date.now() - processingStart;
+    if (result.failed > 0 || result.deadLetter > 0) {
+      observability.sync.recordSyncFailure("queue_processing", duration, result);
+    } else {
+      observability.sync.recordSyncSuccess("queue_processing", duration, result);
+    }
   } catch (error) {
-    console.error("[SyncProcessor] Unexpected error during processing:", error);
+    observability.crashes.captureException(error, {
+      feature: "sync_queue_processing",
+    });
   } finally {
     releaseLock();
   }
@@ -301,7 +318,7 @@ export function startBackgroundSync(): void {
  */
 export function forceReleaseLock(): void {
   if (isProcessing) {
-    console.warn("[SyncProcessor] Force releasing processing lock");
+    observability.logger.warn("[SyncProcessor] Force releasing processing lock");
     releaseLock();
   }
 }

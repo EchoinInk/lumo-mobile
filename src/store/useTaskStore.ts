@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { observability } from '@/services/observability';
 
 export interface Task {
   id: string;
@@ -66,20 +67,30 @@ export const useTaskStore = create<TaskStore>((set) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
     })),
 
-  toggleTaskCompletion: (id) =>
+  toggleTaskCompletion: (id) => {
+    let completed = false;
+
     set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              completed: !task.completed,
-              updatedAt: new Date().toISOString(),
-              version: (task.version ?? 0) + 1,
-              pendingSync: true,
-            }
-          : task
-      ),
-    })),
+      tasks: state.tasks.map((task) => {
+        if (task.id !== id) {
+          return task;
+        }
+
+        completed = !task.completed;
+        return {
+          ...task,
+          completed,
+          updatedAt: new Date().toISOString(),
+          version: (task.version ?? 0) + 1,
+          pendingSync: true,
+        };
+      }),
+    }));
+
+    if (completed) {
+      observability.analytics.track('task_completed');
+    }
+  },
 
   setTasks: (tasks) => set({ tasks }),
 

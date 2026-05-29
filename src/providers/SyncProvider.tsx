@@ -20,6 +20,7 @@ import {
     logBootstrapTiming,
     logSyncEvent,
 } from "@/services/sync/monitor/syncLogger";
+import { observability } from "@/services/observability";
 import {
     initializeNetworkMonitor,
     isOffline,
@@ -67,6 +68,10 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         initializeNetworkMonitor();
         const networkDuration = Date.now() - networkStart;
         logBootstrapTiming("Network monitoring", networkDuration);
+        observability.performance.recordMetric(
+          "sync.network_monitoring_duration",
+          networkDuration,
+        );
 
         // Step 2: Set initial offline state
         setOffline(isOffline());
@@ -74,6 +79,11 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         // Step 3: Subscribe to network changes to update store
         const unsubscribe = subscribeToNetworkChanges((state) => {
           setOffline(state === "offline");
+          if (state === "online") {
+            observability.sync.recordQueueRecovery(1, {
+              source: "network_state",
+            });
+          }
         });
 
         // Step 4: Bootstrap sync system (recovery + processor)
@@ -81,9 +91,17 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         bootstrapSync();
         const syncDuration = Date.now() - syncStart;
         logBootstrapTiming("Sync bootstrap", syncDuration);
+        observability.performance.recordMetric(
+          "sync.bootstrap_duration",
+          syncDuration,
+        );
 
         const totalDuration = Date.now() - startTime;
         logBootstrapTiming("Total initialization", totalDuration);
+        observability.performance.recordMetric(
+          "sync.total_initialization_duration",
+          totalDuration,
+        );
 
         logSyncEvent(
           "Bootstrap",
@@ -103,7 +121,9 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
           "ERROR",
           "Sync system initialization failed",
         );
-        console.error("[SyncProvider] Initialization failed:", error);
+        observability.crashes.captureException(error, {
+          feature: "sync_bootstrap",
+        });
       }
     };
 
