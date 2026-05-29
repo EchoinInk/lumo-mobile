@@ -21203,3 +21203,9 @@ src/testing/observability/performanceMetrics.test.ts
 src/testing/observability/syncMetrics.test.ts
 src/testing/observability/testUtils.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 10:13:53
+COMMIT: chore(lumo): update syncProcessor.ts
+FILES:
+src/services/sync/queue/syncProcessor.ts
+

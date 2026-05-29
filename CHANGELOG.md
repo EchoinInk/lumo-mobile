@@ -1,5 +1,75 @@
 # Changelog
 
+## Phase 14.3 — Observability Foundation
+
+### Summary
+
+Added a vendor-agnostic observability foundation for system health visibility without adding analytics SDKs, user profiling, or invasive tracking. Application code now has a single facade for logs, feature events, sync health, performance timing, and crash capture:
+
+```ts
+import { observability } from "@/services/observability";
+```
+
+### Files Created
+
+**Observability Layer**
+
+- `src/services/observability/types.ts` — Vendor-neutral event, metric, log, crash context, and transport types
+- `src/services/observability/logger.ts` — Environment-gated centralized logger with future transport support
+- `src/services/observability/analytics.ts` — Local privacy-preserving event buffer with sensitive property redaction
+- `src/services/observability/syncMetrics.ts` — Queue replay, queue failure, recovery, conflict, and sync duration metrics
+- `src/services/observability/performanceMetrics.ts` — Lightweight start/end measurements and direct metric recording
+- `src/services/observability/crashReporting.ts` — Local crash/message capture with Sentry-compatible context shape
+- `src/services/observability/observability.ts` — Single facade for all observability domains
+- `src/services/observability/index.ts` — Barrel exports
+
+**Observability Tests**
+
+- `src/testing/observability/logger.test.ts`
+- `src/testing/observability/analytics.test.ts`
+- `src/testing/observability/syncMetrics.test.ts`
+- `src/testing/observability/performanceMetrics.test.ts`
+- `src/testing/observability/crashReporting.test.ts`
+- `src/testing/observability/facade.test.ts`
+- `src/testing/observability/testUtils.ts`
+- `src/testing/observability/index.ts`
+
+### Files Modified
+
+- `app/_layout.tsx` — Wrapped the app with `GlobalErrorBoundary` and records startup duration
+- `app/onboarding/_layout.tsx` — Tracks onboarding start, completion duration, and abandoned flows
+- `app/onboarding/complete.tsx` — Tracks onboarding completion
+- `src/components/feedback/GlobalErrorBoundary.tsx` — Captures uncaught render errors through crash reporting
+- `src/components/feedback/ErrorBoundary.tsx` — Captures scoped render errors through crash reporting
+- `src/features/focus/hooks/useFocusMode.ts` — Tracks Focus Mode enabled/disabled without task content
+- `src/features/calmMode/hooks/useCalmMode.ts` — Tracks Calm Mode enabled/disabled
+- `src/store/useTaskStore.ts` — Tracks task completion counts only, not task content
+- `src/providers/SyncProvider.tsx` — Records sync bootstrap, network monitor, and recovery metrics
+- `src/services/sync/queue/syncProcessor.ts` — Records queue replay, queue failure, sync success/failure, and crash contexts
+
+### Architecture Notes
+
+- No vendor SDKs were added.
+- No route files were moved, duplicated, or rebuilt.
+- Observability buffers locally and supports future transports for Sentry, PostHog, Supabase logs, Datadog, Firebase Analytics, or custom pipelines.
+- Analytics sanitizes sensitive property keys and avoids task content, email, names, tokens, descriptions, and free-form user content.
+- Sync and performance metrics focus on system health: what failed, what recovered, and what was slow.
+
+### Verification
+
+- `npx tsc --noEmit` passes.
+- No package dependencies were added.
+- Existing Expo Router route tree remains unchanged.
+- Observability facade compiles through feature integrations.
+- Test harness files compile with the TypeScript baseline. A dedicated test runner is still not configured in `package.json`.
+
+### Remaining Roadmap
+
+- Add a real test runner and wire `src/testing/observability` into CI.
+- Add opt-in production transports behind the observability facade.
+- Expand migration safety metrics around guest-to-account migration flows.
+- Add screen render timing helpers once screen-level performance boundaries are standardized.
+
 ## Phase 14.2.1 — Router Type Safety Cleanup
 
 ### Summary
