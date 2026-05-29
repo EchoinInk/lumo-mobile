@@ -21183,3 +21183,10 @@ src/providers/SyncProvider.tsx
 src/services/sync/queue/syncProcessor.ts
 src/store/useTaskStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 10:12:57
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/_layout.tsx
+src/services/sync/queue/syncProcessor.ts
+
