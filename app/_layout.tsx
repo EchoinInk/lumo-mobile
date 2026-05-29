@@ -4,6 +4,8 @@
  * Wrapped with ErrorBoundary for production hardening
  */
 
+import { GlobalErrorBoundary } from "@/src/components/feedback/GlobalErrorBoundary";
+import { observability } from "@/src/services/observability";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 
@@ -11,8 +13,11 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
   useEffect(() => {
-    // Hide splash screen immediately for debugging
+    const startupMeasurementId =
+      observability.performance.startMeasurement("app.startup_duration");
+
     SplashScreen.hideAsync();
+    observability.performance.endMeasurement(startupMeasurementId);
   }, []);
 
   return (
@@ -25,5 +30,9 @@ function RootLayoutContent() {
 }
 
 export default function RootLayout() {
-  return <RootLayoutContent />;
+  return (
+    <GlobalErrorBoundary>
+      <RootLayoutContent />
+    </GlobalErrorBoundary>
+  );
 }

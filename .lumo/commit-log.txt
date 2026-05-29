@@ -21175,3 +21175,11 @@ src/services/observability/performanceMetrics.ts
 src/services/observability/syncMetrics.ts
 src/services/observability/types.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 10:12:44
+COMMIT: chore(lumo): refine system (3 files)
+FILES:
+src/providers/SyncProvider.tsx
+src/services/sync/queue/syncProcessor.ts
+src/store/useTaskStore.ts
+

@@ -308,7 +308,9 @@ export function getDeadLetterCount(): number {
 export function startBackgroundSync(): void {
   // Don't await — run in background
   processSyncQueue().catch((err) => {
-    console.error("[SyncProcessor] Background sync failed:", err);
+    observability.crashes.captureException(err, {
+      feature: "background_sync",
+    });
   });
 }
 
