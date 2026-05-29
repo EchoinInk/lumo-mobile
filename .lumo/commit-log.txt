@@ -21098,3 +21098,10 @@ src/features/focus/hooks/useCognitiveLoad.ts
 src/features/tasks/components/TaskRow.tsx
 src/features/tasks/screens/TasksScreen.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 00:00:36
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/onboarding/planning.tsx
+src/components/app-tabs.web.tsx
+
