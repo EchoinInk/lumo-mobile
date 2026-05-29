@@ -26,7 +26,7 @@ export default function OnboardingStep2Screen() {
   const { preferences, setPlanningStyle } = useOnboarding();
 
   const handleNext = () => {
-    router.push("/onboarding/focus" as const);
+    router.push({ pathname: "/onboarding/focus" as const } as any);
   };
 
   const handleBack = () => {

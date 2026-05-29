@@ -36,7 +36,7 @@ export default function OnboardingStep1Screen() {
   };
 
   const handleNext = () => {
-    router.push("/onboarding/planning" as const);
+    router.push({ pathname: "/onboarding/planning" as const } as any);
   };
 
   return (

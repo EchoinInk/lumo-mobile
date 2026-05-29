@@ -18,7 +18,7 @@ export default function OnboardingCompleteScreen() {
 
   const handleEnterLumo = () => {
     completeOnboarding();
-    router.replace("/(tabs)" as const);
+    router.replace({ pathname: "/(tabs)" as const } as any);
   };
 
   return (

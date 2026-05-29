@@ -36,7 +36,7 @@ export default function OnboardingStep3Screen() {
   };
 
   const handleNext = () => {
-    router.push("/onboarding/complete" as const);
+    router.push({ pathname: "/onboarding/complete" as const } as any);
   };
 
   const handleBack = () => {
