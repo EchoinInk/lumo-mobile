@@ -21069,3 +21069,32 @@ FILES:
 src/features/focus/components/FocusEmptyState.tsx
 src/features/focus/index.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-29 23:37:00
+COMMIT: refactor(lumo): large system evolution (24 files)
+FILES:
+CHANGELOG.md
+app/(tabs)/add.tsx
+app/(tabs)/dashboard.tsx
+app/(tabs)/index.tsx
+app/index.tsx
+app/onboarding/complete.tsx
+app/onboarding/focus.tsx
+app/onboarding/index.tsx
+src/features/calmMode/components/CalmGradientOverlay.tsx
+src/features/calmMode/components/CalmModeBanner.tsx
+src/features/calmMode/components/ReducedMotionWrapper.tsx
+src/features/calmMode/components/SoftenedSurface.tsx
+src/features/calmMode/hooks/useCalmMode.ts
+src/features/calmMode/hooks/useEnvironmentalSoftening.ts
+src/features/calmMode/index.ts
+src/features/calmMode/services/calmModeService.ts
+src/features/calmMode/services/environmentalRules.ts
+src/features/calmMode/store/useCalmModeStore.ts
+src/features/calmMode/types/calmMode.types.ts
+src/features/calmMode/utils/calmSelectors.ts
+src/features/dashboard/screens/DashboardScreen.tsx
+src/features/focus/hooks/useCognitiveLoad.ts
+src/features/tasks/components/TaskRow.tsx
+src/features/tasks/screens/TasksScreen.tsx
+

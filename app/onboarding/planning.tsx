@@ -8,12 +8,11 @@ import { ChoiceChip } from "@/src/features/onboarding/components/ChoiceChip";
 import { OnboardingShell } from "@/src/features/onboarding/components/OnboardingShell";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
 import {
-  PLANNING_STYLE_LABELS,
-  PlanningStyle,
+    PLANNING_STYLE_LABELS,
+    PlanningStyle,
 } from "@/src/features/onboarding/types/onboarding";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
-import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 const PLANNING_OPTIONS: PlanningStyle[] = [
@@ -27,7 +26,7 @@ export default function OnboardingStep2Screen() {
   const { preferences, setPlanningStyle } = useOnboarding();
 
   const handleNext = () => {
-    router.push("/onboarding/focus");
+    router.push("/onboarding/focus" as const);
   };
 
   const handleBack = () => {
