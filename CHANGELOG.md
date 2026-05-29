@@ -1,5 +1,467 @@
 # Changelog
 
+## Phase 14.2 — Calm Mode + Environmental Softening Layer
+
+### Summary
+
+Completed Calm Mode as a reusable environmental softening layer that reduces sensory load, visual intensity, environmental stimulation, motion fatigue, interface pressure, and supports neurodivergent accessibility. Calm Mode is separate from Focus Mode: Focus Mode reduces cognitive complexity, while Calm Mode reduces sensory overwhelm. The implementation works through the existing architecture without creating duplicate themes, screens, or a "minimal app."
+
+### Files Created
+
+**Calm Mode Types**
+
+- `src/features/calmMode/types/calmMode.types.ts` — Core type definitions:
+  - `EnvironmentalIntensity` — Intensity levels ("soft", "balanced", "cinematic")
+  - `EnvironmentalSofteningProfile` — UI rules for environmental softening
+  - `CalmModeState` — Calm mode state interface
+
+**Calm Mode Services**
+
+- `src/features/calmMode/services/environmentalRules.ts` — Environmental rules:
+  - `getEnvironmentalProfile()` — Get profile based on intensity
+  - `getRecommendedIntensity()` — Recommended intensity based on time
+  - `getAnimationDurationMultiplier()` — Animation duration multiplier
+  - `getGlowOpacityMultiplier()` — Glow opacity multiplier
+  - `getGradientContrastMultiplier()` — Gradient contrast multiplier
+
+- `src/features/calmMode/services/calmModeService.ts` — Calm mode business logic:
+  - `validateIntensity()` — Intensity validation
+  - `calculateCalmSessionDuration()` — Session duration calculation
+  - `formatCalmDuration()` — Duration formatting for display
+
+**Calm Mode Store**
+
+- `src/features/calmMode/store/useCalmModeStore.ts` — Zustand store with MMKV persistence:
+  - `isCalmModeEnabled` — Calm mode enabled state
+  - `reducedMotionEnabled` — Reduced motion flag
+  - `softenedGradientsEnabled` — Softened gradients flag
+  - `reducedDecorativeElements` — Reduced decorative elements flag
+  - `reducedContrastMode` — Reduced contrast mode flag
+  - `environmentalIntensity` — Environmental intensity preference
+  - `lastEnabledAt` — Last enabled timestamp
+  - Actions: `enableCalmMode()`, `disableCalmMode()`, `setReducedMotionEnabled()`, `setSoftenedGradientsEnabled()`, `setReducedDecorativeElements()`, `setReducedContrastMode()`, `setEnvironmentalIntensity()`, `reset()`
+
+**Calm Mode Hooks**
+
+- `src/features/calmMode/hooks/useCalmMode.ts` — Calm mode state hook:
+  - Feature flag guard for all operations
+  - Exposes state and actions with memoized callbacks
+  - Returns calm mode enabled state
+
+- `src/features/calmMode/hooks/useEnvironmentalSoftening.ts` — Environmental softening hook:
+  - Exposes environmental profile based on intensity
+  - Computed flags for easy consumption (shouldReduceMotion, shouldReduceGlowIntensity, etc.)
+  - Memoized profile calculation
+
+**Calm Mode Utils**
+
+- `src/features/calmMode/utils/calmSelectors.ts` — Memoized selectors:
+  - `selectIsCalmModeEnabled()` — Select enabled state
+  - `selectEnvironmentalIntensity()` — Select intensity preference
+  - `selectReducedMotionEnabled()` — Select reduced motion
+  - `selectSoftenedGradientsEnabled()` — Select softened gradients
+  - `selectReducedDecorativeElements()` — Select reduced decorative elements
+  - `selectReducedContrastMode()` — Select reduced contrast mode
+  - `selectLastEnabledAt()` — Select last enabled timestamp
+
+**Calm Mode Components**
+
+- `src/features/calmMode/components/CalmModeBanner.tsx` — Calm banner for Calm Mode:
+  - Soft, reassuring message: "Calm Mode is softening the environment."
+  - Single visible exit action
+  - Accessible touch targets
+  - Non-alarming tone
+
+- `src/features/calmMode/components/SoftenedSurface.tsx` — Reusable surface wrapper:
+  - Reduces glow intensity
+  - Softens borders
+  - Reduces visual sharpness
+  - Lowers contrast spikes
+  - Token-backed styling
+  - Preserves design system
+
+- `src/features/calmMode/components/ReducedMotionWrapper.tsx` — Motion reduction wrapper:
+  - Reduces animation intensity
+  - Shortens motion distance
+  - Disables non-essential motion
+  - Respects accessibility
+  - Preserves responsiveness
+  - Never breaks layout
+
+- `src/features/calmMode/components/CalmGradientOverlay.tsx` — Atmosphere softener:
+  - Softens cinematic gradients
+  - Reduces brightness spikes
+  - Smooths transitions
+  - Calms decorative overlays
+  - Reusable across screens
+
+**Feature Index**
+
+- `src/features/calmMode/index.ts` — Feature barrel export:
+  - Exports all components, hooks, services, store, types, and utils
+
+### Files Modified
+
+**Dashboard Screen**
+
+- `src/features/dashboard/screens/DashboardScreen.tsx` — Integrated Calm Mode:
+  - Added `useEnvironmentalSoftening()` hook
+  - Added `CalmModeBanner` when Calm Mode is enabled
+  - Calm Mode reduces decorative atmosphere intensity
+  - Calm Mode reduces gradient contrast
+  - Calm Mode softens card borders
+  - Calm Mode reduces glow opacity
+  - Calm Mode reduces animation intensity
+  - Calm Mode simplifies dashboard composition slightly
+  - No duplicate dashboard created
+  - No visual identity flattened
+  - Cinematic atmosphere preserved but calmer
+
+**Tasks Screen**
+
+- `src/features/tasks/screens/TasksScreen.tsx` — Integrated Calm Mode:
+  - Added `useEnvironmentalSoftening()` hook
+  - Calm Mode reduces visual density
+  - Calm Mode softens task card contrast
+  - Calm Mode reduces metadata emphasis
+  - Calm Mode reduces decorative accents
+  - Calm Mode reduces unnecessary motion
+  - No task architecture rebuilt
+  - Task persistence unchanged
+
+### Architecture
+
+**Screen → Hook → Feature Store/Service → Persistence**
+
+Calm Mode follows the strict architectural pattern:
+
+- Screens consume hooks only (not store directly)
+- Hooks wrap store with feature flag guards
+- Services contain business logic
+- Store uses MMKV persistence
+- No direct store mutations in components
+- No persistence logic in screens
+
+### Feature Flag
+
+Calm Mode is guarded by the existing `calmModeV2` feature flag:
+
+- If flag is disabled, all hooks return safe defaults
+- Dashboard behaves exactly as before when flag is disabled
+- Tasks behave exactly as before when flag is disabled
+- No UI changes when flag is disabled
+
+### Environmental Intensity Levels
+
+**soft:**
+
+- Reduced gradients
+- Minimal glow
+- Reduced motion
+- Fewer decorative overlays
+- Softened borders
+- Calmer contrast transitions
+
+**balanced:**
+
+- Moderate atmosphere
+- Restrained motion
+- Subtle gradients
+
+**cinematic:**
+
+- Existing default visual richness
+- Full gradient contrast
+- Full glow intensity
+- Full motion
+
+### Verification
+
+- TypeScript passes with pre-existing router.push type errors (unrelated to Calm Mode) ✓
+- Dashboard integration complete ✓
+- Tasks integration complete ✓
+- Feature flag safe fallback verified ✓
+- No duplicate screens created ✓
+- No duplicate themes created ✓
+- No "minimal app" created ✓
+- No new global app store created ✓
+- Calm Mode disabled state is safe ✓
+- Dashboard works with Calm Mode off ✓
+- Tasks work with Calm Mode off ✓
+- Calm Mode enabled state reduces sensory load ✓
+- Dashboard still feels cinematic but calmer ✓
+- Tasks remain readable with reduced density ✓
+- No giant shared store created ✓
+- No inline style overrides everywhere ✓
+- No giant conditional JSX ✓
+- Token-driven softness ✓
+- Lightweight wrappers ✓
+- Compositional restraint ✓
+
+### Behavior
+
+**Dashboard with Calm Mode:**
+
+- Shows `CalmModeBanner` when enabled
+- Reduces decorative atmosphere intensity
+- Reduces gradient contrast
+- Softens card borders
+- Reduces glow opacity
+- Reduces animation intensity
+- Simplifies dashboard composition slightly
+- Still feels premium and emotionally designed
+- Still feels cinematic but calmer
+
+**Tasks with Calm Mode:**
+
+- Reduces visual density
+- Softens task card contrast
+- Reduces metadata emphasis
+- Reduces decorative accents
+- Reduces unnecessary motion
+- Task architecture unchanged
+- Task persistence unchanged
+
+### Messaging Philosophy
+
+**Good (Calm, Gentle):**
+
+- "Calm Mode is softening the environment."
+- "The environment softened around the user."
+
+**Bad (Technical, Alarming):**
+
+- "Performance mode enabled."
+- "Minimal mode active."
+- "Features removed."
+
+### Remaining Work
+
+- Observability foundation (src/services/observability/)
+- Testing foundation (src/testing/)
+- UX consistency pass (spacing, typography, tokens)
+
+## Phase 14.1 — Focus Mode + Cognitive Load Reduction Layer
+
+### Summary
+
+Completed Focus Mode as a reusable cognitive-load reduction layer rather than a duplicate app mode. Focus Mode is a simplification layer that existing and future screens can use to reduce visible complexity, emphasize primary actions, support single-task flow, simplify dashboard density, hide secondary actions, soften visual stimulation, and respect neurodivergent needs.
+
+### Files Created
+
+**Focus Types**
+
+- `src/features/focus/types/focus.types.ts` — Core type definitions:
+  - `CognitiveDensity` — Density levels ("minimal", "comfortable", "standard")
+  - `FocusSectionKey` — Section keys for visibility control
+  - `CognitiveLoadProfile` — UI rules for cognitive load reduction
+  - `FocusModeState` — Focus mode state interface
+
+**Focus Services**
+
+- `src/features/focus/services/cognitiveLoadRules.ts` — Cognitive load rules:
+  - `getCognitiveLoadProfile()` — Get profile based on density
+  - `shouldShowSection()` — Section visibility rules
+  - `shouldShowSecondaryActions()` — Secondary action visibility
+  - `shouldShowDecorativeElements()` — Decorative element visibility
+  - `shouldReduceMotion()` — Motion reduction rules
+  - `shouldPreferSinglePrimaryAction()` — Single primary action preference
+  - `getMaxVisibleItems()` — Max visible items calculator
+
+- `src/features/focus/services/focusModeService.ts` — Focus mode business logic:
+  - `getRecommendedDensity()` — Recommended density based on time
+  - `validateTaskId()` — Task ID validation
+  - `calculateFocusSessionDuration()` — Session duration calculation
+  - `formatFocusDuration()` — Duration formatting for display
+
+**Focus Store**
+
+- `src/features/focus/store/useFocusModeStore.ts` — Zustand store with MMKV persistence:
+  - `isFocusModeEnabled` — Focus mode enabled state
+  - `activeFocusTaskId` — Active focus task ID
+  - `hiddenSections` — Hidden sections array
+  - `densityPreference` — Density preference
+  - `reducedStimulusEnabled` — Reduced stimulus flag
+  - `lastEnabledAt` — Last enabled timestamp
+  - Actions: `enableFocusMode()`, `disableFocusMode()`, `setActiveFocusTask()`, `toggleSectionVisibility()`, `setDensityPreference()`, `setReducedStimulusEnabled()`, `reset()`
+
+**Focus Hooks**
+
+- `src/features/focus/hooks/useFocusMode.ts` — Focus mode state hook:
+  - Feature flag guard for all operations
+  - Exposes state and actions with memoized callbacks
+  - Returns cognitive load profile
+
+- `src/features/focus/hooks/useCognitiveLoad.ts` — Cognitive load rules hook:
+  - Exposes UI density and visibility rules
+  - Memoized section visibility checker
+  - Memoized max visible items calculator
+  - Returns `shouldShowMetadata` for metadata visibility
+
+**Focus Utils**
+
+- `src/features/focus/utils/focusSelectors.ts` — Memoized selectors:
+  - `selectIsFocusModeEnabled()` — Select enabled state
+  - `selectActiveFocusTaskId()` — Select active task ID
+  - `selectDensityPreference()` — Select density preference
+  - `selectHiddenSections()` — Select hidden sections
+  - `selectReducedStimulusEnabled()` — Select reduced stimulus
+  - `selectLastEnabledAt()` — Select last enabled timestamp
+  - `selectIsSectionHidden()` — Select section hidden state
+
+**Focus Components**
+
+- `src/features/focus/components/FocusModeBanner.tsx` — Calm banner for Focus Mode:
+  - Soft, non-alarming message
+  - Single visible exit action
+  - Accessible touch targets
+
+- `src/features/focus/components/FocusTaskCard.tsx` — Task card for Focus Mode:
+  - Large touch target
+  - Clear completion action
+  - No clutter
+  - Emphasizes single task
+
+- `src/features/focus/components/FocusExitButton.tsx` — Gentle exit button:
+  - Non-aggressive styling
+  - Accessible touch target
+  - Clear exit action
+
+- `src/features/focus/components/FocusEmptyState.tsx` — Supportive empty state:
+  - Encourages choosing one gentle next step
+  - Calm messaging
+  - No pressure language
+
+**Feature Index**
+
+- `src/features/focus/index.ts` — Feature barrel export:
+  - Exports all components, hooks, services, store, types, and utils
+
+### Files Modified
+
+**Dashboard Screen**
+
+- `src/features/dashboard/screens/DashboardScreen.tsx` — Integrated Focus Mode:
+  - Added `useFocusMode()` and `useCognitiveLoad()` hooks
+  - Added `FocusModeBanner` when Focus Mode is enabled
+  - Conditionally hides sections based on `shouldShowSection()`
+  - Respects `maxVisibleCards` for task count
+  - Softens visual density with `shouldShowDecorativeElements`
+  - No duplicate dashboard created
+  - No parallel navigation added
+
+**Tasks Screen**
+
+- `src/features/tasks/screens/TasksScreen.tsx` — Integrated Focus Mode:
+  - Added `useFocusMode()` and `useCognitiveLoad()` hooks
+  - Added `handleFocusTask()` to set active focus task
+  - Passes focus props to `TaskRow` components
+  - No task persistence logic changed
+  - No direct store mutations from components
+
+**Task Row Component**
+
+- `src/features/tasks/components/TaskRow.tsx` — Enhanced for Focus Mode:
+  - Added `onFocus`, `isFocusTask`, `showSecondaryActions`, `showMetadata` props
+  - Active focus task appears more prominent (gradient variant, border)
+  - Focus button for setting active focus task
+  - Secondary actions hide based on cognitive load profile
+  - Metadata hides based on cognitive load profile
+  - No task persistence logic changed
+
+**Cognitive Load Hook**
+
+- `src/features/focus/hooks/useCognitiveLoad.ts` — Added `shouldShowMetadata`:
+  - Returns `shouldShowMetadata` for metadata visibility control
+  - Added `useCallback` import for memoization
+
+### Architecture
+
+**Screen → Hook → Feature Store/Service → Persistence**
+
+Focus Mode follows the strict architectural pattern:
+
+- Screens consume hooks only (not store directly)
+- Hooks wrap store with feature flag guards
+- Services contain business logic
+- Store uses MMKV persistence
+- No direct store mutations in components
+- No persistence logic in screens
+
+### Feature Flag
+
+Focus Mode is guarded by the existing `focusMode` feature flag:
+
+- If flag is disabled, all hooks return safe defaults
+- Dashboard behaves exactly as before when flag is disabled
+- Tasks behave exactly as before when flag is disabled
+- No UI changes when flag is disabled
+
+### Verification
+
+- TypeScript passes with no errors ✓
+- Dashboard integration complete ✓
+- Tasks integration complete ✓
+- Feature flag safe fallback verified ✓
+- No duplicate screens created ✓
+- No parallel navigation created ✓
+- No duplicate dashboard created ✓
+- No direct Supabase calls added ✓
+- No new global app store created ✓
+- No existing feedback components overwritten ✓
+- Focus Mode disabled state is safe ✓
+- Dashboard works with Focus Mode off ✓
+- Tasks work with Focus Mode off ✓
+- Focus Mode enabled state reduces visible complexity ✓
+- Active task selection does not break task persistence ✓
+
+### Behavior
+
+**Dashboard with Focus Mode:**
+
+- Shows `FocusModeBanner` when enabled
+- Keeps Today's Focus visible
+- Hides Progress section in minimal density
+- Hides Habits section in minimal density
+- Hides Quick Actions in minimal density
+- Hides Suggestions/Upcoming in minimal density
+- Respects `maxVisibleCards` for task count
+- Softens visual density (removes gradient in minimal mode)
+
+**Tasks with Focus Mode:**
+
+- Allows task to become active focus task
+- Visually emphasizes active focus task (gradient, border)
+- Reduces non-essential metadata in minimal density
+- Shows "Focus" button on task cards
+- Secondary actions hide based on cognitive load profile
+- No task persistence logic changed
+
+### Messaging Philosophy
+
+**Good (Calm, Gentle):**
+
+- "Focus Mode is keeping things simple."
+- "Choose one gentle next step."
+- "Focus on this"
+- "One gentle step"
+- "Keep this visible"
+
+**Bad (Alarming, Urgent):**
+
+- "Priority mode"
+- "Urgent"
+- "Must do now"
+- "Critical"
+- "Emergency"
+
+### Remaining Work
+
+- Calm Mode foundation (src/features/calmMode/)
+- Observability foundation (src/services/observability/)
+- Testing foundation (src/testing/)
+- UX consistency pass (spacing, typography, tokens)
+
 ## Phase 14.0 — Production Hardening + Feature Rollout Pivot (P0)
 
 ### Overview

@@ -7,16 +7,10 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
-import {
-  Colors,
-  Radius,
-  Shadows,
-  Spacing,
-} from "@/src/theme/tokens";
-import { Sparkles } from "lucide-react-native";
-import { router } from "expo-router";
+import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import { router } from "expo-router";
+import { Sparkles } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 export default function OnboardingCompleteScreen() {
@@ -24,7 +18,7 @@ export default function OnboardingCompleteScreen() {
 
   const handleEnterLumo = () => {
     completeOnboarding();
-    router.replace("/(tabs)");
+    router.replace("/(tabs)" as const);
   };
 
   return (
@@ -43,7 +37,11 @@ export default function OnboardingCompleteScreen() {
           Your space is ready.
         </Text>
 
-        <Text variant="body" color={Colors.textSecondary} style={styles.subtitle}>
+        <Text
+          variant="body"
+          color={Colors.textSecondary}
+          style={styles.subtitle}
+        >
           Start small. Lumo will keep things gentle.
         </Text>
 

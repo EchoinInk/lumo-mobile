@@ -5,27 +5,32 @@
  * Screens should consume this hook to get UI density and visibility rules.
  */
 
-import { useMemo } from 'react';
-import { useFocusMode } from './useFocusMode';
+import { useCallback } from "react";
 import {
-  shouldShowSection,
-  shouldShowSecondaryActions,
-  shouldShowDecorativeElements,
-  shouldReduceMotion,
-  shouldPreferSinglePrimaryAction,
-  getMaxVisibleItems,
-} from '../services/cognitiveLoadRules';
-import type { FocusSectionKey } from '../types/focus.types';
+    getMaxVisibleItems,
+    shouldPreferSinglePrimaryAction,
+    shouldReduceMotion,
+    shouldShowDecorativeElements,
+    shouldShowSecondaryActions,
+    shouldShowSection,
+} from "../services/cognitiveLoadRules";
+import type { FocusSectionKey } from "../types/focus.types";
+import { useFocusMode } from "./useFocusMode";
 
 export function useCognitiveLoad() {
-  const { isFocusModeEnabled, densityPreference, hiddenSections, cognitiveLoadProfile } = useFocusMode();
+  const {
+    isFocusModeEnabled,
+    densityPreference,
+    hiddenSections,
+    cognitiveLoadProfile,
+  } = useFocusMode();
 
   // Memoized section visibility checker
   const checkSectionVisibility = useCallback(
     (sectionKey: FocusSectionKey): boolean => {
       return shouldShowSection(sectionKey, densityPreference, hiddenSections);
     },
-    [densityPreference, hiddenSections]
+    [densityPreference, hiddenSections],
   );
 
   // Memoized max visible items calculator
@@ -33,7 +38,7 @@ export function useCognitiveLoad() {
     (defaultMax: number): number => {
       return getMaxVisibleItems(densityPreference, defaultMax);
     },
-    [densityPreference]
+    [densityPreference],
   );
 
   return {
@@ -46,9 +51,12 @@ export function useCognitiveLoad() {
     // Helper functions
     shouldShowSection: checkSectionVisibility,
     shouldShowSecondaryActions: shouldShowSecondaryActions(densityPreference),
-    shouldShowDecorativeElements: shouldShowDecorativeElements(densityPreference),
+    shouldShowDecorativeElements:
+      shouldShowDecorativeElements(densityPreference),
+    shouldShowMetadata: shouldShowDecorativeElements(densityPreference),
     shouldReduceMotion: shouldReduceMotion(densityPreference),
-    shouldPreferSinglePrimaryAction: shouldPreferSinglePrimaryAction(densityPreference),
+    shouldPreferSinglePrimaryAction:
+      shouldPreferSinglePrimaryAction(densityPreference),
     maxVisibleCards: cognitiveLoadProfile.maxVisibleCards,
     getMaxVisibleItems: calculateMaxVisibleItems,
 

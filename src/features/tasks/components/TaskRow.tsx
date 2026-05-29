@@ -10,6 +10,10 @@ interface TaskRowProps {
   onToggle?: (id: string) => void;
   onDelete?: (id: string) => void;
   onPress?: (task: Task) => void;
+  onFocus?: (id: string) => void;
+  isFocusTask?: boolean;
+  showSecondaryActions?: boolean;
+  showMetadata?: boolean;
 }
 
 const priorityColors: Record<TaskPriority, string> = {
@@ -25,7 +29,16 @@ const priorityTextColors: Record<TaskPriority, string> = {
 };
 
 export const TaskRow = React.memo<TaskRowProps>(
-  ({ task, onToggle, onDelete, onPress }) => {
+  ({
+    task,
+    onToggle,
+    onDelete,
+    onPress,
+    onFocus,
+    isFocusTask,
+    showSecondaryActions = true,
+    showMetadata = true,
+  }) => {
     const handlePress = React.useCallback(() => {
       onPress?.(task);
     }, [onPress, task]);
@@ -38,8 +51,16 @@ export const TaskRow = React.memo<TaskRowProps>(
       onDelete?.(task.id);
     }, [onDelete, task.id]);
 
+    const handleFocus = React.useCallback(() => {
+      onFocus?.(task.id);
+    }, [onFocus, task.id]);
+
     return (
-      <Card variant="elevated" padding="lg">
+      <Card
+        variant={isFocusTask ? "gradient" : "elevated"}
+        padding="lg"
+        style={isFocusTask ? styles.focusTask : undefined}
+      >
         <View style={styles.header}>
           <View style={styles.leftContent}>
             <TouchableOpacity
@@ -62,11 +83,15 @@ export const TaskRow = React.memo<TaskRowProps>(
             <View style={styles.textContainer}>
               <Text
                 variant="body"
-                style={[styles.title, task.completed && styles.completedTitle]}
+                style={[
+                  styles.title,
+                  task.completed && styles.completedTitle,
+                  isFocusTask && styles.focusTitle,
+                ]}
               >
                 {task.title}
               </Text>
-              {task.description && (
+              {showMetadata && task.description && (
                 <Text
                   variant="caption"
                   color={Colors.textSecondary}
@@ -79,23 +104,37 @@ export const TaskRow = React.memo<TaskRowProps>(
             </View>
           </View>
           <View style={styles.rightContent}>
-            <View
-              style={[
-                styles.priorityBadge,
-                { backgroundColor: priorityColors[task.priority] },
-              ]}
-            >
-              <Text
-                variant="small"
+            {showMetadata && (
+              <View
                 style={[
-                  styles.priorityText,
-                  { color: priorityTextColors[task.priority] },
+                  styles.priorityBadge,
+                  { backgroundColor: priorityColors[task.priority] },
                 ]}
               >
-                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-              </Text>
-            </View>
-            {onDelete && (
+                <Text
+                  variant="small"
+                  style={[
+                    styles.priorityText,
+                    { color: priorityTextColors[task.priority] },
+                  ]}
+                >
+                  {task.priority.charAt(0).toUpperCase() +
+                    task.priority.slice(1)}
+                </Text>
+              </View>
+            )}
+            {showSecondaryActions && onFocus && !isFocusTask && (
+              <TouchableOpacity
+                onPress={handleFocus}
+                style={styles.focusButton}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Focus on ${task.title}`}
+              >
+                <Text style={styles.focusText}>Focus</Text>
+              </TouchableOpacity>
+            )}
+            {showSecondaryActions && onDelete && (
               <TouchableOpacity
                 onPress={handleDelete}
                 style={styles.deleteButton}
@@ -108,7 +147,7 @@ export const TaskRow = React.memo<TaskRowProps>(
             )}
           </View>
         </View>
-        {task.dueDate && (
+        {showMetadata && task.dueDate && (
           <Text
             variant="caption"
             color={Colors.textTertiary}
@@ -127,7 +166,10 @@ export const TaskRow = React.memo<TaskRowProps>(
       prevProps.task.description === nextProps.task.description &&
       prevProps.task.completed === nextProps.task.completed &&
       prevProps.task.priority === nextProps.task.priority &&
-      prevProps.task.dueDate === nextProps.task.dueDate
+      prevProps.task.dueDate === nextProps.task.dueDate &&
+      prevProps.isFocusTask === nextProps.isFocusTask &&
+      prevProps.showSecondaryActions === nextProps.showSecondaryActions &&
+      prevProps.showMetadata === nextProps.showMetadata
     );
   },
 );
@@ -181,6 +223,9 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     color: Colors.textTertiary,
   },
+  focusTitle: {
+    fontWeight: "600",
+  },
   description: {
     marginTop: Spacing.xs,
   },
@@ -190,6 +235,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   priorityText: {
+    fontWeight: "600",
+  },
+  focusButton: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 8,
+    backgroundColor: Colors.lavender,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  focusText: {
+    color: Colors.primary,
+    fontSize: 12,
     fontWeight: "600",
   },
   deleteButton: {
@@ -208,5 +266,9 @@ const styles = StyleSheet.create({
   dueDate: {
     marginTop: Spacing.sm,
     marginLeft: 36,
+  },
+  focusTask: {
+    borderWidth: 2,
+    borderColor: Colors.primary,
   },
 });

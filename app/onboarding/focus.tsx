@@ -8,12 +8,11 @@ import { ChoiceChip } from "@/src/features/onboarding/components/ChoiceChip";
 import { OnboardingShell } from "@/src/features/onboarding/components/OnboardingShell";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
 import {
-  FOCUS_AREA_LABELS,
-  FocusArea,
+    FOCUS_AREA_LABELS,
+    FocusArea,
 } from "@/src/features/onboarding/types/onboarding";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
-import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 const FOCUS_OPTIONS: FocusArea[] = [
@@ -37,7 +36,7 @@ export default function OnboardingStep3Screen() {
   };
 
   const handleNext = () => {
-    router.push("/onboarding/complete");
+    router.push("/onboarding/complete" as const);
   };
 
   const handleBack = () => {

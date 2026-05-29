@@ -1,5 +1,10 @@
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Screen } from "@/src/components/ui/Screen";
+import { CalmModeBanner } from "@/src/features/calmMode/components/CalmModeBanner";
+import { useEnvironmentalSoftening } from "@/src/features/calmMode/hooks/useEnvironmentalSoftening";
+import { FocusModeBanner } from "@/src/features/focus/components/FocusModeBanner";
+import { useCognitiveLoad } from "@/src/features/focus/hooks/useCognitiveLoad";
+import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { useHabits } from "@/src/features/habits";
 import { useTasks } from "@/src/features/tasks";
 import { router } from "expo-router";
@@ -12,6 +17,14 @@ import { TodaysRoutinesCard } from "../components/TodaysRoutinesCard";
 import { calculateDailyProgress } from "../utils/dashboardProgress";
 
 export default function DashboardScreen() {
+  // Focus Mode hooks
+  const { isFocusModeEnabled, disableFocusMode } = useFocusMode();
+  const { shouldShowSection, maxVisibleCards, shouldShowDecorativeElements } =
+    useCognitiveLoad();
+
+  // Calm Mode hooks
+  const { isCalmModeEnabled } = useEnvironmentalSoftening();
+
   // Get real data from Tasks and Habits
   const {
     tasks,
@@ -62,24 +75,34 @@ export default function DashboardScreen() {
       ? [...tasks].sort((a, b) => getPriorityScore(b) - getPriorityScore(a))
       : [];
 
-  const focusTasks = sortedTasks.slice(0, 4);
+  // Respect maxVisibleCards from cognitive load profile
+  const maxTasksToShow = maxVisibleCards;
+  const focusTasks = sortedTasks.slice(0, maxTasksToShow);
 
   return (
     <Screen scrollable padded>
+      {/* Focus Mode Banner */}
+      {isFocusModeEnabled && <FocusModeBanner onExit={disableFocusMode} />}
+
+      {/* Calm Mode Banner */}
+      {isCalmModeEnabled && <CalmModeBanner />}
+
       {/* Header Section */}
       <DashboardHeader />
 
-      {/* Daily Progress */}
-      <DailyProgressCard
-        title="Today's Progress"
-        progress={completionRate}
-        subtitle={supportiveLabel}
-        completedCount={completedTodayItems}
-        totalCount={totalTodayItems}
-        variant="gradient"
-      />
+      {/* Daily Progress - hide in minimal mode */}
+      {shouldShowSection("progress") && (
+        <DailyProgressCard
+          title="Today's Progress"
+          progress={completionRate}
+          subtitle={supportiveLabel}
+          completedCount={completedTodayItems}
+          totalCount={totalTodayItems}
+          variant={shouldShowDecorativeElements ? "gradient" : "default"}
+        />
+      )}
 
-      {/* Today's Focus */}
+      {/* Today's Focus - always visible */}
       <DashboardSection title="Today's Focus" actionLabel="View All">
         <TodayFocusCard
           tasks={focusTasks}
@@ -88,28 +111,34 @@ export default function DashboardScreen() {
         />
       </DashboardSection>
 
-      {/* Today's Routines */}
-      <DashboardSection title="Today's Routines">
-        <TodaysRoutinesCard
-          habits={todayHabits.slice(0, 4)}
-          completedIds={completedHabits.map((h) => h.id)}
-          onToggle={toggleHabit}
-          onAddPress={() => router.push("/(tabs)/more/habits")}
-        />
-      </DashboardSection>
+      {/* Today's Routines - hide in minimal mode */}
+      {shouldShowSection("habits") && (
+        <DashboardSection title="Today's Routines">
+          <TodaysRoutinesCard
+            habits={todayHabits.slice(0, 4)}
+            completedIds={completedHabits.map((h) => h.id)}
+            onToggle={toggleHabit}
+            onAddPress={() => router.push("/(tabs)/more/habits")}
+          />
+        </DashboardSection>
+      )}
 
-      {/* Quick Actions */}
-      <DashboardSection title="Quick Actions">
-        <QuickActions />
-      </DashboardSection>
+      {/* Quick Actions - hide in minimal mode */}
+      {shouldShowSection("quickActions") && (
+        <DashboardSection title="Quick Actions">
+          <QuickActions />
+        </DashboardSection>
+      )}
 
-      {/* Empty State Demo */}
-      <DashboardSection title="Upcoming">
-        <EmptyState
-          title="No upcoming events"
-          description="You're all caught up for today"
-        />
-      </DashboardSection>
+      {/* Empty State Demo - hide in minimal mode */}
+      {shouldShowSection("suggestions") && (
+        <DashboardSection title="Upcoming">
+          <EmptyState
+            title="No upcoming events"
+            description="You're all caught up for today"
+          />
+        </DashboardSection>
+      )}
     </Screen>
   );
 }

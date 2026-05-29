@@ -1,6 +1,9 @@
 import { Button } from "@/src/components/ui/Button";
 import { Input } from "@/src/components/ui/Input";
 import { Screen } from "@/src/components/ui/Screen";
+import { useEnvironmentalSoftening } from "@/src/features/calmMode/hooks/useEnvironmentalSoftening";
+import { useCognitiveLoad } from "@/src/features/focus/hooks/useCognitiveLoad";
+import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { Spacing } from "@/src/theme/tokens";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -22,6 +25,15 @@ export default function TasksScreen() {
   const [filter, setFilter] = useState<TaskFilter>("all");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+
+  // Focus Mode hooks
+  const { activeFocusTaskId, enableFocusMode, setActiveFocusTask } =
+    useFocusMode();
+  const { shouldShowSecondaryActions, shouldShowMetadata } = useCognitiveLoad();
+
+  // Calm Mode hooks
+  const { shouldReduceDecorativeElements, shouldLowerVisualNoise } =
+    useEnvironmentalSoftening();
 
   const {
     tasks,
@@ -51,6 +63,11 @@ export default function TasksScreen() {
 
   const handleDeleteTask = async (id: string) => {
     await deleteTask(id);
+  };
+
+  const handleFocusTask = (taskId: string) => {
+    setActiveFocusTask(taskId);
+    enableFocusMode(taskId);
   };
 
   return (
@@ -121,6 +138,12 @@ export default function TasksScreen() {
                 task={task}
                 onToggle={handleToggleTask}
                 onDelete={handleDeleteTask}
+                onFocus={handleFocusTask}
+                isFocusTask={task.id === activeFocusTaskId}
+                showSecondaryActions={
+                  shouldShowSecondaryActions && !shouldReduceDecorativeElements
+                }
+                showMetadata={shouldShowMetadata && !shouldLowerVisualNoise}
               />
             ))}
           </View>
