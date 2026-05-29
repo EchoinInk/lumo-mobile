@@ -21138,3 +21138,9 @@ app/onboarding/focus.tsx
 app/onboarding/index.tsx
 app/onboarding/planning.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 09:33:51
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+
