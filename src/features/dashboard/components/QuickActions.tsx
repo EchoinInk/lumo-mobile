@@ -34,7 +34,7 @@ const defaultActions: QuickAction[] = [
   { 
     title: 'Brain Dump', 
     icon: <Cloud size={24} color={Colors.textPrimary} />,
-    onPress: () => router.push({ pathname: '/(tabs)/more/brain-dump' as const } as any),
+    onPress: () => router.push({ pathname: '/brain-dump' as const } as any),
   },
 ];
 
