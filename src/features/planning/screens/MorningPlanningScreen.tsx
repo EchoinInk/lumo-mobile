@@ -1,0 +1,107 @@
+import { Screen } from "@/src/components/ui/Screen";
+import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import type {
+  BrainDumpConversionTarget,
+  BrainDumpEntry,
+} from "@/src/features/brain-dump";
+import { useBrainDump } from "@/src/features/brain-dump";
+import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
+import { MorningPlanningCard } from "@/src/features/planning/components/MorningPlanningCard";
+import { useDailyPlanningFlow } from "@/src/features/planning/hooks/useDailyPlanningFlow";
+import type { PlanningNextStep } from "@/src/features/planning/types/planning";
+import { useReminders } from "@/src/features/reminders";
+import { useTasks } from "@/src/features/tasks";
+import { router } from "expo-router";
+import { useCallback } from "react";
+
+export function MorningPlanningScreen() {
+  const flow = useDailyPlanningFlow("morning");
+  const { createTask } = useTasks();
+  const { convertEntry, openEntries } = useBrainDump();
+  const reminders = useReminders();
+  const { enableFocusMode, setActiveFocusTask } = useFocusMode();
+
+  const handleConvert = useCallback(
+    (entry: BrainDumpEntry, target: BrainDumpConversionTarget) => {
+      if (target === "task") {
+        const task = createTask({ title: entry.text, priority: "medium" });
+        convertEntry(entry.id, target, task?.id);
+        return;
+      }
+      if (target === "reminder") {
+        const reminder = reminders.addReminder({ title: entry.text });
+        convertEntry(entry.id, target, reminder?.id);
+        return;
+      }
+      convertEntry(entry.id, target);
+    },
+    [createTask, convertEntry, reminders],
+  );
+
+  const handleStart = useCallback(
+    (step: PlanningNextStep) => {
+      flow.chooseNextStep(step.id);
+      if (step.sourceType === "task") {
+        setActiveFocusTask(step.sourceId);
+        enableFocusMode(step.sourceId);
+      }
+    },
+    [flow, setActiveFocusTask, enableFocusMode],
+  );
+
+  const handlePickAnother = useCallback(() => {
+    const currentIndex = flow.nextStepOptions.findIndex(
+      (step) => step.id === flow.selectedNextStep?.id,
+    );
+    const next =
+      flow.nextStepOptions[(currentIndex + 1) % flow.nextStepOptions.length];
+    if (next) {
+      flow.chooseNextStep(next.id);
+    }
+  }, [flow]);
+
+  const handleChooseLowEnergy = useCallback(
+    (optionId: string) => {
+      flow.chooseNextStep(optionId);
+    },
+    [flow],
+  );
+
+  const handleComplete = useCallback(() => {
+    flow.completeMorningPlan();
+    router.back();
+  }, [flow]);
+
+  return (
+    <Screen scrollable padded>
+      <SectionHeader
+        title="Morning planning"
+        subtitle="One small step is enough"
+      />
+      <MorningPlanningCard
+        morningComplete={flow.morningComplete}
+        energyLevel={flow.energyLevel}
+        carryOverItems={flow.carryOverItems}
+        brainDumpQueue={flow.brainDumpQueue}
+        brainDumpEntries={openEntries}
+        nextStepOptions={flow.nextStepOptions}
+        lowEnergyOptions={flow.lowEnergyOptions}
+        selectedNextStep={flow.selectedNextStep}
+        onChooseEnergy={flow.chooseEnergyLevel}
+        onCarryOver={flow.carryOverItem}
+        onPark={flow.parkItem}
+        onConvertBrainDump={handleConvert}
+        onSkipBrainDump={(id) => flow.parkItem(id, "brainDump")}
+        onSelectNextStep={flow.chooseNextStep}
+        onStartNextStep={handleStart}
+        onPickAnotherNextStep={handlePickAnother}
+        onChooseLowEnergy={handleChooseLowEnergy}
+        onParkLowEnergy={flow.parkItem}
+        onComplete={handleComplete}
+        onReviewBrainDump={() =>
+          router.push({ pathname: "/brain-dump" as const } as any)
+        }
+      />
+    </Screen>
+  );
+}

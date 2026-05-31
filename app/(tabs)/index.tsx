@@ -8,6 +8,11 @@ import { calculateDailyProgress } from "@/src/features/dashboard/utils/dashboard
 import { getFocusSuggestions } from "@/src/features/dashboard/utils/focusSuggestions";
 import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { useHabits } from "@/src/features/habits";
+import {
+  CalmDailySummary,
+  MorningPlanningCard,
+  useDailyPlanningFlow,
+} from "@/src/features/planning";
 import { useTasks } from "@/src/features/tasks";
 import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -96,6 +101,7 @@ function QuickActions({ onQuickCapture }: { onQuickCapture: () => void }) {
 export default function DashboardScreen() {
   const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
   const { enableFocusMode, setActiveFocusTask } = useFocusMode();
+  const planning = useDailyPlanningFlow("morning");
 
   // Get real data from Tasks and Habits
   const {
@@ -109,7 +115,6 @@ export default function DashboardScreen() {
     todayHabits,
     completedToday: completedHabits,
     toggleHabit,
-    isHydrated: habitsHydrated,
   } = useHabits();
 
   // Calculate daily progress combining tasks and habits
@@ -131,7 +136,6 @@ export default function DashboardScreen() {
   );
 
   const focusSuggestions = tasksHydrated ? getFocusSuggestions(tasks, 3) : [];
-  const allHydrated = tasksHydrated && habitsHydrated;
 
   const shiftTaskDate = (taskId: string, days: number) => {
     const target = new Date(Date.now() + days * 86400000)
@@ -160,6 +164,21 @@ export default function DashboardScreen() {
         variant="gradient"
       />
 
+      <CalmDailySummary
+        nextStep={planning.selectedNextStep}
+        carryOverCount={planning.summary.carryOverIds.length}
+        brainDumpCount={planning.brainDumpQueue.length}
+        morningComplete={planning.morningComplete}
+        eveningCompleted={planning.summary.eveningCompleted}
+        showEveningReset={planning.showEveningReset}
+        onOpenPlanning={() =>
+          router.push({ pathname: "/planning/morning" as const } as any)
+        }
+        onEveningReset={() =>
+          router.push({ pathname: "/planning/evening" as const } as any)
+        }
+      />
+
       <SectionHeader
         title="Today's Focus"
         subtitle="One manageable next step is enough"
@@ -170,6 +189,14 @@ export default function DashboardScreen() {
         onDone={toggleTask}
         onSnooze={(taskId) => shiftTaskDate(taskId, 2)}
         onLater={(taskId) => shiftTaskDate(taskId, 1)}
+      />
+
+      <MorningPlanningCard
+        compact
+        morningComplete={planning.morningComplete}
+        onOpenPlanning={() =>
+          router.push({ pathname: "/planning/morning" as const } as any)
+        }
       />
 
       {/* Today's Routines */}

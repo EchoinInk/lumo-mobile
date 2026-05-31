@@ -1,0 +1,296 @@
+import { Button } from "@/src/components/ui/Button";
+import { Card } from "@/src/components/ui/Card";
+import { Text } from "@/src/components/ui/Text";
+import { ReducedMotionWrapper } from "@/src/features/calmMode/components/ReducedMotionWrapper";
+import type {
+  BrainDumpConversionTarget,
+  BrainDumpEntry,
+} from "@/src/features/brain-dump";
+import { CarryOverReviewCard } from "@/src/features/planning/components/CarryOverReviewCard";
+import { LowEnergyPlanCard } from "@/src/features/planning/components/LowEnergyPlanCard";
+import { NextStepChooser } from "@/src/features/planning/components/NextStepChooser";
+import type {
+  CarryOverItem,
+  LowEnergyOption,
+  PlanningEnergyLevel,
+  PlanningNextStep,
+} from "@/src/features/planning/types/planning";
+import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { BrainDumpReviewQueue } from "./BrainDumpReviewQueue";
+
+interface MorningPlanningCardProps {
+  compact?: boolean;
+  morningComplete?: boolean;
+  energyLevel?: PlanningEnergyLevel;
+  carryOverItems?: CarryOverItem[];
+  brainDumpQueue?: import("@/src/features/planning/types/planning").BrainDumpQueueItem[];
+  brainDumpEntries?: BrainDumpEntry[];
+  nextStepOptions?: PlanningNextStep[];
+  lowEnergyOptions?: LowEnergyOption[];
+  selectedNextStep?: PlanningNextStep;
+  onChooseEnergy?: (level: PlanningEnergyLevel) => void;
+  onCarryOver?: (sourceId: string) => void;
+  onPark?: (sourceId: string) => void;
+  onConvertBrainDump?: (
+    entry: BrainDumpEntry,
+    target: BrainDumpConversionTarget,
+  ) => void;
+  onSkipBrainDump?: (entryId: string) => void;
+  onSelectNextStep?: (stepId: string) => void;
+  onStartNextStep?: (step: PlanningNextStep) => void;
+  onPickAnotherNextStep?: () => void;
+  onChooseLowEnergy?: (optionId: string) => void;
+  onParkLowEnergy?: (
+    sourceId: string,
+    sourceType: LowEnergyOption["sourceType"],
+  ) => void;
+  onComplete?: () => void;
+  onOpenPlanning?: () => void;
+  onReviewBrainDump?: () => void;
+}
+
+const energyOptions: Array<{
+  value: PlanningEnergyLevel;
+  label: string;
+  hint: string;
+}> = [
+  { value: "low", label: "Low", hint: "Tiny or quiet — a lighter plan is still a plan" },
+  { value: "medium", label: "Medium", hint: "Some effort — choose one small step" },
+  { value: "steady", label: "Steady", hint: "Ready to focus gently" },
+];
+
+function PlanningEnergyPicker({
+  value,
+  onChange,
+}: {
+  value?: PlanningEnergyLevel;
+  onChange: (level: PlanningEnergyLevel) => void;
+}) {
+  return (
+    <View style={styles.energySection}>
+      <Text variant="label" color={Colors.textSecondary}>
+        How is your energy today?
+      </Text>
+      <View style={styles.energyOptions}>
+        {energyOptions.map((option) => {
+          const isSelected = value === option.value;
+          return (
+            <TouchableOpacity
+              key={option.value}
+              style={[styles.energyOption, isSelected && styles.energySelected]}
+              onPress={() => onChange(option.value)}
+              accessibilityRole="button"
+              accessibilityLabel={`${option.label} energy`}
+              accessibilityHint={option.hint}
+              accessibilityState={{ selected: isSelected }}
+            >
+              <Text
+                variant="caption"
+                color={isSelected ? Colors.textInverse : Colors.textSecondary}
+              >
+                {option.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+export function MorningPlanningCard({
+  compact = false,
+  morningComplete = false,
+  energyLevel,
+  carryOverItems = [],
+  brainDumpQueue = [],
+  brainDumpEntries = [],
+  nextStepOptions = [],
+  lowEnergyOptions = [],
+  selectedNextStep,
+  onChooseEnergy = () => {},
+  onCarryOver = () => {},
+  onPark = () => {},
+  onConvertBrainDump = () => {},
+  onSkipBrainDump = () => {},
+  onSelectNextStep = () => {},
+  onStartNextStep = () => {},
+  onPickAnotherNextStep = () => {},
+  onChooseLowEnergy = () => {},
+  onParkLowEnergy = () => {},
+  onComplete,
+  onOpenPlanning,
+  onReviewBrainDump,
+}: MorningPlanningCardProps) {
+  if (compact) {
+    if (morningComplete) {
+      return null;
+    }
+
+    return (
+      <ReducedMotionWrapper>
+        <Card variant="outlined" style={styles.compactCard}>
+          <Text variant="body" color={Colors.textSecondary}>
+            Shape your day with one gentle next step.
+          </Text>
+          <Button
+            size="sm"
+            variant="secondary"
+            onPress={onOpenPlanning}
+            accessibilityRole="button"
+            accessibilityLabel="Open morning planning"
+            accessibilityHint="Opens the full morning planning flow"
+          >
+            Open planning
+          </Button>
+        </Card>
+      </ReducedMotionWrapper>
+    );
+  }
+
+  if (morningComplete) {
+    return (
+      <ReducedMotionWrapper>
+        <Card variant="gradient" style={styles.card}>
+          <Text variant="subheading" style={styles.title}>
+            Morning plan set
+          </Text>
+          <Text variant="body" color={Colors.textSecondary}>
+            Today already has a gentle shape.
+            {selectedNextStep ? ` Start with ${selectedNextStep.label}.` : ""}
+          </Text>
+        </Card>
+      </ReducedMotionWrapper>
+    );
+  }
+
+  return (
+    <ReducedMotionWrapper>
+      <Card variant="gradient" style={styles.card}>
+        <Text variant="subheading" style={styles.title}>
+          Morning planning
+        </Text>
+        <Text variant="body" color={Colors.textSecondary}>
+          {energyLevel === "low"
+            ? "Let's keep today light."
+            : energyLevel === "steady"
+              ? "Choose one step that feels steady today."
+              : "Gently shape what today needs."}
+        </Text>
+
+        <PlanningEnergyPicker value={energyLevel} onChange={onChooseEnergy} />
+
+        {!energyLevel ? null : energyLevel === "low" ? (
+          <>
+            <LowEnergyPlanCard
+              embedded
+              options={lowEnergyOptions}
+              onChoose={onChooseLowEnergy}
+              onPark={onParkLowEnergy}
+            />
+            {selectedNextStep && (
+              <Button
+                onPress={onComplete}
+                accessibilityRole="button"
+                accessibilityLabel="Start here"
+                accessibilityHint="Confirms your morning plan and starts your chosen step"
+              >
+                Start here
+              </Button>
+            )}
+          </>
+        ) : (
+          <>
+            <Text variant="label" color={Colors.textSecondary}>
+              Gentle carry-over
+            </Text>
+            <CarryOverReviewCard
+              items={carryOverItems}
+              onCarryOver={onCarryOver}
+              onPark={onPark}
+            />
+
+            {brainDumpQueue.length > 0 && (
+              <>
+                <Text variant="label" color={Colors.textSecondary}>
+                  Brain Dump review
+                </Text>
+                <BrainDumpReviewQueue
+                  items={brainDumpQueue}
+                  entries={brainDumpEntries}
+                  onConvert={onConvertBrainDump}
+                  onSkip={onSkipBrainDump}
+                  onReviewAll={onReviewBrainDump}
+                />
+              </>
+            )}
+
+            <Text variant="label" color={Colors.textSecondary}>
+              Choose one next step
+            </Text>
+            <NextStepChooser
+              options={nextStepOptions}
+              selectedId={selectedNextStep?.id}
+              energyLevel={energyLevel}
+              onSelect={onSelectNextStep}
+              onStart={(step) => {
+                onSelectNextStep(step.id);
+                onStartNextStep(step);
+              }}
+              onPickAnother={onPickAnotherNextStep}
+            />
+
+            {selectedNextStep && (
+              <Button
+                onPress={onComplete}
+                accessibilityRole="button"
+                accessibilityLabel="Start here"
+                accessibilityHint="Confirms your morning plan"
+              >
+                Start here
+              </Button>
+            )}
+          </>
+        )}
+      </Card>
+    </ReducedMotionWrapper>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    padding: Spacing.lg,
+    gap: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  compactCard: {
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  title: {
+    fontWeight: "600",
+  },
+  energySection: {
+    gap: Spacing.sm,
+  },
+  energyOptions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+  },
+  energyOption: {
+    minHeight: 44,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    backgroundColor: Colors.card,
+  },
+  energySelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+});
