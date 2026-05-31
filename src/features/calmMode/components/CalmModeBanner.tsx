@@ -6,6 +6,7 @@
  */
 
 import { Text } from "@/components/ui/Text";
+import { UX } from "@/constants/ux";
 import { Colors, Spacing } from "@/theme/tokens";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useCalmMode } from "../hooks/useCalmMode";
@@ -36,6 +37,7 @@ export function CalmModeBanner({ onDismiss }: CalmModeBannerProps) {
           onPress={handleDismiss}
           style={styles.dismissButton}
           accessibilityLabel="Disable Calm Mode"
+          accessibilityHint="Returns the environment to its standard visual intensity"
           accessibilityRole="button"
         >
           <Text variant="caption" style={styles.dismissText}>
@@ -59,15 +61,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: Spacing.md,
   },
   text: {
     color: Colors.textSecondary,
     flex: 1,
   },
   dismissButton: {
-    marginLeft: Spacing.md,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
+    minHeight: UX.touchTarget,
+    minWidth: UX.touchTargetLarge,
+    alignItems: "center",
+    justifyContent: "center",
   },
   dismissText: {
     color: Colors.primary,

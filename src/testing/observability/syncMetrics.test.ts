@@ -1,9 +1,8 @@
 import { analytics, syncMetrics } from "@/services/observability";
-import { assertEqual } from "./testUtils";
+import { assertEqual, resetTestState } from "../testUtils";
 
 export function testSyncMetricsRecordQueueHealth(): void {
-  analytics.clearBufferedEvents();
-  syncMetrics.clearBufferedMetrics();
+  resetTestState();
 
   syncMetrics.recordSyncSuccess("queue_processing", 12, { processed: 2 });
   syncMetrics.recordQueueReplay(2);
@@ -18,4 +17,17 @@ export function testSyncMetricsRecordQueueHealth(): void {
     true,
     "queue replay should emit a health event",
   );
+}
+
+export function testSyncMetricsRecordFailuresSafely(): void {
+  resetTestState();
+
+  syncMetrics.recordSyncFailure("queue_processing", new Error("network down"), {
+    queueSize: 3,
+  });
+
+  const [metric] = syncMetrics.getBufferedMetrics();
+  assertEqual(metric?.success, false, "sync failure should be recorded");
+  assertEqual(metric?.errorMessage, "network down", "error messages should be normalized");
+  assertEqual(metric?.queueSize, 3, "queue size metadata should be promoted");
 }

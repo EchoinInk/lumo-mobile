@@ -6,6 +6,7 @@
  */
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
+import { observability } from "../../observability";
 import type { SyncQueueItem } from "../../storage/queue.types";
 import { SYNC_QUEUE_STORAGE_KEY } from "../../storage/queue.types";
 
@@ -96,7 +97,7 @@ export function getSyncHealthMetrics(): SyncHealthMetrics {
     healthScore -= Math.min(oldestPendingAge / (24 * 60 * 60 * 1000), 10); // Penalize old pending items (max 10 points)
     healthScore = Math.max(0, healthScore);
 
-    return {
+    const healthMetrics = {
       totalItems: queue.length,
       pendingItems: pendingItems.length,
       processingItems: processingItems.length,
@@ -107,8 +108,17 @@ export function getSyncHealthMetrics(): SyncHealthMetrics {
       oldestPendingAge,
       healthScore,
     };
+    observability.performance.recordMetric("sync.health_score", healthScore, {
+      queueSize: queue.length,
+      failedItems: failedItems.length,
+      deadLetterItems: deadLetterItems.length,
+    });
+    return healthMetrics;
   } catch (err) {
-    console.error("[getSyncHealthMetrics] Failed to parse queue:", err);
+    observability.logger.error("[getSyncHealthMetrics] Failed to parse queue", err);
+    observability.sync.recordSyncFailure("getSyncHealthMetrics", err, {
+      reason: "queue_parse_failed",
+    });
     return {
       totalItems: 0,
       pendingItems: 0,

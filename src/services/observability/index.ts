@@ -8,6 +8,8 @@ export type {
   AnalyticsEvent,
   CrashContext,
   LogEntry,
+  LogLevel,
+  ObservabilityConfig,
   ObservabilityLevel,
   ObservabilityTransport,
   PerformanceMetric,

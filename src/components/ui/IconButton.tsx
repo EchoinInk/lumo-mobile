@@ -1,4 +1,5 @@
 import { Colors, Radius, Shadows } from '@/theme/tokens';
+import { UX } from '@/constants/ux';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
@@ -12,6 +13,7 @@ interface IconButtonProps extends TouchableOpacityProps {
   size?: IconButtonSize;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   haptic?: boolean;
+  reducedMotion?: boolean;
 }
 
 export function IconButton({ 
@@ -20,6 +22,7 @@ export function IconButton({
   size = 'md',
   variant = 'ghost',
   haptic = true,
+  reducedMotion = false,
   className = '',
   onPress,
   ...props 
@@ -34,11 +37,11 @@ export function IconButton({
   const getSizeStyles = () => {
     switch (size) {
       case 'sm':
-        return { width: 32, height: 32 };
+        return { width: UX.touchTarget, height: UX.touchTarget };
       case 'lg':
-        return { width: 48, height: 48 };
+        return { width: UX.touchTargetLarge, height: UX.touchTargetLarge };
       default:
-        return { width: 40, height: 40 };
+        return { width: UX.touchTarget, height: UX.touchTarget };
     }
   };
 
@@ -80,7 +83,8 @@ export function IconButton({
     <TouchableOpacity
       className={className}
       onPress={handlePress}
-      activeOpacity={0.7}
+      activeOpacity={reducedMotion ? 0.9 : 0.7}
+      accessibilityRole="button"
       style={{
         ...getSizeStyles(),
         ...getShapeStyles(),

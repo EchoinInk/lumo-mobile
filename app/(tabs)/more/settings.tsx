@@ -3,6 +3,7 @@ import { Screen } from "@/src/components/ui/Screen";
 import { Text } from "@/src/components/ui/Text";
 import { MoreScreenHeader } from "@/src/features/more/components";
 import { useOnboarding } from "@/src/features/onboarding/hooks/useOnboarding";
+import { ReminderSettingsCard } from "@/src/features/reminders/components/ReminderSettingsCard";
 import { useSettingsStore } from "@/src/store/useSettingsStore";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
@@ -176,6 +177,17 @@ export default function SettingsScreen() {
   return (
     <Screen scrollable padded>
       <MoreScreenHeader title="Settings" subtitle="App Preferences" />
+
+      <View style={styles.section}>
+        <Text
+          variant="caption"
+          color={Colors.textSecondary}
+          style={styles.sectionTitle}
+        >
+          Reminders
+        </Text>
+        <ReminderSettingsCard />
+      </View>
 
       {/* Settings Sections */}
       <ScrollView showsVerticalScrollIndicator={false}>

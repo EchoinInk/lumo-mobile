@@ -99,6 +99,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       description: input.description,
       completed: false,
       priority: input.priority,
+      energyRequired: input.energyRequired,
+      recurrence: input.recurrence,
       dueDate: input.dueDate,
       createdAt: now,
       updatedAt: now,

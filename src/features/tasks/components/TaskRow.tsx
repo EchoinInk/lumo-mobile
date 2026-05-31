@@ -1,5 +1,6 @@
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
+import { UX } from "@/src/constants/ux";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -70,6 +71,7 @@ export const TaskRow = React.memo<TaskRowProps>(
               accessibilityRole="checkbox"
               accessibilityState={{ checked: task.completed }}
               accessibilityLabel={`Mark ${task.title} as ${task.completed ? "incomplete" : "complete"}`}
+              accessibilityHint="Toggles this task's completion state"
             >
               <View
                 style={[
@@ -130,6 +132,7 @@ export const TaskRow = React.memo<TaskRowProps>(
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Focus on ${task.title}`}
+                accessibilityHint="Starts Focus Mode with this task"
               >
                 <Text style={styles.focusText}>Focus</Text>
               </TouchableOpacity>
@@ -141,6 +144,7 @@ export const TaskRow = React.memo<TaskRowProps>(
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Delete ${task.title}`}
+                accessibilityHint="Removes this task"
               >
                 <Text style={styles.deleteText}>✕</Text>
               </TouchableOpacity>
@@ -179,6 +183,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
+    gap: Spacing.md,
   },
   leftContent: {
     flexDirection: "row",
@@ -190,9 +195,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
   },
   checkbox: {
-    marginTop: 2,
+    minWidth: UX.touchTarget,
+    minHeight: UX.touchTarget,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -Spacing.xs,
   },
   checkboxBox: {
     width: 24,
@@ -240,6 +251,8 @@ const styles = StyleSheet.create({
   focusButton: {
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
+    minHeight: UX.touchTarget,
+    justifyContent: "center",
     borderRadius: 8,
     backgroundColor: Colors.lavender,
     borderWidth: 1,
@@ -251,9 +264,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   deleteButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: UX.touchTarget,
+    height: UX.touchTarget,
+    borderRadius: 22,
     backgroundColor: Colors.dangerSoft,
     alignItems: "center",
     justifyContent: "center",

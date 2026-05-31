@@ -1,4 +1,5 @@
 import { Text } from "@/components/ui/Text";
+import { UX } from "@/constants/ux";
 import { Colors, Spacing } from "@/theme/tokens";
 import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
@@ -37,6 +38,9 @@ export function TaskFilterPills({
             styles.pill,
             selectedFilter === filter.value && styles.pillActive,
           ]}
+          accessibilityRole="button"
+          accessibilityLabel={`Show ${filter.label.toLowerCase()} tasks`}
+          accessibilityState={{ selected: selectedFilter === filter.value }}
         >
           <Text
             variant="label"
@@ -62,6 +66,8 @@ const styles = StyleSheet.create({
   pill: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
+    minHeight: UX.touchTarget,
+    justifyContent: "center",
     borderRadius: 20,
     backgroundColor: Colors.card,
     borderWidth: 1,
@@ -75,6 +81,6 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   pillTextActive: {
-    color: Colors.textPrimary,
+    color: Colors.textInverse,
   },
 });

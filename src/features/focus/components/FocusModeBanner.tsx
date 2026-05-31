@@ -5,7 +5,7 @@
  * Displays a soft message with one visible exit action.
  */
 
-import { Colors, Spacing, Typography } from "@/src/theme/tokens";
+import { Colors, Radius, Spacing, Typography } from "@/src/theme/tokens";
 import { StyleSheet, Text, View } from "react-native";
 import { FocusExitButton } from "./FocusExitButton";
 
@@ -33,10 +33,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lavender,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: Spacing.md,
     marginBottom: Spacing.md,
   },
   message: {

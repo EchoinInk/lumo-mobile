@@ -1,9 +1,17 @@
 import { logger } from "./logger";
-import type { AnalyticsEvent, ObservabilityTransport } from "./types";
+import type {
+  AnalyticsEvent,
+  ObservabilityConfig,
+  ObservabilityTransport,
+} from "./types";
 
 const MAX_EVENT_BUFFER = 200;
 const events: AnalyticsEvent[] = [];
 const transports = new Set<ObservabilityTransport>();
+const config: ObservabilityConfig = {
+  enabled: true,
+  debugMode: typeof __DEV__ !== "undefined" && __DEV__,
+};
 
 const sensitivePropertyPattern =
   /email|name|phone|address|token|secret|password|content|title|description/i;
@@ -56,20 +64,27 @@ function sendToTransports(event: AnalyticsEvent): void {
     try {
       transport.analytics?.(event);
     } catch (error) {
-      logger.warn("[Observability] Analytics transport failed", undefined, error);
+      logger.error("[Observability] Analytics transport failed", error);
     }
   });
 }
 
 function track(name: string, properties?: Record<string, unknown>): void {
+  if (!config.enabled) {
+    return;
+  }
+
   const event: AnalyticsEvent = {
     name,
     properties: sanitizeProperties(properties),
+    timestamp: Date.now(),
   };
 
   remember(event);
   sendToTransports(event);
-  logger.debug("[Observability] Analytics event recorded", { name });
+  if (config.debugMode) {
+    logger.debug("[Observability] Analytics event recorded", { name });
+  }
 }
 
 export const analytics = {
@@ -81,6 +96,9 @@ export const analytics = {
       traitKeys: traits ? Object.keys(traits).length : 0,
     }),
   reset: () => track("identity_context_reset"),
+  configure: (nextConfig: Partial<ObservabilityConfig>) => {
+    Object.assign(config, nextConfig);
+  },
   addTransport: (transport: ObservabilityTransport) => {
     transports.add(transport);
     return () => transports.delete(transport);

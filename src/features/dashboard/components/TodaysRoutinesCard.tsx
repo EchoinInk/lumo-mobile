@@ -18,10 +18,10 @@ const colorMap: Record<string, string> = {
   blue: Colors.blue,
   green: Colors.success,
   yellow: Colors.warning,
-  orange: "#F97316",
+  orange: Colors.warning,
   pink: Colors.pink,
   purple: Colors.purple,
-  teal: "#14B8A6",
+  teal: Colors.info,
 };
 
 export function TodaysRoutinesCard({
@@ -37,7 +37,14 @@ export function TodaysRoutinesCard({
         <Text variant="body" color={Colors.textSecondary} style={styles.emptyText}>
           {emptyMessage}
         </Text>
-        <TouchableOpacity onPress={onAddPress} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={onAddPress}
+          activeOpacity={0.7}
+          style={styles.linkButton}
+          accessibilityRole="button"
+          accessibilityLabel="Add a routine"
+          accessibilityHint="Opens routines so you can add a gentle anchor"
+        >
           <Text variant="caption" color={Colors.purple}>
             Add a routine →
           </Text>
@@ -65,6 +72,7 @@ export function TodaysRoutinesCard({
               activeOpacity={0.7}
               accessibilityLabel={`${isCompleted ? "Completed" : "Pending"} habit: ${habit.title}`}
               accessibilityRole="button"
+              accessibilityHint="Toggles this routine's completion state"
             >
               <View
                 style={[
@@ -107,7 +115,14 @@ export function TodaysRoutinesCard({
       </View>
 
       {habits.length > 4 && (
-        <TouchableOpacity onPress={onAddPress} activeOpacity={0.7} style={styles.moreLink}>
+        <TouchableOpacity
+          onPress={onAddPress}
+          activeOpacity={0.7}
+          style={styles.moreLink}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${habits.length - 4} more routines`}
+          accessibilityHint="Opens the routines screen"
+        >
           <Text variant="caption" color={Colors.textSecondary}>
             + {habits.length - 4} more routines
           </Text>
@@ -133,7 +148,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.md,
-    paddingVertical: Spacing.xs,
+    minHeight: 44,
+    paddingVertical: Spacing.sm,
   },
   checkbox: {
     width: 28,
@@ -170,6 +186,8 @@ const styles = StyleSheet.create({
   moreLink: {
     marginTop: Spacing.sm,
     alignItems: "center",
+    minHeight: 44,
+    justifyContent: "center",
   },
   emptyCard: {
     padding: Spacing.lg,
@@ -179,5 +197,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: "center",
+  },
+  linkButton: {
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: Spacing.sm,
   },
 });

@@ -1,8 +1,16 @@
+import { QuickCaptureSheet } from "@/src/components/capture/QuickCaptureSheet";
 import { LoadingState, RetryView } from "@/src/components/feedback";
+import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { RoutineBundleCard } from "@/src/features/routines/components/RoutineBundleCard";
+import {
+  createTasksFromBundle,
+  starterRoutineBundles,
+  type RoutineBundle,
+} from "@/src/features/routines";
 import { TaskFormModal } from "@/src/features/tasks/components/TaskFormModal";
 import { useTasks } from "@/src/features/tasks/hooks/useTasks";
 import {
@@ -10,8 +18,10 @@ import {
   Task,
   TaskPriority,
 } from "@/src/features/tasks/types/task";
+import { summarizeRecurrence } from "@/src/features/tasks/utils/recurrence";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import {
   CheckCircle2,
   Circle,
@@ -50,6 +60,7 @@ const getPriorityFromKey = (key: string): TaskPriority | null => {
 export default function TasksScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("today");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const {
@@ -110,6 +121,10 @@ export default function TasksScreen() {
     setSelectedTask(undefined);
   };
 
+  const handleUseBundle = (bundle: RoutineBundle) => {
+    createTasksFromBundle(bundle).forEach(createTask);
+  };
+
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case "high":
@@ -152,6 +167,24 @@ export default function TasksScreen() {
         title="Your Tasks"
         subtitle={`${completedCount} of ${totalCount} completed`}
       />
+
+      <View style={styles.reliefActions}>
+        <Button
+          size="sm"
+          onPress={() => setIsQuickCaptureVisible(true)}
+          accessibilityHint="Opens a lightweight capture sheet"
+        >
+          Quick Capture
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onPress={() => router.push({ pathname: "/brain-dump" as const } as any)}
+          accessibilityHint="Opens Brain Dump for uncategorized thoughts"
+        >
+          Brain Dump
+        </Button>
+      </View>
 
       {/* Filter Tabs */}
       <ScrollView
@@ -326,6 +359,20 @@ export default function TasksScreen() {
                           task.priority.slice(1)}
                       </Text>
                     </View>
+                    {task.energyRequired && (
+                      <View style={styles.energyBadge}>
+                        <Text variant="small" color={Colors.textSecondary}>
+                          {task.energyRequired} energy
+                        </Text>
+                      </View>
+                    )}
+                    {task.recurrence && (
+                      <View style={styles.recurringBadge}>
+                        <Text variant="small" color={Colors.purple}>
+                          {summarizeRecurrence(task.recurrence)}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -381,6 +428,20 @@ export default function TasksScreen() {
         </View>
       </Card>
 
+      <SectionHeader
+        title="Routine bundles"
+        subtitle="Small editable starting points"
+      />
+      <View style={styles.bundleList}>
+        {starterRoutineBundles.map((bundle) => (
+          <RoutineBundleCard
+            key={bundle.id}
+            bundle={bundle}
+            onUse={handleUseBundle}
+          />
+        ))}
+      </View>
+
       {/* Add Task Button */}
       <TouchableOpacity
         style={styles.addButton}
@@ -414,6 +475,11 @@ export default function TasksScreen() {
         onSubmit={handleModalSubmit}
         onClose={handleModalClose}
       />
+
+      <QuickCaptureSheet
+        visible={isQuickCaptureVisible}
+        onClose={() => setIsQuickCaptureVisible(false)}
+      />
     </Screen>
   );
 }
@@ -424,6 +490,12 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     marginBottom: Spacing.lg,
     paddingRight: Spacing.lg,
+  },
+  reliefActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   filterPill: {
     paddingHorizontal: Spacing.lg,
@@ -484,6 +556,7 @@ const styles = StyleSheet.create({
   taskMeta: {
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: Spacing.sm,
   },
   timeBadge: {
@@ -493,6 +566,12 @@ const styles = StyleSheet.create({
   },
   recurringBadge: {
     backgroundColor: Colors.purple + "15",
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: Radius.sm,
+  },
+  energyBadge: {
+    backgroundColor: Colors.blue + "12",
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
     borderRadius: Radius.sm,
@@ -532,6 +611,10 @@ const styles = StyleSheet.create({
   supportTitle: {
     fontWeight: "500",
     marginBottom: Spacing.xs,
+  },
+  bundleList: {
+    gap: Spacing.md,
+    marginBottom: Spacing.xl,
   },
   addButton: {
     marginTop: Spacing.md,

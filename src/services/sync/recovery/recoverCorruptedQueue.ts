@@ -6,6 +6,7 @@
  */
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
+import { observability } from "../../observability";
 import type { SyncQueueItem } from "../../storage/queue.types";
 
 const SYNC_QUEUE_KEY = "sync_queue";
@@ -61,7 +62,13 @@ export function detectCorruptedQueueItems(): string[] {
 
     return corruptedIds;
   } catch (err) {
-    console.error("[detectCorruptedQueueItems] Failed to parse queue:", err);
+    observability.logger.error(
+      "[detectCorruptedQueueItems] Failed to parse queue",
+      err,
+    );
+    observability.sync.recordSyncFailure("detectCorruptedQueueItems", err, {
+      reason: "queue_parse_failed",
+    });
     return [];
   }
 }
@@ -94,11 +101,25 @@ export function removeCorruptedQueueItems(): number {
 
     mmkvStorage.set(SYNC_QUEUE_KEY, JSON.stringify(filteredQueue));
 
-    console.log(`[removeCorruptedQueueItems] Removed ${removedCount} corrupted items`);
+    observability.sync.recordQueueRecovery({
+      operation: "removeCorruptedQueueItems",
+      removedCount,
+      queueSize: filteredQueue.length,
+    });
+    observability.logger.info(
+      "[removeCorruptedQueueItems] Removed corrupted queue items",
+      { removedCount },
+    );
 
     return removedCount;
   } catch (err) {
-    console.error("[removeCorruptedQueueItems] Failed to parse queue:", err);
+    observability.logger.error(
+      "[removeCorruptedQueueItems] Failed to parse queue",
+      err,
+    );
+    observability.sync.recordSyncFailure("removeCorruptedQueueItems", err, {
+      reason: "queue_parse_failed",
+    });
     return 0;
   }
 }

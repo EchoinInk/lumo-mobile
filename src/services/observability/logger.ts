@@ -1,19 +1,23 @@
 import type {
+  LogLevel,
   LogEntry,
-  ObservabilityLevel,
+  ObservabilityConfig,
   ObservabilityTransport,
 } from "./types";
 
 const MAX_BUFFER_SIZE = 100;
 const logs: LogEntry[] = [];
 const transports = new Set<ObservabilityTransport>();
+const config: ObservabilityConfig = {
+  enabled: true,
+  debugMode: typeof __DEV__ !== "undefined" && __DEV__,
+};
 
-function shouldEmitToConsole(level: ObservabilityLevel): boolean {
-  if (typeof __DEV__ !== "undefined" && __DEV__) {
-    return true;
-  }
+const sensitiveMetadataPattern =
+  /email|name|phone|address|token|secret|password|content|title|description|notes?/i;
 
-  return level === "warn" || level === "error";
+function shouldEmitToConsole(): boolean {
+  return config.enabled && config.debugMode;
 }
 
 function remember(entry: LogEntry): void {
@@ -33,30 +37,88 @@ function sendToTransports(entry: LogEntry): void {
   });
 }
 
+function safeSerializeMetadata(
+  metadata?: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  if (!metadata) {
+    return undefined;
+  }
+
+  const seen = new WeakSet<object>();
+
+  try {
+    return JSON.parse(
+      JSON.stringify(metadata, (key, value) => {
+        if (sensitiveMetadataPattern.test(key)) {
+          return "[redacted]";
+        }
+
+        if (value instanceof Error) {
+          return {
+            name: value.name,
+            message: value.message,
+          };
+        }
+
+        if (typeof value === "function" || typeof value === "symbol") {
+          return undefined;
+        }
+
+        if (value && typeof value === "object") {
+          if (seen.has(value)) {
+            return "[circular]";
+          }
+          seen.add(value);
+        }
+
+        return value;
+      }),
+    ) as Record<string, unknown>;
+  } catch {
+    return { serializationError: true };
+  }
+}
+
+function serializeError(error?: unknown): unknown {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: config.debugMode ? error.stack : undefined,
+    };
+  }
+
+  return error;
+}
+
 function emit(
-  level: ObservabilityLevel,
+  level: LogLevel,
   message: string,
   metadata?: Record<string, unknown>,
   error?: unknown,
 ): void {
+  if (!config.enabled) {
+    return;
+  }
+
   const entry: LogEntry = {
     level,
     message,
-    metadata,
-    error,
+    metadata: safeSerializeMetadata(metadata),
+    error: serializeError(error),
     timestamp: Date.now(),
   };
 
   remember(entry);
   sendToTransports(entry);
 
-  if (!shouldEmitToConsole(level)) {
+  if (!shouldEmitToConsole()) {
     return;
   }
 
-  const payload = metadata ?? error;
-  if (payload !== undefined && error !== undefined) {
-    console[level](message, metadata, error);
+  const payload = entry.metadata ?? entry.error;
+  if (payload !== undefined && entry.error !== undefined) {
+    console[level](message, entry.metadata, entry.error);
     return;
   }
 
@@ -77,9 +139,13 @@ export const logger = {
     emit("warn", message, metadata, error),
   error: (
     message: string,
-    metadata?: Record<string, unknown>,
     error?: unknown,
+    metadata?: Record<string, unknown>,
   ) => emit("error", message, metadata, error),
+  configure: (nextConfig: Partial<ObservabilityConfig>) => {
+    Object.assign(config, nextConfig);
+  },
+  getConfig: () => ({ ...config }),
   addTransport: (transport: ObservabilityTransport) => {
     transports.add(transport);
     return () => transports.delete(transport);

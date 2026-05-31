@@ -34,7 +34,14 @@ export function TodayFocusCard({
         >
           {emptyMessage}
         </Text>
-        <TouchableOpacity onPress={onAddPress} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={onAddPress}
+          activeOpacity={0.7}
+          style={styles.linkButton}
+          accessibilityRole="button"
+          accessibilityLabel="Add a task"
+          accessibilityHint="Opens Tasks so you can add one small step"
+        >
           <Text variant="caption" color={Colors.purple}>
             Add a task →
           </Text>
@@ -46,11 +53,14 @@ export function TodayFocusCard({
   return (
     <Card variant="elevated" style={styles.card}>
       <Text variant="subheading" style={styles.title}>
-        Today's Focus
+        One next step
+      </Text>
+      <Text variant="caption" color={Colors.textSecondary} style={styles.subtitle}>
+        Pick one small thing. That counts.
       </Text>
 
       <View style={styles.taskList}>
-        {tasks.slice(0, 4).map((task) => {
+        {tasks.slice(0, 3).map((task) => {
           const isCompleted = task.completed;
           const priorityColor =
             priorityColors[task.priority] || Colors.textSecondary;
@@ -63,6 +73,7 @@ export function TodayFocusCard({
               activeOpacity={0.7}
               accessibilityLabel={`${isCompleted ? "Completed" : "Pending"} task: ${task.title}`}
               accessibilityRole="button"
+              accessibilityHint="Toggles this task's completion state"
             >
               <View
                 style={[
@@ -102,14 +113,17 @@ export function TodayFocusCard({
         })}
       </View>
 
-      {tasks.length > 4 && (
+      {tasks.length > 3 && (
         <TouchableOpacity
           onPress={onAddPress}
           activeOpacity={0.7}
           style={styles.moreLink}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${tasks.length - 3} more tasks`}
+          accessibilityHint="Opens the Tasks screen"
         >
           <Text variant="caption" color={Colors.textSecondary}>
-            + {tasks.length - 4} more tasks
+            + {tasks.length - 3} more tasks
           </Text>
         </TouchableOpacity>
       )}
@@ -123,8 +137,11 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   title: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.xs,
     fontWeight: "600",
+  },
+  subtitle: {
+    marginBottom: Spacing.md,
   },
   taskList: {
     gap: Spacing.sm,
@@ -133,7 +150,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.md,
-    paddingVertical: Spacing.xs,
+    minHeight: 44,
+    paddingVertical: Spacing.sm,
   },
   checkbox: {
     width: 28,
@@ -161,6 +179,8 @@ const styles = StyleSheet.create({
   moreLink: {
     marginTop: Spacing.sm,
     alignItems: "center",
+    minHeight: 44,
+    justifyContent: "center",
   },
   emptyCard: {
     padding: Spacing.lg,
@@ -170,5 +190,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: "center",
+  },
+  linkButton: {
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: Spacing.sm,
   },
 });

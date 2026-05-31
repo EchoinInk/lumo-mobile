@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { QuickActionCard } from '@/components/cards/QuickActionCard';
-import { Plus, Clock, CheckCircle, FileText } from 'lucide-react-native';
+import { Plus, Clock, CheckCircle, FileText, Cloud } from 'lucide-react-native';
 import { Colors, Spacing } from '@/theme/tokens';
+import { router } from 'expo-router';
 
 interface QuickAction {
   title: string;
@@ -15,10 +16,26 @@ interface QuickActionsProps {
 }
 
 const defaultActions: QuickAction[] = [
-  { title: 'Add Task', icon: <Plus size={24} color={Colors.textPrimary} /> },
-  { title: 'Start Focus', icon: <Clock size={24} color={Colors.textPrimary} /> },
-  { title: 'Log Habit', icon: <CheckCircle size={24} color={Colors.textPrimary} /> },
-  { title: 'Quick Note', icon: <FileText size={24} color={Colors.textPrimary} /> },
+  { 
+    title: 'Add Task', 
+    icon: <Plus size={24} color={Colors.textPrimary} />,
+    onPress: () => router.push({ pathname: '/(tabs)/tasks' as const } as any),
+  },
+  { 
+    title: 'Start Focus', 
+    icon: <Clock size={24} color={Colors.textPrimary} />,
+    onPress: () => router.push({ pathname: '/(tabs)/more/focus' as const } as any),
+  },
+  { 
+    title: 'Log Habit', 
+    icon: <CheckCircle size={24} color={Colors.textPrimary} />,
+    onPress: () => router.push({ pathname: '/(tabs)/more/habits' as const } as any),
+  },
+  { 
+    title: 'Brain Dump', 
+    icon: <Cloud size={24} color={Colors.textPrimary} />,
+    onPress: () => router.push({ pathname: '/(tabs)/more/brain-dump' as const } as any),
+  },
 ];
 
 export function QuickActions({ actions = defaultActions }: QuickActionsProps) {

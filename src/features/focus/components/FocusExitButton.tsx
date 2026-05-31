@@ -9,6 +9,7 @@ import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Colors, Spacing, Typography } from '@/src/theme/tokens';
+import { UX } from '@/src/constants/ux';
 
 interface FocusExitButtonProps {
   onPress: () => void;
@@ -37,7 +38,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: Colors.border,
-    minHeight: 44, // Minimum touch target
+    minHeight: UX.touchTarget,
+    minWidth: UX.touchTargetLarge,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     ...Typography.body,

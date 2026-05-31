@@ -12,7 +12,14 @@ interface QuickActionCardProps {
 
 export function QuickActionCard({ title, icon, onPress }: QuickActionCardProps) {
   return (
-    <Card variant="outlined" padding="md" pressable onPress={onPress} style={styles.container}>
+    <Card
+      variant="outlined"
+      padding="md"
+      pressable
+      onPress={onPress}
+      accessibilityLabel={title}
+      style={styles.container}
+    >
       <View style={styles.icon}>{icon}</View>
       <Text variant="body" textAlign="center" style={styles.title}>
         {title}
@@ -26,6 +33,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     aspectRatio: 1,
+    minHeight: 96,
   },
   icon: {
     marginBottom: Spacing.sm,

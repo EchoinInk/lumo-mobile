@@ -1,5 +1,170 @@
 # Changelog
 
+## Phase 15.0 — Daily Relief Features
+
+### Summary
+
+Added local-first daily relief loops focused on helping users unload thoughts, capture quickly, and choose one manageable next step. This phase avoids auth, backend expansion, analytics, AI, monetization, and notification spam.
+
+### Added
+
+- Brain Dump foundations with local storage, a Brain Dump screen, quick text capture, and gentle conversion actions for task, reminder, routine idea, or archived note.
+- Quick Capture flow via a reusable `QuickCaptureSheet` for task, brain dump note, and reminder capture.
+- Dashboard and Tasks entry points for Brain Dump and Quick Capture.
+- Today Focus enhancements with 1–3 deterministic next-step suggestions, Start, Done, Snooze gently, and Later actions.
+- Gentle Reminder foundations with reminder model, local reminder store, tone presets, and reminder settings.
+- Recurring Tasks v2 logic with daily, weekly, selected weekdays, monthly, every-X-days, and every-X-weeks support.
+- Routine Bundle foundations with editable starter bundles:
+  - Morning reset
+  - Evening shutdown
+  - Admin catch-up
+  - Meal prep light
+  - Cleaning reset
+- Energy-aware planning foundations with optional task energy and deterministic focus suggestion logic.
+
+### Files Created
+
+- `app/brain-dump/index.tsx`
+- `src/components/capture/QuickCaptureSheet.tsx`
+- `src/features/brain-dump/**`
+- `src/features/reminders/**`
+- `src/features/routines/**`
+- `src/features/dashboard/components/FocusSuggestionList.tsx`
+- `src/features/dashboard/components/GentleSnoozeActions.tsx`
+- `src/features/dashboard/components/NextStepCard.tsx`
+- `src/features/dashboard/utils/focusSuggestions.ts`
+- `src/features/tasks/components/EnergyPicker.tsx`
+- `src/features/tasks/components/RecurringTaskPicker.tsx`
+- `src/features/tasks/types/energy.ts`
+- `src/features/tasks/types/recurrence.ts`
+- `src/features/tasks/utils/recurrence.ts`
+- `src/testing/dashboard/focusSuggestions.test.ts`
+- `src/testing/tasks/recurrence.test.ts`
+
+### Files Modified
+
+- `app/(tabs)/index.tsx` — Added Brain Dump and Quick Capture actions and switched Today Focus to next-step suggestions
+- `app/(tabs)/tasks.tsx` — Added Quick Capture, Brain Dump, routine bundles, and task energy/recurrence display
+- `app/(tabs)/more/settings.tsx` — Added gentle reminder settings card
+- `src/features/tasks/components/TaskFormModal.tsx` — Added optional energy and recurrence controls
+- `src/features/tasks/hooks/useTasks.ts` — Returns created tasks from local-first create flow
+- `src/features/tasks/store/useTaskStore.ts` — Persists energy and recurrence fields in new tasks
+- `src/features/tasks/types/task.ts` — Added optional `energyRequired` and `recurrence` fields
+- `src/features/dashboard/components/TodayFocusCard.tsx` — Limited visible items and added one-next-step framing
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 46 tests, 0 failures
+- `npx expo start -c` began startup and was stopped after this terminal did not emit a usable URL
+- Added timezone-stable recurrence tests
+- Added focus suggestion complexity tests
+- No new dependencies added
+- No backend, auth, analytics, AI, or monetization work added
+
+## Phase 14.5 — UX Consistency + Accessibility QA Pass
+
+### Summary
+
+Completed a focused UX and accessibility QA pass across shared UI, feedback states, Dashboard, Tasks, Focus Mode, and Calm Mode. This was a refinement pass only: no new product features, no route changes, no broad screen rewrites, and no new dependencies.
+
+### Files Modified
+
+- `src/components/ui/IconButton.tsx` — Standardized icon button touch targets and reduced-motion press feedback
+- `src/components/ui/collapsible.tsx` — Added reduced-motion handling and accessibility state for expandable sections
+- `src/components/cards/QuickActionCard.tsx` — Added accessible labels and steadier minimum card height
+- `src/components/feedback/ErrorState.tsx` — Aligned spacing, typography, and retry action with existing UI primitives
+- `src/components/feedback/RetryButton.tsx` — Added retry accessibility label and hint
+- `src/components/feedback/SyncFailureBanner.tsx` — Replaced hardcoded color/spacing with theme tokens and added alert semantics
+- `src/features/dashboard/components/TodayFocusCard.tsx` — Improved task row touch targets, labels, hints, and empty-state action target
+- `src/features/dashboard/components/TodaysRoutinesCard.tsx` — Improved routine row touch targets, labels, hints, and tokenized accent colors
+- `src/features/tasks/components/TaskRow.tsx` — Enlarged completion/delete/focus actions and added clearer accessibility hints
+- `src/features/tasks/components/TaskFilterPills.tsx` — Added selected state semantics, 44px targets, and improved selected contrast
+- `src/features/focus/components/FocusModeBanner.tsx` — Tokenized radius and added calmer banner spacing
+- `src/features/focus/components/FocusExitButton.tsx` — Standardized exit touch target sizing and alignment
+- `src/features/calmMode/components/CalmModeBanner.tsx` — Standardized exit touch target sizing and added a screen reader hint
+
+### QA Areas
+
+- Touch targets
+- Accessibility labels, hints, roles, and selected/expanded states
+- Typography hierarchy
+- Spacing rhythm
+- Feedback states
+- Reduced motion
+- Color contrast
+- Dashboard density
+- Task interaction clarity
+- Focus + Calm combined behavior
+
+### Verification
+
+- `npx tsc --noEmit` passed
+- `npm test` passed: 42 tests, 0 failures
+- `npx expo start -c --offline --port 8099` began startup and was stopped after the CLI did not emit a usable URL in this terminal
+- Expo Router still resolves `app`
+- Route scan still detects onboarding and tab routes
+- No `src/app` directory exists
+- No new dependencies added
+- No route files moved or duplicated
+
+### Remaining Work
+
+- Notification philosophy implementation
+- Future production monitoring vendor integration
+- Additional feature rollout slices
+
+## Phase 14.4 — Testing Foundation
+
+### Summary
+
+Added a minimal, logic-first testing foundation for observability, sync recovery, feature flags, hydration, migration safety, and repository contracts. The suite uses a small TypeScript-aware Node runner so the app gains durable tests without adding Jest, Vitest, Testing Library, snapshots, UI rendering, network calls, or vendor SDKs.
+
+### Files Created
+
+**Test Runner**
+
+- `scripts/run-tests.js` — Discovers and runs exported `test*` functions from `src/testing/**/*.test.ts`
+
+**Shared Test Utilities**
+
+- `src/testing/testUtils/assertions.ts`
+- `src/testing/testUtils/createMockStorage.ts`
+- `src/testing/testUtils/createMockRepository.ts`
+- `src/testing/testUtils/createMockSyncQueue.ts`
+- `src/testing/testUtils/resetTestState.ts`
+- `src/testing/testUtils/index.ts`
+
+**Logic Test Suites**
+
+- `src/testing/featureFlags/featureFlags.test.ts`
+- `src/testing/hydration/hydration.test.ts`
+- `src/testing/migrations/migrationSafety.test.ts`
+- `src/testing/repositories/repositoryContracts.test.ts`
+- `src/testing/sync/queue.test.ts`
+- `src/testing/sync/recovery.test.ts`
+
+### Files Modified
+
+- `package.json` — Added `test`, `test:watch`, and `test:typecheck` scripts
+- `src/testing/observability/*.test.ts` — Expanded observability tests for no-op behavior, quiet logging, sanitization, context handling, performance timing, and sync metrics
+- `src/testing/observability/testUtils.ts` — Re-exported shared assertions
+- `src/services/sync/recovery/staleCacheRecovery.ts` — Fixed stale cache removal for the existing storage API and routed diagnostics through observability
+
+### Verification
+
+- `npx tsc --noEmit` passed
+- `npm test` passed: 42 tests, 0 failures
+- No network or Supabase calls added to tests
+- No broad UI snapshot testing added
+- No vendor SDKs or test framework dependencies added
+
+### Remaining Work
+
+- UX consistency pass
+- Notification philosophy implementation
+- Future vendor observability integration
+
 ## Phase 14.3 — Observability Foundation
 
 ### Summary
@@ -46,6 +211,10 @@ import { observability } from "@/services/observability";
 - `src/store/useTaskStore.ts` — Tracks task completion counts only, not task content
 - `src/providers/SyncProvider.tsx` — Records sync bootstrap, network monitor, and recovery metrics
 - `src/services/sync/queue/syncProcessor.ts` — Records queue replay, queue failure, sync success/failure, and crash contexts
+- `src/services/sync/recovery/replayFailedQueue.ts` — Records replay counts, recovery outcomes, and parse/storage failures
+- `src/services/sync/recovery/recoverCorruptedQueue.ts` — Records corrupted queue recovery and parse failures
+- `src/services/sync/recovery/syncHealth.ts` — Records queue health score metrics and parse failures
+- `src/services/sync/recovery/queueDiagnostics.ts` — Records diagnostic summary metrics without logging raw user content
 
 ### Architecture Notes
 
@@ -54,6 +223,7 @@ import { observability } from "@/services/observability";
 - Observability buffers locally and supports future transports for Sentry, PostHog, Supabase logs, Datadog, Firebase Analytics, or custom pipelines.
 - Analytics sanitizes sensitive property keys and avoids task content, email, names, tokens, descriptions, and free-form user content.
 - Sync and performance metrics focus on system health: what failed, what recovered, and what was slow.
+- The observability facade exposes a shared `configure()` hook so metrics can be disabled or debug logging enabled without changing feature code.
 
 ### Verification
 

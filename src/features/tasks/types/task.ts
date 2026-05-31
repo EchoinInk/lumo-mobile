@@ -1,3 +1,6 @@
+import type { EnergyLevel } from "./energy";
+import type { RecurrencePattern } from "./recurrence";
+
 export type TaskPriority = "low" | "medium" | "high";
 
 export type TaskStatus = "todo" | "completed";
@@ -16,6 +19,8 @@ export interface Task {
   description?: string;
   completed: boolean;
   priority: TaskPriority;
+  energyRequired?: EnergyLevel;
+  recurrence?: RecurrencePattern;
   dueDate?: string;
   dueTime?: string;
   createdAt: string;
@@ -36,6 +41,8 @@ export interface CreateTaskInput {
   title: string;
   description?: string;
   priority: TaskPriority;
+  energyRequired?: EnergyLevel;
+  recurrence?: RecurrencePattern;
   dueDate?: string;
   dueTime?: string;
 }
@@ -45,6 +52,8 @@ export interface UpdateTaskInput {
   description?: string;
   completed?: boolean;
   priority?: TaskPriority;
+  energyRequired?: EnergyLevel;
+  recurrence?: RecurrencePattern;
   dueDate?: string;
   dueTime?: string;
 }

@@ -1,5 +1,5 @@
 import { observability } from "@/services/observability";
-import { assert } from "./testUtils";
+import { assert, assertEqual, resetTestState } from "../testUtils";
 
 export function testObservabilityFacadeShape(): void {
   assert(Boolean(observability.logger), "facade should expose logger");
@@ -10,4 +10,23 @@ export function testObservabilityFacadeShape(): void {
     "facade should expose performance metrics",
   );
   assert(Boolean(observability.crashes), "facade should expose crash reporting");
+}
+
+export function testObservabilityFacadeConfiguresDomains(): void {
+  resetTestState();
+
+  observability.configure({ enabled: false });
+  observability.analytics.track("calm_mode_enabled");
+  observability.logger.info("quiet");
+
+  assertEqual(
+    observability.analytics.getBufferedEvents().length,
+    0,
+    "facade config should disable analytics",
+  );
+  assertEqual(
+    observability.logger.getBufferedLogs().length,
+    0,
+    "facade config should disable logger",
+  );
 }

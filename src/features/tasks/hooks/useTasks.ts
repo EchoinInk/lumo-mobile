@@ -58,10 +58,11 @@ export function useTasks() {
   // Wrapped actions with error handling
   const handleCreateTask = (input: CreateTaskInput) => {
     try {
-      addTask(input);
+      return addTask(input);
     } catch (err) {
       console.error("[useTasks] Failed to create task:", err);
       setError("Couldn't save your task. Please try again.");
+      return null;
     }
   };
 

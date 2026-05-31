@@ -1,9 +1,12 @@
+import { QuickCaptureSheet } from "@/src/components/capture/QuickCaptureSheet";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { DailyProgressCard } from "@/src/features/dashboard/components/DailyProgressCard";
-import { TodayFocusCard } from "@/src/features/dashboard/components/TodayFocusCard";
+import { FocusSuggestionList } from "@/src/features/dashboard/components/FocusSuggestionList";
 import { TodaysRoutinesCard } from "@/src/features/dashboard/components/TodaysRoutinesCard";
 import { calculateDailyProgress } from "@/src/features/dashboard/utils/dashboardProgress";
+import { getFocusSuggestions } from "@/src/features/dashboard/utils/focusSuggestions";
+import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { useHabits } from "@/src/features/habits";
 import { useTasks } from "@/src/features/tasks";
 import { router } from "expo-router";
@@ -13,10 +16,23 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
-import { Calendar, Flame, Menu, Plus } from "lucide-react-native";
+import { Brain, Calendar, Cloud, Flame, Menu, Plus } from "lucide-react-native";
+import { useState } from "react";
 
-function QuickActions() {
+function QuickActions({ onQuickCapture }: { onQuickCapture: () => void }) {
   const actions = [
+    {
+      label: "Quick Capture",
+      icon: Cloud,
+      color: Colors.primary,
+      onPress: onQuickCapture,
+    },
+    {
+      label: "Brain Dump",
+      icon: Brain,
+      color: Colors.purple,
+      onPress: () => router.push({ pathname: "/brain-dump" as const } as any),
+    },
     {
       label: "Add Task",
       icon: Plus,
@@ -52,6 +68,8 @@ function QuickActions() {
           key={action.label}
           onPress={action.onPress}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={action.label}
         >
           <Card
             variant="elevated"
@@ -76,11 +94,15 @@ function QuickActions() {
 }
 
 export default function DashboardScreen() {
+  const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
+  const { enableFocusMode, setActiveFocusTask } = useFocusMode();
+
   // Get real data from Tasks and Habits
   const {
     tasks,
     completedCount: completedTasks,
     toggleTask,
+    updateTask,
     hasHydrated: tasksHydrated,
   } = useTasks();
   const {
@@ -108,26 +130,20 @@ export default function DashboardScreen() {
     completedHabitIds.length,
   );
 
-  // Prioritize tasks for Today's Focus
-  const today = new Date().toISOString().split("T")[0];
-  const getPriorityScore = (task: (typeof tasks)[0]) => {
-    let score = 0;
-    if (task.completed) score -= 1000;
-    if (task.priority === "high") score += 100;
-    if (task.priority === "medium") score += 50;
-    if (task.dueDate === today) score += 200;
-    if (task.dueDate && task.dueDate < today) score += 150;
-    score += new Date(task.createdAt).getTime() / 1000000000;
-    return score;
+  const focusSuggestions = tasksHydrated ? getFocusSuggestions(tasks, 3) : [];
+  const allHydrated = tasksHydrated && habitsHydrated;
+
+  const shiftTaskDate = (taskId: string, days: number) => {
+    const target = new Date(Date.now() + days * 86400000)
+      .toISOString()
+      .split("T")[0];
+    updateTask(taskId, { dueDate: target });
   };
 
-  const sortedTasks =
-    tasksHydrated && tasks.length > 0
-      ? [...tasks].sort((a, b) => getPriorityScore(b) - getPriorityScore(a))
-      : [];
-
-  const focusTasks = sortedTasks.slice(0, 4);
-  const allHydrated = tasksHydrated && habitsHydrated;
+  const handleStartTask = (taskId: string) => {
+    setActiveFocusTask(taskId);
+    enableFocusMode(taskId);
+  };
 
   return (
     <Screen scrollable padded>
@@ -144,13 +160,16 @@ export default function DashboardScreen() {
         variant="gradient"
       />
 
-      {/* Today's Focus */}
-      <TodayFocusCard
-        tasks={focusTasks}
-        onToggle={toggleTask}
-        onAddPress={() =>
-          router.push({ pathname: "/(tabs)/tasks" as const } as any)
-        }
+      <SectionHeader
+        title="Today's Focus"
+        subtitle="One manageable next step is enough"
+      />
+      <FocusSuggestionList
+        suggestions={focusSuggestions}
+        onStart={handleStartTask}
+        onDone={toggleTask}
+        onSnooze={(taskId) => shiftTaskDate(taskId, 2)}
+        onLater={(taskId) => shiftTaskDate(taskId, 1)}
       />
 
       {/* Today's Routines */}
@@ -165,7 +184,12 @@ export default function DashboardScreen() {
 
       {/* Quick Actions */}
       <SectionHeader title="Quick Actions" />
-      <QuickActions />
+      <QuickActions onQuickCapture={() => setIsQuickCaptureVisible(true)} />
+
+      <QuickCaptureSheet
+        visible={isQuickCaptureVisible}
+        onClose={() => setIsQuickCaptureVisible(false)}
+      />
     </Screen>
   );
 }

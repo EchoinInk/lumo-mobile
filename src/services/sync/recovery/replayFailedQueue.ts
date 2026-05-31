@@ -6,6 +6,7 @@
  */
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
+import { observability } from "../../observability";
 import type { SyncQueueItem } from "../../storage/queue.types";
 
 const SYNC_QUEUE_KEY = "sync_queue";
@@ -19,8 +20,13 @@ const SYNC_QUEUE_KEY = "sync_queue";
 export async function replayFailedQueue(
   maxRetries: number = 3,
 ): Promise<number> {
+  const startedAt = Date.now();
+
   if (!mmkvStorage) {
-    console.warn("[replayFailedQueue] MMKV storage not available");
+    observability.logger.warn("[replayFailedQueue] MMKV storage not available");
+    observability.sync.recordSyncFailure("replayFailedQueue", undefined, {
+      reason: "storage_unavailable",
+    });
     return 0;
   }
 
@@ -33,7 +39,13 @@ export async function replayFailedQueue(
   try {
     queue = JSON.parse(queueData);
   } catch (err) {
-    console.error("[replayFailedQueue] Failed to parse queue:", err);
+    observability.logger.error(
+      "[replayFailedQueue] Failed to parse queue",
+      err,
+    );
+    observability.sync.recordSyncFailure("replayFailedQueue", err, {
+      reason: "queue_parse_failed",
+    });
     return 0;
   }
 
@@ -56,10 +68,9 @@ export async function replayFailedQueue(
 
       successCount++;
     } catch (err) {
-      console.error(
-        `[replayFailedQueue] Failed to replay item ${item.id}:`,
-        err,
-      );
+      observability.logger.error("[replayFailedQueue] Failed to replay item", err, {
+        itemId: item.id,
+      });
       item.status = "failed";
       item.error = err instanceof Error ? err.message : String(err);
     }
@@ -68,7 +79,17 @@ export async function replayFailedQueue(
   // Save updated queue
   mmkvStorage.set(SYNC_QUEUE_KEY, JSON.stringify(queue));
 
-  console.log(`[replayFailedQueue] Replayed ${successCount} items`);
+  observability.sync.recordQueueReplay(successCount, {
+    queueSize: queue.length,
+  });
+  observability.sync.recordSyncSuccess("replayFailedQueue", {
+    duration: Date.now() - startedAt,
+    queueSize: queue.length,
+    replayedCount: successCount,
+  });
+  observability.logger.info("[replayFailedQueue] Replayed failed queue items", {
+    replayedCount: successCount,
+  });
 
   return successCount;
 }
@@ -92,7 +113,10 @@ export function getFailedQueueItems(): SyncQueueItem[] {
     const queue: SyncQueueItem[] = JSON.parse(queueData);
     return queue.filter((item) => item.status === "failed");
   } catch (err) {
-    console.error("[getFailedQueueItems] Failed to parse queue:", err);
+    observability.logger.error("[getFailedQueueItems] Failed to parse queue", err);
+    observability.sync.recordSyncFailure("getFailedQueueItems", err, {
+      reason: "queue_parse_failed",
+    });
     return [];
   }
 }
@@ -133,11 +157,23 @@ export function clearFailedQueueItems(olderThanMs?: number): number {
     const clearedCount = queue.length - filteredQueue.length;
     mmkvStorage.set(SYNC_QUEUE_KEY, JSON.stringify(filteredQueue));
 
-    console.log(`[clearFailedQueueItems] Cleared ${clearedCount} items`);
+    observability.sync.recordQueueRecovery({
+      clearedCount,
+      operation: "clearFailedQueueItems",
+    });
+    observability.logger.info("[clearFailedQueueItems] Cleared failed queue items", {
+      clearedCount,
+    });
 
     return clearedCount;
   } catch (err) {
-    console.error("[clearFailedQueueItems] Failed to parse queue:", err);
+    observability.logger.error(
+      "[clearFailedQueueItems] Failed to parse queue",
+      err,
+    );
+    observability.sync.recordSyncFailure("clearFailedQueueItems", err, {
+      reason: "queue_parse_failed",
+    });
     return 0;
   }
 }

@@ -12,6 +12,7 @@
 
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import { Colors, Radius, Spacing } from "@/theme/tokens";
 import { Text } from "../ui/Text";
 import { RetryButton } from "./index";
 
@@ -25,7 +26,11 @@ export function SyncFailureBanner({
   isRetrying = false,
 }: Props): React.JSX.Element {
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessibilityRole="alert"
+      accessibilityLabel="Something drifted out of sync"
+    >
       <Text variant="body" style={styles.message}>
         Something drifted out of sync
       </Text>
@@ -36,17 +41,19 @@ export function SyncFailureBanner({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1a1a1f",
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 8,
+    backgroundColor: Colors.card,
+    borderColor: Colors.border,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    padding: Spacing.md,
+    marginHorizontal: Spacing.md,
+    marginTop: Spacing.sm,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: Spacing.md,
   },
   message: {
     flex: 1,
-    marginRight: 12,
   },
 });

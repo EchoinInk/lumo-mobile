@@ -94,6 +94,7 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
   if (!invariantCheck.valid) {
     observability.logger.error(
       "[SyncProcessor] Invariant violations",
+      undefined,
       {
         itemId: item.id,
         violations: invariantCheck.violations.join(", "),
@@ -128,7 +129,7 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
   // 4. RETRY EXHAUSTION: send straight to dead letter
   if (!canRetryAttempt(attempt)) {
     const reason = "Max retries exceeded";
-    observability.logger.error("[SyncProcessor] Dead letter", {
+    observability.logger.error("[SyncProcessor] Dead letter", undefined, {
       itemId: item.id,
       reason,
     });
@@ -158,7 +159,7 @@ async function processItem(item: SyncQueueItem, attempt = 0): Promise<boolean> {
       observability.sync.recordSyncFailure(`${item.entity}.${item.operation}`, 0, {
         retryable: false,
       });
-      observability.logger.error("[SyncProcessor] Non-retryable error", {
+      observability.logger.error("[SyncProcessor] Non-retryable error", error, {
         itemId: item.id,
         message,
       });

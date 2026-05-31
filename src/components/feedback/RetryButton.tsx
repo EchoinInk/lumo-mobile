@@ -21,6 +21,8 @@ export function RetryButton({ onPress, isRetrying = false }: Props): React.JSX.E
       disabled={isRetrying}
       style={styles.button}
       variant="ghost"
+      accessibilityLabel={isRetrying ? "Retry in progress" : "Try again"}
+      accessibilityHint="Attempts the recovery action again"
     >
       {isRetrying ? "Trying again..." : "Try again"}
     </Button>

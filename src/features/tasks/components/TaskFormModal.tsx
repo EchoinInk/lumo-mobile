@@ -16,6 +16,10 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import { EnergyPicker } from "./EnergyPicker";
+import { RecurringTaskPicker } from "./RecurringTaskPicker";
+import type { EnergyLevel } from "../types/energy";
+import type { RecurrencePattern } from "../types/recurrence";
 import { CreateTaskInput, Task, TaskPriority } from "../types/task";
 
 interface TaskFormModalProps {
@@ -50,6 +54,8 @@ export function TaskFormModal({
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [selectedDate, setSelectedDate] = useState<string>("none");
   const [dueTime, setDueTime] = useState<string>("");
+  const [energyRequired, setEnergyRequired] = useState<EnergyLevel | undefined>();
+  const [recurrence, setRecurrence] = useState<RecurrencePattern | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form when modal opens or initialTask changes
@@ -59,6 +65,8 @@ export function TaskFormModal({
         setTitle(initialTask.title);
         setNotes(initialTask.description || "");
         setPriority(initialTask.priority);
+        setEnergyRequired(initialTask.energyRequired);
+        setRecurrence(initialTask.recurrence);
         setDueTime(initialTask.dueTime || "");
 
         // Determine date selection from dueDate
@@ -82,6 +90,8 @@ export function TaskFormModal({
         setTitle("");
         setNotes("");
         setPriority("medium");
+        setEnergyRequired(undefined);
+        setRecurrence(undefined);
         setSelectedDate("none");
         setDueTime("");
       }
@@ -106,6 +116,8 @@ export function TaskFormModal({
       title: title.trim(),
       description: notes.trim() || undefined,
       priority,
+      energyRequired,
+      recurrence,
       dueDate,
       dueTime: dueTime.trim() || undefined,
     });
@@ -303,6 +315,20 @@ export function TaskFormModal({
                           </TouchableOpacity>
                         ))}
                       </View>
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                      <EnergyPicker
+                        value={energyRequired}
+                        onChange={setEnergyRequired}
+                      />
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                      <RecurringTaskPicker
+                        value={recurrence}
+                        onChange={setRecurrence}
+                      />
                     </View>
 
                     {/* Notes (Optional) */}

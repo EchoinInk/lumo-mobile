@@ -6,6 +6,7 @@
  */
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
+import { observability } from "../../observability";
 import type { SyncQueueItem } from "../../storage/queue.types";
 import { SYNC_QUEUE_STORAGE_KEY } from "../../storage/queue.types";
 
@@ -157,7 +158,7 @@ export function generateQueueDiagnostics(): QueueDiagnosticReport {
       recommendations.push("Queue appears healthy");
     }
 
-    return {
+    const report = {
       totalItems: queue.length,
       itemsByStatus,
       itemsByEntity,
@@ -168,8 +169,21 @@ export function generateQueueDiagnostics(): QueueDiagnosticReport {
       stuckItems,
       recommendations,
     };
+    observability.performance.recordMetric("sync.queue_diagnostic_items", queue.length, {
+      failedItems: itemsByStatus.failed ?? 0,
+      deadLetterItems: itemsByStatus.dead_letter ?? 0,
+      stuckItems: stuckItems.length,
+      highRetryItems: highRetryItems.length,
+    });
+    return report;
   } catch (err) {
-    console.error("[generateQueueDiagnostics] Failed to parse queue:", err);
+    observability.logger.error(
+      "[generateQueueDiagnostics] Failed to parse queue",
+      err,
+    );
+    observability.sync.recordSyncFailure("generateQueueDiagnostics", err, {
+      reason: "queue_parse_failed",
+    });
     return {
       totalItems: 0,
       itemsByStatus: {},
@@ -192,16 +206,17 @@ export function generateQueueDiagnostics(): QueueDiagnosticReport {
 export function printQueueDiagnostics(): QueueDiagnosticReport {
   const report = generateQueueDiagnostics();
 
-  console.log("=== Queue Diagnostics ===");
-  console.log(`Total Items: ${report.totalItems}`);
-  console.log(`Items by Status:`, report.itemsByStatus);
-  console.log(`Items by Entity:`, report.itemsByEntity);
-  console.log(`Items by Operation:`, report.itemsByOperation);
-  console.log(`Items by Owner Type:`, report.itemsByOwnerType);
-  console.log(`Common Errors:`, report.commonErrors);
-  console.log(`High Retry Items:`, report.highRetryItems);
-  console.log(`Stuck Items:`, report.stuckItems);
-  console.log(`Recommendations:`, report.recommendations);
+  observability.logger.info("[QueueDiagnostics] Queue diagnostic report", {
+    totalItems: report.totalItems,
+    itemsByStatus: report.itemsByStatus,
+    itemsByEntity: report.itemsByEntity,
+    itemsByOperation: report.itemsByOperation,
+    itemsByOwnerType: report.itemsByOwnerType,
+    commonErrorCount: report.commonErrors.length,
+    highRetryCount: report.highRetryItems.length,
+    stuckItemCount: report.stuckItems.length,
+    recommendationCount: report.recommendations.length,
+  });
 
   return report;
 }

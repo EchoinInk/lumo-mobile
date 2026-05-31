@@ -5,6 +5,7 @@ import { useEnvironmentalSoftening } from "@/src/features/calmMode/hooks/useEnvi
 import { useCognitiveLoad } from "@/src/features/focus/hooks/useCognitiveLoad";
 import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { Spacing } from "@/src/theme/tokens";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { EmptyTasks } from "../components/EmptyTasks";
@@ -114,14 +115,28 @@ export default function TasksScreen() {
             </View>
           </View>
         ) : (
-          <Button
-            variant="secondary"
-            size="md"
-            onPress={() => setIsAdding(true)}
-            accessibilityLabel="Add a new task"
-          >
-            + Add Task
-          </Button>
+          <View style={styles.actionButtons}>
+            <Button
+              variant="secondary"
+              size="md"
+              onPress={() => setIsAdding(true)}
+              accessibilityLabel="Add a new task"
+            >
+              + Add Task
+            </Button>
+            <Button
+              variant="ghost"
+              size="md"
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/more/brain-dump" as const,
+                } as any)
+              }
+              accessibilityLabel="Open Brain Dump"
+            >
+              Brain Dump
+            </Button>
+          </View>
         )}
 
         {/* Filter Pills */}
@@ -171,6 +186,10 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     gap: Spacing.sm,
     marginTop: Spacing.sm,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: Spacing.sm,
   },
   filterContainer: {
     marginTop: Spacing.md,

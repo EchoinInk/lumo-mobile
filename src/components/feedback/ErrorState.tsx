@@ -6,9 +6,10 @@
  */
 
 import { getErrorMessage } from "@/constants/feedbackMessages";
-import { Colors } from "@/theme/colors";
+import { Button } from "@/components/ui/Button";
+import { Colors, Spacing, Typography } from "@/theme/tokens";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 interface ErrorStateProps {
   errorKey?: string;
@@ -39,16 +40,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           {description || message.description}
         </Text>
         {onRetry && (
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: Colors.primary }]}
+          <Button
+            style={styles.button}
             onPress={onRetry}
-            accessibilityRole="button"
             accessibilityLabel={actionLabel || message.actionLabel}
+            accessibilityHint="Retries the recovery action"
           >
-            <Text style={styles.buttonText}>
-              {actionLabel || message.actionLabel}
-            </Text>
-          </TouchableOpacity>
+            {actionLabel || message.actionLabel}
+          </Button>
         )}
       </View>
     </View>
@@ -60,34 +59,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: Spacing.lg,
   },
   content: {
     alignItems: "center",
     maxWidth: 300,
   },
   title: {
-    fontSize: 18,
+    ...Typography.subheading,
     fontWeight: "600",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: Spacing.sm,
   },
   description: {
-    fontSize: 14,
+    ...Typography.body,
     textAlign: "center",
-    marginBottom: 24,
-    lineHeight: 20,
+    marginBottom: Spacing.lg,
   },
   button: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.textPrimary,
+    minWidth: 120,
   },
 });

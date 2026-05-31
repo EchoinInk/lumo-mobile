@@ -1,11 +1,19 @@
 import { analytics } from "./analytics";
 import { logger } from "./logger";
 import { performanceMetrics } from "./performanceMetrics";
-import type { ObservabilityTransport, SyncMetric } from "./types";
+import type {
+  ObservabilityConfig,
+  ObservabilityTransport,
+  SyncMetric,
+} from "./types";
 
 const metrics: SyncMetric[] = [];
 const transports = new Set<ObservabilityTransport>();
 const MAX_SYNC_BUFFER = 200;
+const config: ObservabilityConfig = {
+  enabled: true,
+  debugMode: typeof __DEV__ !== "undefined" && __DEV__,
+};
 
 function remember(metric: SyncMetric): void {
   metrics.push(metric);
@@ -19,25 +27,64 @@ function sendToTransports(metric: SyncMetric): void {
     try {
       transport.sync?.(metric);
     } catch (error) {
-      logger.warn("[Observability] Sync transport failed", undefined, error);
+      logger.error("[Observability] Sync transport failed", error);
     }
   });
 }
 
+function normalizeErrorMessage(error?: unknown): string | undefined {
+  if (!error) {
+    return undefined;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
 function recordSyncMetric(
   operation: string,
-  duration: number,
   success: boolean,
-  properties?: Record<string, unknown>,
+  metadata?: Record<string, unknown>,
+  error?: unknown,
 ): SyncMetric {
-  const metric = { operation, duration, success };
+  if (!config.enabled) {
+    return {
+      operation,
+      success,
+      timestamp: Date.now(),
+    };
+  }
+
+  const metric: SyncMetric = {
+    operation,
+    duration:
+      typeof metadata?.duration === "number" ? metadata.duration : undefined,
+    success,
+    queueSize:
+      typeof metadata?.queueSize === "number" ? metadata.queueSize : undefined,
+    errorMessage: normalizeErrorMessage(error),
+    timestamp: Date.now(),
+    metadata,
+  };
+
   remember(metric);
   sendToTransports(metric);
-  performanceMetrics.recordMetric(`sync.${operation}.duration`, duration);
+  if (typeof metric.duration === "number") {
+    performanceMetrics.recordMetric(
+      `sync.${operation}.duration`,
+      metric.duration,
+      metadata,
+    );
+  }
   analytics.track(success ? "sync_operation_succeeded" : "sync_operation_failed", {
     operation,
-    duration,
-    ...properties,
+    duration: metric.duration,
+    queueSize: metric.queueSize,
+    errorMessage: metric.errorMessage,
+    ...metadata,
   });
   return metric;
 }
@@ -45,24 +92,64 @@ function recordSyncMetric(
 export const syncMetrics = {
   recordSyncSuccess: (
     operation: string,
-    duration = 0,
-    properties?: Record<string, unknown>,
-  ) => recordSyncMetric(operation, duration, true, properties),
+    metadata?: Record<string, unknown> | number,
+    legacyMetadata?: Record<string, unknown>,
+  ) =>
+    recordSyncMetric(
+      operation,
+      true,
+      typeof metadata === "number"
+        ? { ...legacyMetadata, duration: metadata }
+        : metadata,
+    ),
   recordSyncFailure: (
     operation: string,
-    duration = 0,
-    properties?: Record<string, unknown>,
-  ) => recordSyncMetric(operation, duration, false, properties),
-  recordQueueReplay: (count = 1, properties?: Record<string, unknown>) =>
-    analytics.track("sync_queue_replay", { count, ...properties }),
-  recordQueueFailure: (count = 1, properties?: Record<string, unknown>) =>
-    analytics.track("sync_queue_failure", { count, ...properties }),
-  recordQueueRecovery: (count = 1, properties?: Record<string, unknown>) =>
-    analytics.track("sync_queue_recovery", { count, ...properties }),
-  recordConflictResolution: (
-    count = 1,
-    properties?: Record<string, unknown>,
-  ) => analytics.track("sync_conflict_resolution", { count, ...properties }),
+    errorOrDuration?: unknown,
+    metadata?: Record<string, unknown>,
+  ) =>
+    recordSyncMetric(
+      operation,
+      false,
+      typeof errorOrDuration === "number"
+        ? { ...metadata, duration: errorOrDuration }
+        : metadata,
+      typeof errorOrDuration === "number" ? undefined : errorOrDuration,
+    ),
+  recordQueueReplay: (count = 1, metadata?: Record<string, unknown>) => {
+    if (!config.enabled) {
+      return;
+    }
+    analytics.track("sync_queue_replay", { count, ...metadata });
+  },
+  recordQueueFailure: (count = 1, metadata?: Record<string, unknown>) => {
+    if (!config.enabled) {
+      return;
+    }
+    analytics.track("sync_queue_failure", { count, ...metadata });
+  },
+  recordQueueRecovery: (
+    metadataOrCount?: Record<string, unknown> | number,
+    legacyMetadata?: Record<string, unknown>,
+  ) => {
+    if (!config.enabled) {
+      return;
+    }
+
+    const metadata =
+      typeof metadataOrCount === "number"
+        ? { count: metadataOrCount, ...legacyMetadata }
+        : metadataOrCount;
+    analytics.track("sync_queue_recovery", metadata);
+  },
+  recordConflictResolution: (metadata?: Record<string, unknown>) => {
+    if (!config.enabled) {
+      return;
+    }
+    analytics.track("sync_conflict_resolution", metadata);
+  },
+  configure: (nextConfig: Partial<ObservabilityConfig>) => {
+    Object.assign(config, nextConfig);
+  },
   addTransport: (transport: ObservabilityTransport) => {
     transports.add(transport);
     return () => transports.delete(transport);

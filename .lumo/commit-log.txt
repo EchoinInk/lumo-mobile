@@ -21209,3 +21209,9 @@ COMMIT: chore(lumo): update syncProcessor.ts
 FILES:
 src/services/sync/queue/syncProcessor.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-05-30 10:14:15
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+

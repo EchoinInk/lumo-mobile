@@ -7,6 +7,7 @@
 
 import { storageInstance as mmkvStorage } from "../../../store/storage";
 import { getEntityStorageKey } from "../../../services/storage/storagePartition";
+import { observability } from "../../observability";
 
 const STALE_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -72,10 +73,20 @@ export function removeStaleCacheEntries(localOwnerId: string): number {
   const staleKeys = detectStaleCacheEntries(localOwnerId);
 
   for (const key of staleKeys) {
-    mmkvStorage.delete(key);
+    if (typeof mmkvStorage.remove === "function") {
+      mmkvStorage.remove(key);
+    } else if (typeof mmkvStorage.delete === "function") {
+      mmkvStorage.delete(key);
+    }
   }
 
-  console.log(`[removeStaleCacheEntries] Removed ${staleKeys.length} stale entries`);
+  observability.sync.recordQueueRecovery({
+    operation: "removeStaleCacheEntries",
+    removedCount: staleKeys.length,
+  });
+  observability.logger.info("[removeStaleCacheEntries] Removed stale entries", {
+    removedCount: staleKeys.length,
+  });
 
   return staleKeys.length;
 }
@@ -131,7 +142,9 @@ export function removeOrphanedCacheEntries(localOwnerId: string): number {
   // Check if these entities have corresponding queue items
   // This is a simplified check - in production, you'd want more sophisticated logic
 
-  console.log(`[removeOrphanedCacheEntries] Found ${cachedEntityIds.size} cached entities`);
+  observability.logger.info("[removeOrphanedCacheEntries] Found cached entities", {
+    cachedEntityCount: cachedEntityIds.size,
+  });
 
   return 0;
 }

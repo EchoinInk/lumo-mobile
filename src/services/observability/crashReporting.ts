@@ -1,12 +1,23 @@
 import { analytics } from "./analytics";
 import { logger } from "./logger";
-import type { CrashContext, ObservabilityTransport } from "./types";
+import type {
+  CrashContext,
+  ObservabilityConfig,
+  ObservabilityTransport,
+} from "./types";
 
 const context: CrashContext = {};
-const captured: Array<{ error: unknown; context?: CrashContext; timestamp: number }> =
-  [];
+const captured: Array<{
+  error: unknown;
+  context?: CrashContext;
+  timestamp: number;
+}> = [];
 const transports = new Set<ObservabilityTransport>();
 const MAX_CRASH_BUFFER = 50;
+const config: ObservabilityConfig = {
+  enabled: true,
+  debugMode: typeof __DEV__ !== "undefined" && __DEV__,
+};
 
 function mergeContext(incoming?: CrashContext): CrashContext {
   return {
@@ -43,6 +54,10 @@ function sendToTransports(error: unknown, crashContext?: CrashContext): void {
 
 export const crashReporting = {
   captureException: (error: unknown, crashContext?: CrashContext): void => {
+    if (!config.enabled) {
+      return;
+    }
+
     const mergedContext = mergeContext(crashContext);
     remember(error, mergedContext);
     sendToTransports(error, mergedContext);
@@ -50,10 +65,15 @@ export const crashReporting = {
       screen: mergedContext.screen,
       feature: mergedContext.feature,
     });
-    logger.error("[Observability] Exception captured", mergedContext.metadata, error);
+    logger.error("[Observability] Exception captured", error, mergedContext.metadata);
   },
   captureMessage: (message: string, crashContext?: CrashContext): void => {
+    if (!config.enabled) {
+      return;
+    }
+
     const mergedContext = mergeContext(crashContext);
+    remember(message, mergedContext);
     analytics.track("crash_message_captured", {
       screen: mergedContext.screen,
       feature: mergedContext.feature,
@@ -67,6 +87,9 @@ export const crashReporting = {
     delete context.screen;
     delete context.feature;
     delete context.metadata;
+  },
+  configure: (nextConfig: Partial<ObservabilityConfig>) => {
+    Object.assign(config, nextConfig);
   },
   addTransport: (transport: ObservabilityTransport) => {
     transports.add(transport);
