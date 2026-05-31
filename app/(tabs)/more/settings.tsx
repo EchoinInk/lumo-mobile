@@ -187,6 +187,20 @@ export default function SettingsScreen() {
           Reminders
         </Text>
         <ReminderSettingsCard />
+        <TouchableOpacity
+          style={styles.reminderLink}
+          onPress={() =>
+            router.push({ pathname: "/reminder-settings" as const } as any)
+          }
+          accessibilityRole="button"
+          accessibilityLabel="Open reminder settings"
+          accessibilityHint="Opens the full reminder settings screen"
+        >
+          <Text variant="caption" color={Colors.primary}>
+            Open reminder settings
+          </Text>
+          <ChevronRight size={16} color={Colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {/* Settings Sections */}
@@ -275,5 +289,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.xs,
+  },
+  reminderLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: Spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: Spacing.sm,
   },
 });

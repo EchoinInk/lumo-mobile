@@ -52,28 +52,28 @@ export function getNextOccurrence(
   const next = new Date(date);
 
   if (pattern.type === "daily") {
-    next.setDate(date.getDate() + (pattern.interval ?? 1));
+    next.setUTCDate(date.getUTCDate() + (pattern.interval ?? 1));
     return formatDateOnly(next);
   }
 
   if (pattern.type === "weekly") {
     const selected = pattern.weekdays ?? [];
     if (selected.length === 0) {
-      next.setDate(date.getDate() + 7 * (pattern.interval ?? 1));
+      next.setUTCDate(date.getUTCDate() + 7 * (pattern.interval ?? 1));
       return formatDateOnly(next);
     }
 
     for (let offset = 1; offset <= 14 * (pattern.interval ?? 1); offset++) {
       next.setTime(date.getTime());
-      next.setDate(date.getDate() + offset);
-      if (selected.includes(weekdays[next.getDay()])) {
+      next.setUTCDate(date.getUTCDate() + offset);
+      if (selected.includes(weekdays[next.getUTCDay()])) {
         return formatDateOnly(next);
       }
     }
   }
 
   if (pattern.type === "monthly") {
-    next.setMonth(date.getMonth() + (pattern.interval ?? 1));
+    next.setUTCMonth(date.getUTCMonth() + (pattern.interval ?? 1));
     return formatDateOnly(next);
   }
 

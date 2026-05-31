@@ -36,4 +36,22 @@ export function testRecurrenceCalculatesNextDates(): void {
     "2026-06-03",
     "selected weekday recurrence should find the next selected day",
   );
+  assertEqual(
+    getNextOccurrence("2026-06-01", { type: "monthly", interval: 1 }),
+    "2026-07-01",
+    "monthly recurrence should advance by months in UTC",
+  );
+}
+
+export function testMonthlyRecurrenceSummaryIsReadable(): void {
+  assertEqual(
+    summarizeRecurrence({ type: "monthly", interval: 1 }),
+    "Every month",
+    "monthly recurrence should be readable",
+  );
+  assertEqual(
+    summarizeRecurrence({ type: "monthly", interval: 2 }),
+    "Every 2 months",
+    "monthly interval recurrence should be readable",
+  );
 }

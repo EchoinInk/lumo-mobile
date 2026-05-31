@@ -172,6 +172,7 @@ export default function TasksScreen() {
         <Button
           size="sm"
           onPress={() => setIsQuickCaptureVisible(true)}
+          accessibilityLabel="Quick capture"
           accessibilityHint="Opens a lightweight capture sheet"
         >
           Quick Capture
@@ -180,6 +181,7 @@ export default function TasksScreen() {
           size="sm"
           variant="ghost"
           onPress={() => router.push({ pathname: "/brain-dump" as const } as any)}
+          accessibilityLabel="Brain dump"
           accessibilityHint="Opens Brain Dump for uncategorized thoughts"
         >
           Brain Dump
@@ -431,6 +433,19 @@ export default function TasksScreen() {
       <SectionHeader
         title="Routine bundles"
         subtitle="Small editable starting points"
+        rightElement={
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() =>
+              router.push({ pathname: "/routine-bundles" as const } as any)
+            }
+            accessibilityLabel="Open routine bundles"
+            accessibilityHint="Opens the full routine bundles screen"
+          >
+            View all
+          </Button>
+        }
       />
       <View style={styles.bundleList}>
         {starterRoutineBundles.map((bundle) => (

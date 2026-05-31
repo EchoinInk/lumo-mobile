@@ -129,7 +129,7 @@ export default function TasksScreen() {
               size="md"
               onPress={() =>
                 router.push({
-                  pathname: "/(tabs)/more/brain-dump" as const,
+                  pathname: "/brain-dump" as const,
                 } as any)
               }
               accessibilityLabel="Open Brain Dump"
