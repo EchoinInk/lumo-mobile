@@ -6,6 +6,11 @@ import {
 
 export function testRecurrenceSummariesStayHumanReadable(): void {
   assertEqual(
+    summarizeRecurrence({ type: "daily", interval: 1 }),
+    "Every day",
+    "daily recurrence should be readable",
+  );
+  assertEqual(
     summarizeRecurrence({ type: "weekly", weekdays: ["Mon"] }),
     "Every Mon",
     "single weekday recurrence should be readable",

@@ -1,5 +1,30 @@
 # Changelog
 
+## Phase 15.1 — Daily Relief QA + Integration Pass
+
+### Summary
+
+Audited and refined Phase 15.0 Daily Relief features for reachability, calm UX, local-first behavior, and production-safe polish. No new major features, dependencies, backend work, or route moves.
+
+### Changes
+
+- Fixed Brain Dump navigation paths that incorrectly pointed at a non-existent `/(tabs)/more/brain-dump` route; all entry points now use `/brain-dump`.
+- Added thin Expo Router wrappers for `/routine-bundles` and `/reminder-settings`, with Tasks and Settings links for reachability.
+- Hardened recurrence next-date math to use UTC date fields for timezone-stable daily, weekly, and monthly calculations.
+- Expanded recurrence tests for daily, monthly summaries, and monthly next-date behavior.
+- Enhanced `ReminderSettingsCard` with quiet hours display and reminder haptics toggle wiring.
+- Reset `QuickCaptureSheet` input/target when closed; improved capture and Brain Dump conversion accessibility labels.
+- Softened Today Focus empty copy and improved Today Focus / snooze action labels.
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 47 tests, 0 failures
+- Route scan detects `app/brain-dump`, `app/routine-bundles`, `app/reminder-settings`, and tab routes under `app/`
+- `src/app` does not exist
+- No route files moved or duplicated
+- No new dependencies added
+
 ## Phase 15.0 — Daily Relief Features
 
 ### Summary
