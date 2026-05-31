@@ -7,7 +7,7 @@ import { useReminders } from "@/src/features/reminders";
 import { useTasks } from "@/src/features/tasks";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import { Bell, CheckSquare, Cloud } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export type QuickCaptureTarget = "task" | "brain_dump" | "reminder";
@@ -38,6 +38,13 @@ export function QuickCaptureSheet({
   const { createTask } = useTasks();
   const brainDump = useBrainDump();
   const reminders = useReminders();
+
+  useEffect(() => {
+    if (!visible) {
+      setText("");
+      setTarget(defaultTarget);
+    }
+  }, [visible, defaultTarget]);
 
   const handleSave = () => {
     const value = text.trim();
@@ -103,9 +110,13 @@ export function QuickCaptureSheet({
         />
 
         <View style={styles.actions}>
-          <Button variant="ghost" onPress={onClose}>
-            Cancel
-          </Button>
+        <Button
+          variant="ghost"
+          onPress={onClose}
+          accessibilityLabel="Close quick capture"
+        >
+          Cancel
+        </Button>
           <Button
             onPress={handleSave}
             disabled={!text.trim()}

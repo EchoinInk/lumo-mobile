@@ -22,7 +22,7 @@ export function TodayFocusCard({
   tasks,
   onToggle,
   onAddPress,
-  emptyMessage = "Nothing urgent here. You can add one small step when you're ready.",
+  emptyMessage = "Nothing lined up here. You can add one small step when you're ready.",
 }: TodayFocusCardProps) {
   if (tasks.length === 0) {
     return (

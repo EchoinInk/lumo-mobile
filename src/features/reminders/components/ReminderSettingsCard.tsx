@@ -55,6 +55,41 @@ export function ReminderSettingsCard() {
           );
         })}
       </View>
+
+      <View style={styles.quietHours}>
+        <Text variant="label" color={Colors.textSecondary}>
+          Quiet hours
+        </Text>
+        <Text variant="body">
+          {settings.quietHoursStart} – {settings.quietHoursEnd}
+        </Text>
+        <Text variant="caption" color={Colors.textTertiary}>
+          Reminders stay gentle during this window.
+        </Text>
+      </View>
+
+      <View style={styles.hapticsRow}>
+        <View style={styles.hapticsCopy}>
+          <Text variant="label" color={Colors.textSecondary}>
+            Haptics
+          </Text>
+          <Text variant="caption" color={Colors.textTertiary}>
+            Soft feedback when reminders are used.
+          </Text>
+        </View>
+        <Button
+          size="sm"
+          variant={settings.hapticsEnabled ? "secondary" : "ghost"}
+          onPress={() =>
+            updateSettings({ hapticsEnabled: !settings.hapticsEnabled })
+          }
+          accessibilityRole="switch"
+          accessibilityState={{ checked: settings.hapticsEnabled }}
+          accessibilityLabel="Reminder haptics"
+        >
+          {settings.hapticsEnabled ? "On" : "Off"}
+        </Button>
+      </View>
     </Card>
   );
 }
@@ -85,5 +120,18 @@ const styles = StyleSheet.create({
   toneSelected: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
+  },
+  quietHours: {
+    gap: Spacing.xs,
+  },
+  hapticsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: Spacing.md,
+  },
+  hapticsCopy: {
+    flex: 1,
+    gap: Spacing.xs,
   },
 });

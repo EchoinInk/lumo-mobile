@@ -26,13 +26,19 @@ export function BrainDumpEntryCard({
         Review gently when ready.
       </Text>
       <View style={styles.actions}>
-        <Button size="sm" variant="secondary" onPress={() => onConvert(entry, "task")}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onPress={() => onConvert(entry, "task")}
+          accessibilityLabel="Convert to task"
+        >
           Task
         </Button>
         <Button
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "reminder")}
+          accessibilityLabel="Convert to reminder"
         >
           Reminder
         </Button>
@@ -40,6 +46,7 @@ export function BrainDumpEntryCard({
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "routine_idea")}
+          accessibilityLabel="Save as routine idea"
         >
           Routine
         </Button>
@@ -47,6 +54,7 @@ export function BrainDumpEntryCard({
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "archived_note")}
+          accessibilityLabel="Archive thought"
         >
           Archive
         </Button>

@@ -17,6 +17,7 @@ export function GentleSnoozeActions({
         size="sm"
         variant="ghost"
         onPress={onSnooze}
+        accessibilityLabel="Snooze gently"
         accessibilityHint="Moves this item out of today"
       >
         Snooze gently
@@ -25,6 +26,7 @@ export function GentleSnoozeActions({
         size="sm"
         variant="ghost"
         onPress={onLater}
+        accessibilityLabel="Move to later"
         accessibilityHint="Moves this item to tomorrow"
       >
         Later

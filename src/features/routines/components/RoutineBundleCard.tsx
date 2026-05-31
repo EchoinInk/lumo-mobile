@@ -47,6 +47,8 @@ export function RoutineBundleCard({ bundle, onUse }: RoutineBundleCardProps) {
             items: items.filter((item) => item.title.trim().length > 0),
           })
         }
+        accessibilityLabel={`Use ${bundle.title} bundle`}
+        accessibilityHint="Creates tasks from the edited bundle items"
       >
         Use bundle
       </Button>

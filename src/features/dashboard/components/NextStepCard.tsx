@@ -40,6 +40,7 @@ export function NextStepCard({
           size="sm"
           onPress={() => onStart(task.id)}
           leftIcon={<Play size={16} color={Colors.textInverse} />}
+          accessibilityLabel={`Start ${task.title}`}
           accessibilityHint="Starts Focus Mode for this task"
         >
           Start
@@ -49,6 +50,7 @@ export function NextStepCard({
           variant="secondary"
           onPress={() => onDone(task.id)}
           leftIcon={<CheckCircle2 size={16} color={Colors.textInverse} />}
+          accessibilityLabel={`Mark ${task.title} done`}
           accessibilityHint="Marks this task as done"
         >
           Done
