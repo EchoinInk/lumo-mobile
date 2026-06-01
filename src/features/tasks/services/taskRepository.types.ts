@@ -61,4 +61,10 @@ export interface ITaskRepository extends IRepository<Task> {
    * Clears pendingSync flag and stamps lastSyncedAt.
    */
   markSynced(id: string): Promise<void>;
+
+  /**
+   * Persist the current visible task list as source of truth.
+   * Upserts visible tasks and soft-deletes tasks removed from the list.
+   */
+  persistVisibleTasks(tasks: Task[]): Promise<void>;
 }

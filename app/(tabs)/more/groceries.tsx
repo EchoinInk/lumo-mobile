@@ -1,3 +1,4 @@
+import { CalmPlaceholderNote } from "@/src/components/ui/CalmPlaceholderNote";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Screen } from "@/src/components/ui/Screen";
@@ -56,7 +57,14 @@ export default function GroceriesScreen() {
       </ScrollView>
 
       {/* Add Button */}
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        disabled
+        accessibilityRole="button"
+        accessibilityLabel="Add grocery item"
+        accessibilityHint="Grocery tracking is coming soon"
+        accessibilityState={{ disabled: true }}
+      >
         <LinearGradient
           colors={[Colors.pink, Colors.purple]}
           start={{ x: 0, y: 0 }}
@@ -82,6 +90,8 @@ export default function GroceriesScreen() {
           actionLabel="Add First Item"
         />
       )}
+
+      <CalmPlaceholderNote />
     </Screen>
   );
 }

@@ -22,8 +22,12 @@ export {
 export { useDailyPlanningFlow } from "./hooks/useDailyPlanningFlow";
 
 export { CalmDailySummary } from "./components/CalmDailySummary";
+export type { PlanningDashboardState } from "./components/CalmDailySummary";
 export { MorningPlanningCard } from "./components/MorningPlanningCard";
+export { MorningPlanningCompleteCard } from "./components/MorningPlanningCompleteCard";
 export { EveningResetCard } from "./components/EveningResetCard";
+export { EveningResetCompleteCard } from "./components/EveningResetCompleteCard";
+export { PlanningGentleFade } from "./components/PlanningGentleFade";
 export { BrainDumpReviewQueue } from "./components/BrainDumpReviewQueue";
 export { NextStepChooser } from "./components/NextStepChooser";
 export { LowEnergyPlanCard } from "./components/LowEnergyPlanCard";

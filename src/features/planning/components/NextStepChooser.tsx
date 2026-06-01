@@ -2,7 +2,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import type { PlanningNextStep } from "@/src/features/planning/types/planning";
-import { Colors, Radius, Spacing } from "@/src/theme/tokens";
+import { Colors, Spacing } from "@/src/theme/tokens";
 import { Check } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
   },
   selectedCard: {
     borderColor: Colors.primary + "40",
+    borderWidth: 1,
   },
   selectedRow: {
     flexDirection: "row",
@@ -134,3 +135,4 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
 });
+

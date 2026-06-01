@@ -2,6 +2,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { ReducedMotionWrapper } from "@/src/features/calmMode/components/ReducedMotionWrapper";
+import { MorningPlanningCompleteCard } from "@/src/features/planning/components/MorningPlanningCompleteCard";
 import type {
   BrainDumpConversionTarget,
   BrainDumpEntry,
@@ -23,6 +24,8 @@ interface MorningPlanningCardProps {
   compact?: boolean;
   morningComplete?: boolean;
   energyLevel?: PlanningEnergyLevel;
+  carryOverCount?: number;
+  brainDumpCount?: number;
   carryOverItems?: CarryOverItem[];
   brainDumpQueue?: import("@/src/features/planning/types/planning").BrainDumpQueueItem[];
   brainDumpEntries?: BrainDumpEntry[];
@@ -48,6 +51,9 @@ interface MorningPlanningCardProps {
   onComplete?: () => void;
   onOpenPlanning?: () => void;
   onReviewBrainDump?: () => void;
+  onBackToDashboard?: () => void;
+  onOpenTodayFocus?: () => void;
+  onAdjustPlan?: () => void;
 }
 
 const energyOptions: Array<{
@@ -55,9 +61,21 @@ const energyOptions: Array<{
   label: string;
   hint: string;
 }> = [
-  { value: "low", label: "Low", hint: "Tiny or quiet — a lighter plan is still a plan" },
-  { value: "medium", label: "Medium", hint: "Some effort — choose one small step" },
-  { value: "steady", label: "Steady", hint: "Ready to focus gently" },
+  {
+    value: "low",
+    label: "Low",
+    hint: "Tiny or quiet — a lighter plan still counts",
+  },
+  {
+    value: "medium",
+    label: "Medium",
+    hint: "Some effort — choose one small step",
+  },
+  {
+    value: "steady",
+    label: "Steady",
+    hint: "Ready to focus gently",
+  },
 ];
 
 function PlanningEnergyPicker({
@@ -103,6 +121,8 @@ export function MorningPlanningCard({
   compact = false,
   morningComplete = false,
   energyLevel,
+  carryOverCount = 0,
+  brainDumpCount = 0,
   carryOverItems = [],
   brainDumpQueue = [],
   brainDumpEntries = [],
@@ -122,6 +142,9 @@ export function MorningPlanningCard({
   onComplete,
   onOpenPlanning,
   onReviewBrainDump,
+  onBackToDashboard,
+  onOpenTodayFocus,
+  onAdjustPlan,
 }: MorningPlanningCardProps) {
   if (compact) {
     if (morningComplete) {
@@ -149,19 +172,17 @@ export function MorningPlanningCard({
     );
   }
 
-  if (morningComplete) {
+  if (morningComplete && onBackToDashboard) {
     return (
-      <ReducedMotionWrapper>
-        <Card variant="gradient" style={styles.card}>
-          <Text variant="subheading" style={styles.title}>
-            Morning plan set
-          </Text>
-          <Text variant="body" color={Colors.textSecondary}>
-            Today already has a gentle shape.
-            {selectedNextStep ? ` Start with ${selectedNextStep.label}.` : ""}
-          </Text>
-        </Card>
-      </ReducedMotionWrapper>
+      <MorningPlanningCompleteCard
+        energyLevel={energyLevel}
+        nextStep={selectedNextStep}
+        carryOverCount={carryOverCount}
+        brainDumpCount={brainDumpCount}
+        onBackToDashboard={onBackToDashboard}
+        onOpenTodayFocus={onOpenTodayFocus}
+        onAdjustPlan={onAdjustPlan}
+      />
     );
   }
 
@@ -193,10 +214,10 @@ export function MorningPlanningCard({
               <Button
                 onPress={onComplete}
                 accessibilityRole="button"
-                accessibilityLabel="Start here"
-                accessibilityHint="Confirms your morning plan and starts your chosen step"
+                accessibilityLabel="Complete planning"
+                accessibilityHint="Confirms your morning plan"
               >
-                Start here
+                Complete planning
               </Button>
             )}
           </>
@@ -245,10 +266,10 @@ export function MorningPlanningCard({
               <Button
                 onPress={onComplete}
                 accessibilityRole="button"
-                accessibilityLabel="Start here"
+                accessibilityLabel="Complete planning"
                 accessibilityHint="Confirms your morning plan"
               >
-                Start here
+                Complete planning
               </Button>
             )}
           </>

@@ -115,6 +115,9 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen name="dashboard" options={{ href: null }} />
+      <Tabs.Screen name="add" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -1,0 +1,57 @@
+import {
+  createEmptyDailySummary,
+  loadDailyPlanningSummary,
+  normalizeDailyPlanningSummary,
+  persistDailyPlanningSummary,
+} from "@/features/planning/services/planningStorage";
+import { deleteKey, setString } from "@/services/storage/mmkv";
+import { StorageKeys } from "@/services/storage/storageKeys";
+import { assertEqual, resetTestState } from "../testUtils";
+
+export async function testNormalizeDailyPlanningSummaryFallsBackSafely(): Promise<void> {
+  const summary = normalizeDailyPlanningSummary({
+    date: "2026-01-01",
+    selectedFocusIds: ["a", 1, null] as unknown as string[],
+    energyLevel: "invalid" as never,
+    morningCompleted: "yes" as never,
+  });
+
+  assertEqual(summary.selectedFocusIds.join(","), "a", "non-string ids should be filtered");
+  assertEqual(summary.energyLevel, undefined, "invalid energy should be cleared");
+  assertEqual(summary.morningCompleted, false, "invalid booleans should default false");
+}
+
+export async function testLoadDailyPlanningSummaryRollsOverStaleDate(): Promise<void> {
+  resetTestState();
+  deleteKey(StorageKeys.PLANNING_SUMMARY);
+
+  persistDailyPlanningSummary(
+    normalizeDailyPlanningSummary({
+      date: "2000-01-01",
+      morningCompleted: true,
+      selectedFocusIds: ["old-focus"],
+    }),
+  );
+
+  const loaded = loadDailyPlanningSummary();
+  const today = new Date().toISOString().split("T")[0];
+
+  assertEqual(loaded?.date, today, "stale planning summary should roll to today");
+  assertEqual(loaded?.morningCompleted, false, "rolled summary should reset completion flags");
+  assertEqual(loaded?.selectedFocusIds.length, 0, "rolled summary should clear focus ids");
+}
+
+export async function testLoadDailyPlanningSummaryHandlesCorruptJson(): Promise<void> {
+  resetTestState();
+  setString(StorageKeys.PLANNING_SUMMARY, "{bad json");
+
+  assertEqual(loadDailyPlanningSummary(), null, "corrupt planning json should return null");
+}
+
+export async function testCreateEmptyDailySummaryUsesToday(): Promise<void> {
+  const summary = createEmptyDailySummary();
+  const today = new Date().toISOString().split("T")[0];
+
+  assertEqual(summary.date, today, "empty summary should use today");
+  assertEqual(summary.eveningCompleted, false, "empty summary should not be completed");
+}

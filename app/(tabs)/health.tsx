@@ -15,7 +15,7 @@ import {
   ArrowRight,
   Dumbbell,
   Flame,
-  Heart,
+  HeartPulse,
   Plus,
   Scale,
   TrendingDown,
@@ -48,25 +48,25 @@ const healthLinks = [
     title: "My Habits",
     icon: Flame,
     color: Colors.purple,
-    route: "/more/habits",
+    route: "/(tabs)/more/habits",
   },
   {
     title: "My Meals",
     icon: Utensils,
     color: Colors.pink,
-    route: "/more/meals",
+    route: "/(tabs)/more/meals",
   },
   {
     title: "Weight Tracker",
     icon: Scale,
     color: Colors.primary,
-    route: "/more/weight",
+    route: "/(tabs)/more/weight",
   },
   {
     title: "Workout Log",
     icon: Dumbbell,
     color: Colors.warning,
-    route: "/more/workouts",
+    route: "/(tabs)/more/workouts",
   },
 ];
 
@@ -186,10 +186,10 @@ export default function HealthScreen() {
             color={Colors.textSecondary}
             style={styles.emptyTitle}
           >
-            No habits yet
+            Nothing needs your attention here yet.
           </Text>
           <Text variant="caption" color={Colors.textTertiary}>
-            Add a gentle routine to get started
+            Add a gentle routine when you are ready.
           </Text>
         </Card>
       )}
@@ -345,6 +345,9 @@ export default function HealthScreen() {
             key={link.title}
             onPress={() => router.push(link.route as any)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={link.title}
+            accessibilityHint={`Opens ${link.title}`}
           >
             <Card variant="elevated" style={styles.linkCard}>
               <View
@@ -364,18 +367,14 @@ export default function HealthScreen() {
         ))}
       </View>
 
-      {/* Encouragement Card */}
-      <Card variant="gradient" style={styles.encouragementCard}>
-        <View style={styles.encouragementContent}>
-          <Heart size={20} color={Colors.textInverse} />
-          <Text
-            variant="body"
-            color={Colors.textInverse}
-            style={styles.encouragementText}
-          >
-            Your body appreciates every healthy choice you make
-          </Text>
-        </View>
+      {/* Calm note */}
+      <Card variant="outlined" style={styles.placeholderCard}>
+        <Text variant="body" color={Colors.textSecondary}>
+          This space is coming together.
+        </Text>
+        <Text variant="caption" color={Colors.textTertiary}>
+          Nothing needs your attention here yet.
+        </Text>
       </Card>
     </Screen>
   );
@@ -450,18 +449,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "500",
   },
-  encouragementCard: {
+  placeholderCard: {
     marginBottom: Spacing.xl,
     padding: Spacing.lg,
-  },
-  encouragementContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
-  },
-  encouragementText: {
-    flex: 1,
-    fontWeight: "500",
+    gap: Spacing.xs,
   },
   habitList: {
     gap: Spacing.md,

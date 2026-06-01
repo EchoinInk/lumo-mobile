@@ -1,3 +1,4 @@
+import { CalmPlaceholderNote } from "@/src/components/ui/CalmPlaceholderNote";
 import { Card } from "@/src/components/ui/Card";
 import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
@@ -89,7 +90,14 @@ export default function CleaningScreen() {
       </ScrollView>
 
       {/* Add Button */}
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        disabled
+        accessibilityRole="button"
+        accessibilityLabel="Add cleaning task"
+        accessibilityHint="Cleaning scheduling is coming soon"
+        accessibilityState={{ disabled: true }}
+      >
         <LinearGradient
           colors={[Colors.pink, Colors.purple]}
           start={{ x: 0, y: 0 }}
@@ -106,6 +114,8 @@ export default function CleaningScreen() {
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      <CalmPlaceholderNote />
     </Screen>
   );
 }

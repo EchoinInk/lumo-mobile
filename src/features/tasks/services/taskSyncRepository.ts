@@ -195,6 +195,10 @@ class TaskSyncRepository implements ITaskRepository {
     return taskLocalRepository.markSynced(id);
   }
 
+  async persistVisibleTasks(tasks: Task[]): Promise<void> {
+    return taskLocalRepository.persistVisibleTasks(tasks);
+  }
+
   /**
    * Check if there are unsynced task operations.
    */

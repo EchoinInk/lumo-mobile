@@ -166,6 +166,7 @@ export default function DashboardScreen() {
 
       <CalmDailySummary
         nextStep={planning.selectedNextStep}
+        energyLevel={planning.energyLevel}
         carryOverCount={planning.summary.carryOverIds.length}
         brainDumpCount={planning.brainDumpQueue.length}
         morningComplete={planning.morningComplete}
@@ -177,6 +178,10 @@ export default function DashboardScreen() {
         onEveningReset={() =>
           router.push({ pathname: "/planning/evening" as const } as any)
         }
+        onAdjustPlan={() => {
+          planning.resetMorningPlan();
+          router.push({ pathname: "/planning/morning" as const } as any);
+        }}
       />
 
       <SectionHeader

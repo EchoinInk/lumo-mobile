@@ -4,6 +4,10 @@ export const StorageKeys = {
   HABITS: "habits",
   MEALS: "meals",
   BUDGET: "budget",
+  BRAIN_DUMP_ENTRIES: "brain_dump_entries",
+  REMINDERS: "reminders",
+  REMINDER_SETTINGS: "reminder_settings",
+  PLANNING_SUMMARY: "daily_planning_summary",
 
   // User preferences
   USER_SETTINGS: "user_settings",

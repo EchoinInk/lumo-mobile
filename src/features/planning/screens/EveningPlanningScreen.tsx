@@ -13,24 +13,38 @@ export function EveningPlanningScreen() {
 
   const handleFinish = useCallback(() => {
     flow.completeEveningReset();
+  }, [flow]);
+
+  const handleBackToDashboard = useCallback(() => {
     router.back();
+  }, []);
+
+  const handleAddToBrainDump = useCallback(() => {
+    flow.markEveningBrainDumpVisited();
+    router.push({ pathname: "/brain-dump" as const } as any);
   }, [flow]);
 
   return (
     <Screen scrollable padded>
       <SectionHeader
         title="Evening reset"
-        subtitle="Close the loop without making it a project"
+        subtitle={
+          flow.summary.eveningCompleted
+            ? "Today is closed gently"
+            : "Close the loop without making it a project"
+        }
       />
       <EveningResetCard
         carryOverItems={flow.carryOverItems}
         eveningCompleted={flow.summary.eveningCompleted}
+        carriedCount={flow.summary.eveningCarriedIds.length}
+        parkedCount={flow.summary.eveningParkedIds.length}
+        brainDumpVisited={flow.summary.eveningBrainDumpVisited}
         onCarryToTomorrow={flow.carryToTomorrow}
         onPark={flow.parkItem}
-        onAddToBrainDump={() =>
-          router.push({ pathname: "/brain-dump" as const } as any)
-        }
+        onAddToBrainDump={handleAddToBrainDump}
         onFinishReset={handleFinish}
+        onBackToDashboard={handleBackToDashboard}
       />
     </Screen>
   );

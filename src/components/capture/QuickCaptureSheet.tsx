@@ -35,6 +35,7 @@ export function QuickCaptureSheet({
 }: QuickCaptureSheetProps) {
   const [target, setTarget] = useState<QuickCaptureTarget>(defaultTarget);
   const [text, setText] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const { createTask } = useTasks();
   const brainDump = useBrainDump();
   const reminders = useReminders();
@@ -43,24 +44,30 @@ export function QuickCaptureSheet({
     if (!visible) {
       setText("");
       setTarget(defaultTarget);
+      setIsSaving(false);
     }
   }, [visible, defaultTarget]);
 
   const handleSave = () => {
     const value = text.trim();
-    if (!value) return;
+    if (!value || isSaving) return;
 
-    if (target === "task") {
-      createTask({ title: value, priority: "medium" });
-    } else if (target === "reminder") {
-      reminders.addReminder({ title: value, tone: reminders.settings.tone });
-    } else {
-      brainDump.addEntry({ text: value });
+    setIsSaving(true);
+    try {
+      if (target === "task") {
+        createTask({ title: value, priority: "medium" });
+      } else if (target === "reminder") {
+        reminders.addReminder({ title: value, tone: reminders.settings.tone });
+      } else {
+        brainDump.addEntry({ text: value });
+      }
+
+      setText("");
+      setTarget(defaultTarget);
+      onClose();
+    } finally {
+      setIsSaving(false);
     }
-
-    setText("");
-    setTarget(defaultTarget);
-    onClose();
   };
 
   return (
@@ -119,7 +126,8 @@ export function QuickCaptureSheet({
         </Button>
           <Button
             onPress={handleSave}
-            disabled={!text.trim()}
+            disabled={!text.trim() || isSaving}
+            loading={isSaving}
             accessibilityHint="Saves this item locally"
           >
             Capture

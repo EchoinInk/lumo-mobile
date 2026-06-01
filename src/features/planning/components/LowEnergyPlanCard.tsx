@@ -24,16 +24,18 @@ export function LowEnergyPlanCard({
         Today can be lighter.
       </Text>
       <Text variant="body" color={Colors.textSecondary}>
-        A lighter plan is still a plan. Pick one thing that helps future you.
+        A lighter plan still counts. One supportive action is enough.
       </Text>
       <Text variant="caption" color={Colors.textTertiary}>
-        You can leave the rest parked.
+        The rest can wait.
       </Text>
 
       {options.length === 0 ? (
-        <Text variant="body" color={Colors.textSecondary}>
-          No pressure — you can start with a small reset.
-        </Text>
+        <View style={styles.emptyBlock}>
+          <Text variant="body" color={Colors.textSecondary}>
+            No pressure — you can start with a small reset.
+          </Text>
+        </View>
       ) : (
         <View style={styles.list}>
           {options.map((option) => (
@@ -96,6 +98,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "600",
+  },
+  emptyBlock: {
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   list: {
     gap: Spacing.md,

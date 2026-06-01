@@ -69,18 +69,31 @@ export function MorningPlanningScreen() {
 
   const handleComplete = useCallback(() => {
     flow.completeMorningPlan();
+  }, [flow]);
+
+  const handleBackToDashboard = useCallback(() => {
     router.back();
+  }, []);
+
+  const handleAdjustPlan = useCallback(() => {
+    flow.resetMorningPlan();
   }, [flow]);
 
   return (
     <Screen scrollable padded>
       <SectionHeader
         title="Morning planning"
-        subtitle="One small step is enough"
+        subtitle={
+          flow.morningComplete
+            ? "Today has a gentle shape"
+            : "One small step is enough"
+        }
       />
       <MorningPlanningCard
         morningComplete={flow.morningComplete}
         energyLevel={flow.energyLevel}
+        carryOverCount={flow.summary.carryOverIds.length}
+        brainDumpCount={flow.brainDumpQueue.length}
         carryOverItems={flow.carryOverItems}
         brainDumpQueue={flow.brainDumpQueue}
         brainDumpEntries={openEntries}
@@ -101,6 +114,9 @@ export function MorningPlanningScreen() {
         onReviewBrainDump={() =>
           router.push({ pathname: "/brain-dump" as const } as any)
         }
+        onBackToDashboard={handleBackToDashboard}
+        onOpenTodayFocus={handleBackToDashboard}
+        onAdjustPlan={handleAdjustPlan}
       />
     </Screen>
   );

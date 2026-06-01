@@ -1,11 +1,17 @@
 {
   "expo": {
-    "name": "lumo-mobile",
+    "name": "Lumo",
     "slug": "lumo-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "lumomobile",
     "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.meltmyheart.lumo"
+    },
+    "android": {
+      "package": "com.meltmyheart.lumo"
+    },
     "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true

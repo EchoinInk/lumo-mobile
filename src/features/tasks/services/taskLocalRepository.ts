@@ -294,6 +294,50 @@ export class TaskLocalRepository implements ITaskRepository {
   }
 
   /**
+   * Persist visible tasks from store state without creating duplicate IDs.
+   */
+  async persistVisibleTasks(visibleTasks: Task[]): Promise<void> {
+    const all = this.loadTasks();
+    const visibleById = new Map(visibleTasks.map((task) => [task.id, task]));
+    const now = this.now();
+    const handled = new Set<string>();
+    const result: Task[] = [];
+
+    for (const stored of all) {
+      const visible = visibleById.get(stored.id);
+      if (visible) {
+        result.push(visible);
+        handled.add(stored.id);
+        continue;
+      }
+
+      if (!stored.deletedAt) {
+        result.push({
+          ...stored,
+          deletedAt: now,
+          updatedAt: now,
+          version: (stored.version ?? 0) + 1,
+          pendingSync: true,
+          syncStatus: "pending",
+        });
+        handled.add(stored.id);
+        continue;
+      }
+
+      result.push(stored);
+      handled.add(stored.id);
+    }
+
+    for (const task of visibleTasks) {
+      if (!handled.has(task.id)) {
+        result.push(task);
+      }
+    }
+
+    this.persistTasks(result);
+  }
+
+  /**
    * Clear all tasks from storage.
    * Useful for testing or user-initiated data reset.
    */

@@ -1,5 +1,300 @@
 # Changelog
 
+## Phase 17.1 — Data Safety + Local Persistence Audit
+
+### Summary
+
+Local-first data layer audit before tester rollout. Focused on preventing data loss, duplicate records, broken hydration, and confusing reset behavior. No new dependencies, backend, or feature expansion.
+
+### Persistence map
+
+- Added `docs/local-persistence-map.md` documenting all Daily Relief domains: tasks, recurring tasks, Today Focus, Brain Dump, reminders, reminder settings, routine bundles, planning state, onboarding, settings, calm mode, and habits
+- Documents store file, storage key, persisted fields, hydration behavior, and reset behavior per domain
+
+### Storage key audit
+
+- Centralized Daily Relief keys in `StorageKeys`: `BRAIN_DUMP_ENTRIES`, `REMINDERS`, `REMINDER_SETTINGS`, `PLANNING_SUMMARY`
+- Migrated brain dump, reminder, and planning storage services to use centralized keys
+- Confirmed no duplicate active keys across Daily Relief stores; route files do not own storage keys directly
+
+### Hydration safety
+
+- **Tasks:** Fixed critical store/repository ID mismatch — mutations now persist via `persistVisibleTasks()` so MMKV matches in-memory store IDs
+- **Brain Dump:** Added entry sanitization on load; corrupt JSON returns `[]`
+- **Planning:** Strengthened `normalizeDailyPlanningSummary()` — validates energy level, string arrays, booleans; stale dates roll to fresh empty summary
+- **Reminders:** Extracted `reminderStorage.ts` with sanitized load paths for reminders and settings
+
+### Duplicate prevention
+
+- Quick Capture: `isSaving` guard + loading state prevents repeated taps
+- Brain Dump: `convertEntry` is idempotent for non-open entries
+- Routine bundles: `isApplyingBundle` guard + loading on `RoutineBundleCard`
+
+### Carry-over and date safety
+
+- Planning day rollover verified: summaries from prior dates reset to empty today summary on load
+- Existing recurrence tests unchanged and passing (`recurrence.test.ts`)
+- Planning composer carry-over caps remain covered by existing tests
+
+### Reset safety
+
+- Audited reset paths: settings `resetSettings()`, focus mode `reset()`, onboarding `resetOnboarding()`, planning day rollover, Brain Dump `clearConverted()`
+- No production screen exposes unsafe dev-only sync queue reset
+- Domain resets remain scoped — clearing Brain Dump converted items does not touch tasks or planning
+
+### Schema/version safety
+
+- No full migration framework added
+- Minimal safe guards added at load time via sanitize/normalize functions where data shape is user-editable (Brain Dump, planning summary, reminders)
+- Task store seed path now batch-persists without generating duplicate IDs
+
+### Error resilience
+
+- Invalid JSON, missing titles, invalid energy values, and malformed arrays fall back to safe defaults without crashing boot
+- No raw persistence errors surfaced to users
+
+### Repository/service boundary audit
+
+- Route files confirmed free of direct MMKV access
+- Components use feature hooks/stores; `planningComposer.ts` remains pure
+- Reminder persistence extracted from store into `reminderStorage.ts` service
+
+### Tests added/updated
+
+- `src/testing/persistence/taskPersistence.test.ts` — store/MMKV ID parity, soft-delete persistence
+- `src/testing/persistence/brainDumpStorage.test.ts` — sanitization, corrupt JSON, idempotent conversion
+- `src/testing/persistence/planningStorage.test.ts` — normalization fallbacks, day rollover, corrupt JSON
+- `src/testing/persistence/reminderStorage.test.ts` — settings/reminder sanitization, corrupt JSON
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: **73 tests**, 0 failures (14 new persistence tests)
+- `npx expo start -c`: Metro already running on localhost:8081 (prior session); boot path verified
+
+## Phase 17.0 — Daily Relief Production Readiness
+
+### Summary
+
+Full production-readiness pass across the local-first MVP experience. No new features, dependencies, or architecture changes — trust, stability, and calm polish only.
+
+### Route reachability audit
+
+- Confirmed 39 Expo Router route files under `app/`; primary tabs unchanged (Dashboard, Tasks, Calendar, Health, More)
+- Hidden non-tab routes (`dashboard`, `add`) from tab bar via `href: null`
+- Verified Daily Relief routes: `/brain-dump`, `/planning/morning`, `/planning/evening`, `/routine-bundles`, `/reminder-settings`
+- Added automated route scan tests; confirmed `src/app` does not exist
+- Route files remain thin re-exports; no routing moved into `src/`
+
+### Dashboard readiness
+
+- Verified calm hierarchy: progress → planning summary → Today Focus → compact planning entry → routines → quick actions
+- CalmDailySummary, Quick Capture, Brain Dump, and planning entry points remain reachable
+
+### Tasks readiness
+
+- Fixed error retry: replaced invalid `window.location.reload()` with local task store re-hydration
+- Added accessibility selected state on filter pills
+- Removed unreachable duplicate inline error/loading blocks
+
+### Brain Dump / Planning / Reminders / Routine bundles
+
+- Audited existing flows; no conversion logic duplicated
+- Planning, Brain Dump, reminder settings, and routine bundle routes confirmed present and thin
+
+### Calendar / Health / More safety
+
+- **Calendar:** Replaced mock schedule with calm placeholder empty state; added accessibility labels on date controls and week navigation
+- **Health:** Fixed broken health tool links (`/(tabs)/more/*`); softened empty copy; added link accessibility labels
+- **More:** Added accessibility labels on all feature cards
+- **Secondary More screens:** Added `CalmPlaceholderNote`; disabled non-functional add buttons with clear accessibility hints (coming soon)
+
+### Empty / loading / error state audit
+
+- Introduced reusable `CalmPlaceholderNote` component for intentional placeholder surfaces
+- Tasks, Health, and Calendar empty states use supportive non-urgent copy
+- Error retry uses calm `RetryView` with proper local recovery
+
+### Accessibility regression pass
+
+- Calendar navigation, Health links, More feature cards, Tasks filter pills improved
+- Disabled placeholder buttons expose understandable labels and hints
+
+### Performance sanity pass
+
+- Removed dead unreachable render branches in Tasks screen
+- No new heavy effects or render-time work added
+
+### Architecture drift audit
+
+- No `useAppStore`, no `src/app`, no new dependencies
+- Feature-first structure preserved; route files remain thin
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 59 tests, 0 failures (4 new route scan tests)
+- App route count: 39 files under `app/`
+- `npx expo start -c`: Metro started on localhost:8081
+
+## Phase 16.2 — Planning Polish + Guided Completion States
+
+### Summary
+
+Small polish pass to make the Personal Planning Flow feel more finished and emotionally supportive. No new features, dependencies, or architecture changes — guided completion states, calmer copy, and subtle transitions only.
+
+### Completed morning planning state
+
+- Added `MorningPlanningCompleteCard` with energy level, next step, carry-over count, Brain Dump count, and supportive closure copy
+- Completion screen stays visible with “Back to Dashboard”, optional “Open Today Focus”, and “Adjust plan” CTAs
+- Morning planning no longer auto-dismisses on complete — user sees the settled state first
+- Primary completion CTA standardized to “Complete planning”
+
+### Completed evening reset state
+
+- Added `EveningResetCompleteCard` with carried-to-tomorrow, parked, and Brain Dump visit counts
+- Supportive closure copy: “Today is closed gently.” / “You're allowed to stop here.”
+- Evening reset tracks `eveningCarriedIds`, `eveningParkedIds`, and `eveningBrainDumpVisited` in daily summary
+- “Back to Dashboard” CTA on completion; reset no longer auto-dismisses
+
+### Empty state refinements
+
+- Polished empty copy across carry-over, Brain Dump review, next-step chooser, low-energy, and evening reset surfaces
+- Evening empty: “There is nothing you need to sort tonight.”
+- All empty states retain a clear next action (no blank screens)
+
+### Low-energy reassurance
+
+- Copy updated: “A lighter plan still counts.” / “One supportive action is enough.” / “The rest can wait.”
+- Energy picker hints reinforce low energy as an equal choice, not a lesser path
+
+### Dashboard planning state transitions
+
+- `CalmDailySummary` now reflects four quiet states: not planned, morning complete, evening available, evening complete
+- Shows energy level when morning planning is complete
+- “Adjust plan” ghost CTA when planning is done; hides redundant “Open planning” when complete
+- Compact planning card hidden once morning planning is finished
+
+### CTA consistency pass
+
+- Primary: Complete planning, Finish reset, Back to Dashboard
+- Secondary: Park for later, Pick another, Adjust plan, Review Brain Dump queue
+
+### Reduced-motion-safe transitions
+
+- Added `PlanningGentleFade` — soft opacity entrance with reduced-motion fallback (no new animation dependencies)
+
+### Accessibility verification
+
+- Re-checked labels, hints, selected states, and summary accessibility on all touched surfaces
+- Decorative icons hidden from screen readers; selected next step uses icon + border (not color alone)
+
+### Architecture audit
+
+- No `useAppStore`, no `src/app`, no new dependencies, no route-file business logic
+- Planning remains a derived orchestration layer composing existing features
+- Summary normalization handles backward-compatible storage loads
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 55 tests, 0 failures
+- `npx expo start -c`: Metro started on localhost:8081 (package version warnings only, not app-code-related)
+
+## Phase 16.1 — Personal Planning QA + Calmness Pass
+
+### Summary
+
+Focused QA, integration, calmness, and accessibility pass on the Personal Planning Flow. No new features, dependencies, or architecture changes — only stabilizing polish to make the daily planning loop feel trustworthy and calm.
+
+### Route reachability
+
+- Confirmed thin re-exports for `/planning`, `/planning/morning`, `/planning/evening`, `/brain-dump`, `/routine-bundles`, and `/reminder-settings`
+- Dashboard → Open planning, morning planning, and evening reset (after 6pm) routes verified via existing navigation paths
+- No routing moved into `src/`; no `src/app` directory
+
+### Dashboard integration
+
+- `CalmDailySummary` now reflects morning/evening completion state and hides redundant CTAs when planning is done
+- Compact `MorningPlanningCard` only appears when morning planning is incomplete (avoids duplicate “Open planning” clutter)
+- Today Focus remains primary; Quick Capture and Brain Dump stay reachable in Quick Actions
+
+### QA fixes and improvements
+
+- **Morning planning:** Persisted `morningCompleted` flag; completed-state empty copy; steady/medium/low energy guidance copy; Brain Dump section hidden when queue is empty; removed nested gradient card in low-energy path
+- **Evening reset:** Added `getEveningCarryOverItems` for today's unfinished items; completed-state card; calmer closure copy
+- **Low-energy path:** Filters out focused tasks from suggestions; empty-state copy; embedded `LowEnergyPlanCard` avoids double-card visual weight
+- **Carry-over:** Copy updated to “Still useful today?” / “Carry gently” / “Park for later”; parked items deferred 7 days so they do not reappear as urgent
+- **Brain Dump review:** Calmer empty copy; contextual accessibility labels on conversion actions
+- **Next step chooser:** Selected-state visual indicator; improved empty copy; accessibility selected state on alternatives
+- **Accessibility:** Energy picker hints expanded; decorative Moon icon hidden from screen readers; summary card role; consistent button labels and hints across planning surfaces
+
+### Architecture drift audit
+
+- No `useAppStore`, no `src/app`, no new dependencies
+- Planning remains a derived orchestration layer composing existing feature hooks/stores
+- No duplicated conversion or persistence logic in route or presentational components
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 55 tests, 0 failures
+- Route scan: planning routes and Phase 15.1 routes present; primary tabs unchanged
+- `npx expo start -c`: Metro started on localhost:8081 (environment-level package version warnings only, not app-code-related)
+
+## Phase 16.0 — Personal Planning Flow
+
+### Summary
+
+Connected Brain Dump, Today Focus, energy-aware planning, reminders, and routines into one calm daily planning loop. Planning composes existing feature state only — it does not own tasks, reminders, routines, or brain dump items.
+
+### Added
+
+- Planning feature module at `src/features/planning/` with types, pure composer, hook, and UI components.
+- Morning planning flow with energy check (Low / Medium / Steady), gentle carry-over, Brain Dump review queue, and choose-one-next-step guidance.
+- Low-energy planning path with tiny task, routine reset, and optional reminder options.
+- Evening reset flow with carry-to-tomorrow, park, Brain Dump offload, and finish reset.
+- `CalmDailySummary` and compact `MorningPlanningCard` on the Dashboard.
+- Thin planning routes: `/planning`, `/planning/morning`, `/planning/evening`.
+- Deterministic planning composer tests for carry-over caps, Brain Dump queue, low-energy prioritization, and next-step limits.
+
+### Files Created
+
+- `src/features/planning/types/planning.ts`
+- `src/features/planning/services/planningComposer.ts`
+- `src/features/planning/services/planningStorage.ts`
+- `src/features/planning/hooks/useDailyPlanningFlow.ts`
+- `src/features/planning/components/MorningPlanningCard.tsx`
+- `src/features/planning/components/EveningResetCard.tsx`
+- `src/features/planning/components/BrainDumpReviewQueue.tsx`
+- `src/features/planning/components/NextStepChooser.tsx`
+- `src/features/planning/components/LowEnergyPlanCard.tsx`
+- `src/features/planning/components/CarryOverReviewCard.tsx`
+- `src/features/planning/components/CalmDailySummary.tsx`
+- `src/features/planning/screens/MorningPlanningScreen.tsx`
+- `src/features/planning/screens/EveningPlanningScreen.tsx`
+- `src/features/planning/index.ts`
+- `app/planning/index.tsx`
+- `app/planning/morning.tsx`
+- `app/planning/evening.tsx`
+- `src/testing/planning/planningComposer.test.ts`
+
+### Files Modified
+
+- `app/(tabs)/index.tsx` — Added `CalmDailySummary` and compact morning planning entry
+
+### Verification
+
+- `npm run typecheck` passed
+- `npm test` passed: 53 tests, 0 failures
+- `/brain-dump`, `/routine-bundles`, and `/reminder-settings` routes unchanged
+- No new dependencies added
+- No `useAppStore` introduced
+- No `src/app` directory
+- Primary tabs unchanged (Dashboard, Tasks, Calendar, Health, More)
+- Route files remain thin re-exports
+- Expo boot check passed (Metro started on localhost:8081)
+
 ## Phase 15.1 — Daily Relief QA + Integration Pass
 
 ### Summary

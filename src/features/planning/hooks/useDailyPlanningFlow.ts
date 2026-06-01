@@ -157,12 +157,18 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
   const carryToTomorrow = useCallback(
     (sourceId: string) => {
       updateTask(sourceId, { dueDate: shiftTaskDate(1) });
+      const carriedIds = [...new Set([...summary.carryOverIds, `carry-${sourceId}`])];
+      const eveningCarriedIds =
+        mode === "evening"
+          ? [...new Set([...summary.eveningCarriedIds, sourceId])]
+          : summary.eveningCarriedIds;
       persistSummary({
         ...summary,
-        carryOverIds: [...new Set([...summary.carryOverIds, `carry-${sourceId}`])],
+        carryOverIds: carriedIds,
+        eveningCarriedIds,
       });
     },
-    [summary, updateTask, persistSummary],
+    [summary, updateTask, persistSummary, mode],
   );
 
   const parkItem = useCallback(
@@ -172,9 +178,26 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
       } else if (sourceType === "brainDump") {
         archiveEntry(sourceId);
       }
+
+      if (mode === "evening" && sourceType === "task") {
+        persistSummary({
+          ...summary,
+          eveningParkedIds: [
+            ...new Set([...summary.eveningParkedIds, sourceId]),
+          ],
+        });
+      }
     },
-    [updateTask, archiveEntry],
+    [updateTask, archiveEntry, mode, summary, persistSummary],
   );
+
+  const markEveningBrainDumpVisited = useCallback(() => {
+    persistSummary({ ...summary, eveningBrainDumpVisited: true });
+  }, [summary, persistSummary]);
+
+  const resetMorningPlan = useCallback(() => {
+    persistSummary({ ...summary, morningCompleted: false });
+  }, [summary, persistSummary]);
 
   const completeMorningPlan = useCallback(() => {
     const next = composeDailyPlanningSummary(composerInput, {
@@ -212,6 +235,8 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     carryOverItem,
     carryToTomorrow,
     parkItem,
+    markEveningBrainDumpVisited,
+    resetMorningPlan,
     completeMorningPlan,
     completeEveningReset,
   };

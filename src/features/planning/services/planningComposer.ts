@@ -270,5 +270,8 @@ export function composeDailyPlanningSummary(
     energyLevel: partial.energyLevel ?? input.energyLevel,
     morningCompleted: partial.morningCompleted ?? false,
     eveningCompleted: partial.eveningCompleted ?? false,
+    eveningCarriedIds: partial.eveningCarriedIds ?? [],
+    eveningParkedIds: partial.eveningParkedIds ?? [],
+    eveningBrainDumpVisited: partial.eveningBrainDumpVisited ?? false,
   };
 }

@@ -1,3 +1,4 @@
+import { CalmPlaceholderNote } from "@/src/components/ui/CalmPlaceholderNote";
 import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { Text } from "@/src/components/ui/Text";
@@ -79,7 +80,14 @@ export default function PaymentsScreen() {
       </ScrollView>
 
       {/* Add Button */}
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        disabled
+        accessibilityRole="button"
+        accessibilityLabel="Add payment"
+        accessibilityHint="Payment logging is coming soon"
+        accessibilityState={{ disabled: true }}
+      >
         <LinearGradient
           colors={[Colors.pink, Colors.purple]}
           start={{ x: 0, y: 0 }}
@@ -96,6 +104,8 @@ export default function PaymentsScreen() {
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      <CalmPlaceholderNote />
     </Screen>
   );
 }

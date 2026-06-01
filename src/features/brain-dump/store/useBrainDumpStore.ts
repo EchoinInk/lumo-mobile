@@ -69,6 +69,9 @@ export const useBrainDumpStore = create<BrainDumpStore>((set, get) => ({
   },
 
   convertEntry: (id, target, linkedEntityId) => {
+    const entry = get().entries.find((item) => item.id === id);
+    if (!entry || entry.status !== "open") return;
+
     const now = new Date().toISOString();
     const status: BrainDumpStatus =
       target === "archived_note" ? "archived" : "converted";

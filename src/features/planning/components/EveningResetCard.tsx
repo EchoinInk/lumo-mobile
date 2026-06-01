@@ -2,6 +2,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { ReducedMotionWrapper } from "@/src/features/calmMode/components/ReducedMotionWrapper";
+import { EveningResetCompleteCard } from "@/src/features/planning/components/EveningResetCompleteCard";
 import type { CarryOverItem } from "@/src/features/planning/types/planning";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { Moon } from "lucide-react-native";
@@ -10,32 +11,36 @@ import { StyleSheet, View } from "react-native";
 interface EveningResetCardProps {
   carryOverItems: CarryOverItem[];
   eveningCompleted?: boolean;
+  carriedCount?: number;
+  parkedCount?: number;
+  brainDumpVisited?: boolean;
   onCarryToTomorrow: (sourceId: string) => void;
   onPark: (sourceId: string) => void;
   onAddToBrainDump: () => void;
   onFinishReset: () => void;
+  onBackToDashboard?: () => void;
 }
 
 export function EveningResetCard({
   carryOverItems,
   eveningCompleted = false,
+  carriedCount = 0,
+  parkedCount = 0,
+  brainDumpVisited = false,
   onCarryToTomorrow,
   onPark,
   onAddToBrainDump,
   onFinishReset,
+  onBackToDashboard,
 }: EveningResetCardProps) {
-  if (eveningCompleted) {
+  if (eveningCompleted && onBackToDashboard) {
     return (
-      <ReducedMotionWrapper>
-        <Card variant="gradient" style={styles.card}>
-          <Text variant="subheading" style={styles.title}>
-            Reset complete
-          </Text>
-          <Text variant="body" color={Colors.textSecondary}>
-            You did enough to keep moving. Tomorrow can start small.
-          </Text>
-        </Card>
-      </ReducedMotionWrapper>
+      <EveningResetCompleteCard
+        carriedCount={carriedCount}
+        parkedCount={parkedCount}
+        brainDumpVisited={brainDumpVisited}
+        onBackToDashboard={onBackToDashboard}
+      />
     );
   }
 
@@ -62,9 +67,11 @@ export function EveningResetCard({
             What can be carried gently?
           </Text>
           {carryOverItems.length === 0 ? (
-            <Text variant="body" color={Colors.textTertiary}>
-              Nothing needs carrying right now. You can leave the rest parked.
-            </Text>
+            <View style={styles.emptyBlock}>
+              <Text variant="body" color={Colors.textTertiary}>
+                There is nothing you need to sort tonight.
+              </Text>
+            </View>
           ) : (
             carryOverItems.slice(0, 3).map((item) => (
               <View key={item.id} style={styles.itemRow}>
@@ -141,6 +148,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   section: {
+    gap: Spacing.sm,
+  },
+  emptyBlock: {
     gap: Spacing.sm,
   },
   itemRow: {

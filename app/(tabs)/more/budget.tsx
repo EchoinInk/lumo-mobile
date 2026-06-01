@@ -1,3 +1,4 @@
+import { CalmPlaceholderNote } from "@/src/components/ui/CalmPlaceholderNote";
 import { Card } from "@/src/components/ui/Card";
 import { ProgressBar } from "@/src/components/ui/ProgressBar";
 import { Screen } from "@/src/components/ui/Screen";
@@ -86,7 +87,14 @@ export default function BudgetScreen() {
       </ScrollView>
 
       {/* Add Button */}
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        accessibilityRole="button"
+        accessibilityLabel="Add expense"
+        accessibilityHint="Expense tracking is coming soon"
+        accessibilityState={{ disabled: true }}
+        disabled
+      >
         <LinearGradient
           colors={[Colors.pink, Colors.purple]}
           start={{ x: 0, y: 0 }}
@@ -103,6 +111,8 @@ export default function BudgetScreen() {
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      <CalmPlaceholderNote />
     </Screen>
   );
 }

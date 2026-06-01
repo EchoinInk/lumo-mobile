@@ -10,9 +10,14 @@ import { StyleSheet, View } from "react-native";
 interface RoutineBundleCardProps {
   bundle: RoutineBundle;
   onUse: (bundle: RoutineBundle) => void;
+  isApplying?: boolean;
 }
 
-export function RoutineBundleCard({ bundle, onUse }: RoutineBundleCardProps) {
+export function RoutineBundleCard({
+  bundle,
+  onUse,
+  isApplying = false,
+}: RoutineBundleCardProps) {
   const [items, setItems] = useState(bundle.items);
 
   const updateItem = (index: number, title: string) => {
@@ -47,6 +52,8 @@ export function RoutineBundleCard({ bundle, onUse }: RoutineBundleCardProps) {
             items: items.filter((item) => item.title.trim().length > 0),
           })
         }
+        disabled={isApplying}
+        loading={isApplying}
         accessibilityLabel={`Use ${bundle.title} bundle`}
         accessibilityHint="Creates tasks from the edited bundle items"
       >

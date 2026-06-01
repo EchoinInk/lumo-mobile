@@ -1,0 +1,51 @@
+import {
+  loadBrainDumpEntries,
+  persistBrainDumpEntries,
+  sanitizeBrainDumpEntries,
+} from "@/features/brain-dump/services/brainDumpStorage";
+import { useBrainDumpStore } from "@/features/brain-dump/store/useBrainDumpStore";
+import { deleteKey, setString } from "@/services/storage/mmkv";
+import { StorageKeys } from "@/services/storage/storageKeys";
+import { assertEqual, resetTestState } from "../testUtils";
+
+export async function testSanitizeBrainDumpEntriesFiltersInvalidRecords(): Promise<void> {
+  const entries = sanitizeBrainDumpEntries([
+    { id: "ok", text: "Valid", status: "open", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+    { id: "bad", text: "", status: "open" },
+    { bad: true },
+  ]);
+
+  assertEqual(entries.length, 1, "invalid brain dump entries should be filtered");
+  assertEqual(entries[0]?.id, "ok", "valid entry should remain");
+}
+
+export async function testLoadBrainDumpEntriesHandlesCorruptJson(): Promise<void> {
+  resetTestState();
+  setString(StorageKeys.BRAIN_DUMP_ENTRIES, "{not json");
+
+  assertEqual(loadBrainDumpEntries().length, 0, "corrupt brain dump json should return []");
+}
+
+export async function testConvertEntryIsIdempotent(): Promise<void> {
+  resetTestState();
+  deleteKey(StorageKeys.BRAIN_DUMP_ENTRIES);
+  useBrainDumpStore.setState({ entries: [], hasHydrated: false });
+
+  const entry = useBrainDumpStore.getState().addEntry({ text: "Convert me" });
+  assertEqual(entry?.status, "open", "new entry should start open");
+
+  useBrainDumpStore.getState().convertEntry(entry!.id, "task", "task-1");
+  const afterFirst = useBrainDumpStore.getState().entries[0];
+  assertEqual(afterFirst?.status, "converted", "first conversion should succeed");
+
+  useBrainDumpStore.getState().convertEntry(entry!.id, "task", "task-2");
+  const afterSecond = useBrainDumpStore.getState().entries[0];
+  assertEqual(
+    afterSecond?.linkedEntityId,
+    "task-1",
+    "second conversion should not overwrite converted entry",
+  );
+
+  persistBrainDumpEntries(useBrainDumpStore.getState().entries);
+  assertEqual(loadBrainDumpEntries().length, 1, "converted entry should persist");
+}

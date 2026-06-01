@@ -35,6 +35,9 @@ function FeatureCard({ title, icon, color, onPress }: FeatureCardProps) {
       onPress={onPress}
       activeOpacity={0.7}
       style={styles.cardContainer}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={`Opens ${title}`}
     >
       <Card variant="elevated" style={styles.featureCard}>
         <View style={[styles.iconWrapper, { backgroundColor: color + "15" }]}>

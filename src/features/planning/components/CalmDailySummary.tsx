@@ -1,12 +1,22 @@
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
-import type { PlanningNextStep } from "@/src/features/planning/types/planning";
+import type {
+  PlanningEnergyLevel,
+  PlanningNextStep,
+} from "@/src/features/planning/types/planning";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { StyleSheet, View } from "react-native";
 
+export type PlanningDashboardState =
+  | "not_planned"
+  | "morning_complete"
+  | "evening_available"
+  | "evening_complete";
+
 interface CalmDailySummaryProps {
   nextStep?: PlanningNextStep;
+  energyLevel?: PlanningEnergyLevel;
   carryOverCount: number;
   brainDumpCount: number;
   morningComplete?: boolean;
@@ -14,10 +24,23 @@ interface CalmDailySummaryProps {
   showEveningReset?: boolean;
   onOpenPlanning: () => void;
   onEveningReset: () => void;
+  onAdjustPlan?: () => void;
+}
+
+function resolveDashboardState(
+  morningComplete: boolean,
+  eveningCompleted: boolean,
+  showEveningReset: boolean,
+): PlanningDashboardState {
+  if (eveningCompleted) return "evening_complete";
+  if (showEveningReset && morningComplete) return "evening_available";
+  if (morningComplete) return "morning_complete";
+  return "not_planned";
 }
 
 export function CalmDailySummary({
   nextStep,
+  energyLevel,
   carryOverCount,
   brainDumpCount,
   morningComplete = false,
@@ -25,17 +48,49 @@ export function CalmDailySummary({
   showEveningReset = false,
   onOpenPlanning,
   onEveningReset,
+  onAdjustPlan,
 }: CalmDailySummaryProps) {
-  const shapeLine = morningComplete
-    ? nextStep
-      ? `Start with: ${nextStep.label}`
-      : "Today already has a gentle shape."
-    : nextStep
-      ? `Start with: ${nextStep.label}`
-      : "Choose one gentle next step when ready.";
+  const state = resolveDashboardState(
+    morningComplete,
+    eveningCompleted,
+    showEveningReset,
+  );
+
+  const shapeLine = (() => {
+    if (state === "evening_complete") {
+      return "Today is closed gently.";
+    }
+    if (state === "morning_complete") {
+      return nextStep
+        ? `Start with: ${nextStep.label}`
+        : "Today already has a gentle shape.";
+    }
+    if (nextStep) {
+      return `Start with: ${nextStep.label}`;
+    }
+    return "Choose one gentle next step when ready.";
+  })();
+
+  const supportLine = (() => {
+    if (state === "evening_complete") {
+      return "Tomorrow can start small.";
+    }
+    if (state === "morning_complete") {
+      return "You can adjust this later.";
+    }
+    if (state === "not_planned") {
+      return "Where am I today? One small step is enough.";
+    }
+    return undefined;
+  })();
 
   return (
-    <Card variant="elevated" style={styles.card} accessibilityRole="summary">
+    <Card
+      variant="elevated"
+      style={styles.card}
+      accessibilityRole="summary"
+      accessibilityLabel={`Today's shape. ${shapeLine}`}
+    >
       <Text variant="subheading" style={styles.title}>
         Today's shape
       </Text>
@@ -44,6 +99,16 @@ export function CalmDailySummary({
         <Text variant="body" color={Colors.textSecondary}>
           {shapeLine}
         </Text>
+        {supportLine && (
+          <Text variant="caption" color={Colors.textTertiary}>
+            {supportLine}
+          </Text>
+        )}
+        {energyLevel && morningComplete && (
+          <Text variant="caption" color={Colors.textTertiary}>
+            Energy: {energyLevel}
+          </Text>
+        )}
         {carryOverCount > 0 && (
           <Text variant="caption" color={Colors.textTertiary}>
             {carryOverCount} thing{carryOverCount === 1 ? "" : "s"} carried
@@ -56,15 +121,10 @@ export function CalmDailySummary({
             in Brain Dump
           </Text>
         )}
-        {eveningCompleted && (
-          <Text variant="caption" color={Colors.textTertiary}>
-            Evening reset complete. Tomorrow can start small.
-          </Text>
-        )}
       </View>
 
       <View style={styles.actions}>
-        {!morningComplete && (
+        {state === "not_planned" && (
           <Button
             size="sm"
             variant="secondary"
@@ -76,7 +136,7 @@ export function CalmDailySummary({
             Open planning
           </Button>
         )}
-        {showEveningReset && !eveningCompleted && (
+        {state === "evening_available" && (
           <Button
             size="sm"
             variant="ghost"
@@ -86,6 +146,18 @@ export function CalmDailySummary({
             accessibilityHint="Opens the evening reset flow"
           >
             Evening reset
+          </Button>
+        )}
+        {state === "morning_complete" && onAdjustPlan && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={onAdjustPlan}
+            accessibilityRole="button"
+            accessibilityLabel="Adjust plan"
+            accessibilityHint="Reopens morning planning to make changes"
+          >
+            Adjust plan
           </Button>
         )}
       </View>

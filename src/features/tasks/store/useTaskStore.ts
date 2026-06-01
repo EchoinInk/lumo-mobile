@@ -49,36 +49,26 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   // ── Hydration ────────────────────────────────────────────────────────────
   hydrateTasks: async () => {
-    // Load from local storage
     const storedTasks = await taskLocalRepository.getTasks();
 
     if (storedTasks.length > 0) {
-      // Use stored tasks
       set({ tasks: storedTasks, hasHydrated: true });
-    } else {
-      // Seed with mock tasks and persist them
-      const seededTasks = mockTasks.map((task) => ({
-        ...task,
-        version: 1,
-        pendingSync: false,
-        syncStatus: "synced" as const,
-      }));
+      return;
+    }
 
-      set({ tasks: seededTasks, hasHydrated: true });
+    const seededTasks = mockTasks.map((task) => ({
+      ...task,
+      version: 1,
+      pendingSync: false,
+      syncStatus: "synced" as const,
+    }));
 
-      // Persist seeded tasks in background
-      try {
-        for (const task of seededTasks) {
-          await taskLocalRepository.createTask({
-            title: task.title,
-            description: task.description,
-            priority: task.priority,
-            dueDate: task.dueDate,
-          });
-        }
-      } catch (err) {
-        console.error("[TaskStore] Failed to persist seeded tasks:", err);
-      }
+    set({ tasks: seededTasks, hasHydrated: true });
+
+    try {
+      await taskLocalRepository.persistVisibleTasks(seededTasks);
+    } catch (err) {
+      console.error("[TaskStore] Failed to persist seeded tasks:", err);
     }
   },
 
@@ -114,8 +104,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: [newTask, ...state.tasks],
     }));
 
-    // Persist in background (non-blocking)
-    taskLocalRepository.createTask(input).catch((err) => {
+    taskLocalRepository.persistVisibleTasks(get().tasks).catch((err) => {
       console.error("[TaskStore] Failed to persist new task:", err);
     });
 
@@ -140,8 +129,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: state.tasks.map((t) => (t.id === id ? updatedTask : t)),
     }));
 
-    // Persist in background (non-blocking)
-    taskLocalRepository.toggleTask(id).catch((err) => {
+    taskLocalRepository.persistVisibleTasks(get().tasks).catch((err) => {
       console.error("[TaskStore] Failed to persist task toggle:", err);
     });
   },
@@ -165,8 +153,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: state.tasks.filter((t) => t.id !== id),
     }));
 
-    // Persist soft delete in background (non-blocking)
-    taskLocalRepository.deleteTask(id).catch((err) => {
+    taskLocalRepository.persistVisibleTasks(get().tasks).catch((err) => {
       console.error("[TaskStore] Failed to persist task deletion:", err);
     });
   },
@@ -189,8 +176,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: state.tasks.map((t) => (t.id === id ? updatedTask : t)),
     }));
 
-    // Persist in background (non-blocking)
-    taskLocalRepository.updateTask(id, input).catch((err) => {
+    taskLocalRepository.persistVisibleTasks(get().tasks).catch((err) => {
       console.error("[TaskStore] Failed to persist task update:", err);
     });
   },

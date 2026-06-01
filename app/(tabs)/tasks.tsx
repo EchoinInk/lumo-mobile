@@ -13,6 +13,7 @@ import {
 } from "@/src/features/routines";
 import { TaskFormModal } from "@/src/features/tasks/components/TaskFormModal";
 import { useTasks } from "@/src/features/tasks/hooks/useTasks";
+import { useTaskStore } from "@/src/features/tasks/store/useTaskStore";
 import {
   CreateTaskInput,
   Task,
@@ -63,6 +64,7 @@ export default function TasksScreen() {
   const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
+  const [isApplyingBundle, setIsApplyingBundle] = useState(false);
   const {
     tasks,
     toggleTask,
@@ -73,7 +75,13 @@ export default function TasksScreen() {
     totalCount,
     error,
     isLoading,
+    clearError,
   } = useTasks();
+
+  const handleRetryLoad = () => {
+    clearError();
+    useTaskStore.getState().hydrateTasks();
+  };
 
   // Date helpers
   const today = new Date().toISOString().split("T")[0];
@@ -122,7 +130,14 @@ export default function TasksScreen() {
   };
 
   const handleUseBundle = (bundle: RoutineBundle) => {
-    createTasksFromBundle(bundle).forEach(createTask);
+    if (isApplyingBundle) return;
+
+    setIsApplyingBundle(true);
+    try {
+      createTasksFromBundle(bundle).forEach(createTask);
+    } finally {
+      setIsApplyingBundle(false);
+    }
   };
 
   const getPriorityColor = (priority: TaskPriority) => {
@@ -154,7 +169,7 @@ export default function TasksScreen() {
         <RetryView
           title="Something didn't load gently"
           description="Your tasks are still safe. Try again when you're ready."
-          onRetry={() => window.location.reload()}
+          onRetry={handleRetryLoad}
         />
       </Screen>
     );
@@ -202,6 +217,9 @@ export default function TasksScreen() {
               styles.filterPill,
               activeFilter === filter.key && styles.filterPillActive,
             ]}
+            accessibilityRole="button"
+            accessibilityLabel={`Filter tasks by ${filter.label}`}
+            accessibilityState={{ selected: activeFilter === filter.key }}
           >
             <Text
               variant="body"
@@ -216,24 +234,6 @@ export default function TasksScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
-      {/* Error State */}
-      {error && (
-        <Card variant="outlined" style={styles.errorCard}>
-          <Text variant="body" color={Colors.textSecondary}>
-            {error}
-          </Text>
-        </Card>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <Card variant="outlined" style={styles.emptyCard}>
-          <Text variant="body" color={Colors.textSecondary}>
-            Loading your tasks...
-          </Text>
-        </Card>
-      )}
 
       {/* Empty States */}
       {!isLoading && filteredTasks.length === 0 && (
@@ -453,6 +453,7 @@ export default function TasksScreen() {
             key={bundle.id}
             bundle={bundle}
             onUse={handleUseBundle}
+            isApplying={isApplyingBundle}
           />
         ))}
       </View>

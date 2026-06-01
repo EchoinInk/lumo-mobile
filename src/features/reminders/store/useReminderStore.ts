@@ -1,25 +1,15 @@
-import { getString, setString } from "@/src/services/storage/mmkv";
 import { create } from "zustand";
-import type {
-  CreateReminderInput,
-  Reminder,
-  ReminderSettings,
-} from "../types/reminder";
-
-const REMINDERS_KEY = "reminders";
-const REMINDER_SETTINGS_KEY = "reminder_settings";
-
-const defaultSettings: ReminderSettings = {
-  remindersEnabled: true,
-  quietHoursStart: "21:00",
-  quietHoursEnd: "08:00",
-  hapticsEnabled: true,
-  tone: "gentle",
-};
+import {
+  loadReminders,
+  loadReminderSettings,
+  persistReminders,
+  persistReminderSettings,
+} from "../services/reminderStorage";
+import type { CreateReminderInput, Reminder } from "../types/reminder";
 
 type ReminderState = {
   reminders: Reminder[];
-  settings: ReminderSettings;
+  settings: ReturnType<typeof loadReminderSettings>;
   hasHydrated: boolean;
 };
 
@@ -27,7 +17,9 @@ type ReminderActions = {
   hydrate: () => void;
   addReminder: (input: CreateReminderInput) => Reminder | null;
   archiveReminder: (id: string) => void;
-  updateSettings: (settings: Partial<ReminderSettings>) => void;
+  updateSettings: (
+    settings: Partial<ReturnType<typeof loadReminderSettings>>,
+  ) => void;
 };
 
 function createId(): string {
@@ -37,29 +29,17 @@ function createId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-function loadJson<T>(key: string, fallback: T): T {
-  try {
-    const raw = getString(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 export const useReminderStore = create<ReminderState & ReminderActions>(
   (set, get) => ({
     reminders: [],
-    settings: defaultSettings,
+    settings: loadReminderSettings(),
     hasHydrated: false,
 
     hydrate: () => {
       if (get().hasHydrated) return;
       set({
-        reminders: loadJson<Reminder[]>(REMINDERS_KEY, []),
-        settings: loadJson<ReminderSettings>(
-          REMINDER_SETTINGS_KEY,
-          defaultSettings,
-        ),
+        reminders: loadReminders(),
+        settings: loadReminderSettings(),
         hasHydrated: true,
       });
     },
@@ -80,7 +60,7 @@ export const useReminderStore = create<ReminderState & ReminderActions>(
 
       const reminders = [reminder, ...get().reminders];
       set({ reminders });
-      setString(REMINDERS_KEY, JSON.stringify(reminders));
+      persistReminders(reminders);
       return reminder;
     },
 
@@ -92,13 +72,13 @@ export const useReminderStore = create<ReminderState & ReminderActions>(
           : reminder,
       );
       set({ reminders });
-      setString(REMINDERS_KEY, JSON.stringify(reminders));
+      persistReminders(reminders);
     },
 
     updateSettings: (settings) => {
       const next = { ...get().settings, ...settings };
       set({ settings: next });
-      setString(REMINDER_SETTINGS_KEY, JSON.stringify(next));
+      persistReminderSettings(next);
     },
   }),
 );
