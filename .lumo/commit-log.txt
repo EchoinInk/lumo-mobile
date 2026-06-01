@@ -21408,3 +21408,9 @@ COMMIT: chore(lumo): update .npmrc
 FILES:
 .npmrc
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-01 17:01:25
+COMMIT: chore(lumo): update package.json
+FILES:
+package.json
+
