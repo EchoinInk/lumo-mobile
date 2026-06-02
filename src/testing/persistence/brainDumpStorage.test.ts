@@ -47,5 +47,11 @@ export async function testConvertEntryIsIdempotent(): Promise<void> {
   );
 
   persistBrainDumpEntries(useBrainDumpStore.getState().entries);
-  assertEqual(loadBrainDumpEntries().length, 1, "converted entry should persist");
+  const loadedEntries = loadBrainDumpEntries();
+  assertEqual(loadedEntries.length, 1, "converted entry should persist");
+  assertEqual(
+    loadedEntries[0]?.status,
+    "converted",
+    "converted entry should not reload as unreviewed",
+  );
 }
