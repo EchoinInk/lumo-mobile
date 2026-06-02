@@ -38,6 +38,17 @@ function resolveDashboardState(
   return "not_planned";
 }
 
+export function getPlanningNextStepDisplayLabel(
+  nextStep?: PlanningNextStep,
+): string | undefined {
+  const label = nextStep?.label?.trim();
+  if (!label) return undefined;
+  if (/^\d+$/.test(label)) return undefined;
+  if (/^(undefined|null)$/i.test(label)) return undefined;
+  if (label === nextStep?.id || label === nextStep?.sourceId) return undefined;
+  return label;
+}
+
 export function CalmDailySummary({
   nextStep,
   energyLevel,
@@ -55,18 +66,19 @@ export function CalmDailySummary({
     eveningCompleted,
     showEveningReset,
   );
+  const nextStepLabel = getPlanningNextStepDisplayLabel(nextStep);
 
   const shapeLine = (() => {
     if (state === "evening_complete") {
       return "Today is closed gently.";
     }
     if (state === "morning_complete") {
-      return nextStep
-        ? `Start with: ${nextStep.label}`
-        : "Today already has a gentle shape.";
+      return nextStepLabel
+        ? `Start with: ${nextStepLabel}`
+        : "Start with one small thing";
     }
-    if (nextStep) {
-      return `Start with: ${nextStep.label}`;
+    if (nextStepLabel) {
+      return `Start with: ${nextStepLabel}`;
     }
     return "Choose one gentle next step when ready.";
   })();
