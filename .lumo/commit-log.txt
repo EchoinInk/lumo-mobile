@@ -21922,3 +21922,9 @@ COMMIT: chore(lumo): update CarryOverReviewCard.tsx
 FILES:
 src/features/planning/components/CarryOverReviewCard.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:28:49
+COMMIT: chore(lumo): update MorningPlanningCard.tsx
+FILES:
+src/features/planning/components/MorningPlanningCard.tsx
+

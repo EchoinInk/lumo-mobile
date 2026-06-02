@@ -77,3 +77,22 @@ export async function testArchivedBrainDumpEntryCanBeRestored(): Promise<void> {
     "restored thought should clear archive conversion metadata",
   );
 }
+
+export async function testBrainDumpEntryCanBeDeletedPermanently(): Promise<void> {
+  resetTestState();
+  useBrainDumpStore.setState({ entries: [], hasHydrated: false });
+
+  const entry = useBrainDumpStore.getState().addEntry({ text: "Remove this" });
+  useBrainDumpStore.getState().deleteEntry(entry!.id);
+
+  assertEqual(
+    useBrainDumpStore.getState().entries.length,
+    0,
+    "deleted thought should leave in-memory state",
+  );
+  assertEqual(
+    loadBrainDumpEntries().length,
+    0,
+    "deleted thought should not reload from storage",
+  );
+}
