@@ -21504,3 +21504,9 @@ COMMIT: chore(lumo): update MorningPlanningScreen.tsx
 FILES:
 src/features/planning/screens/MorningPlanningScreen.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 03:26:21
+COMMIT: chore(lumo): update routineBundleApplyGuard.ts
+FILES:
+src/features/routines/services/routineBundleApplyGuard.ts
+
