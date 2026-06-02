@@ -218,6 +218,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
   const morningComplete = summary.morningCompleted;
   const showEveningReset =
     mode === "evening" ||
+    (summary.morningCompleted && !summary.eveningCompleted) ||
     (new Date().getHours() >= 18 && !summary.eveningCompleted);
 
   return {
