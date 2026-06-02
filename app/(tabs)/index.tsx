@@ -172,6 +172,9 @@ export default function DashboardScreen() {
           planning.resetMorningPlan();
           router.push({ pathname: "/planning/morning" as const } as any);
         }}
+        onViewParked={() =>
+          router.push({ pathname: "/parked" as const } as any)
+        }
       />
 
       <SectionHeader

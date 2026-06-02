@@ -26,6 +26,7 @@ interface CalmDailySummaryProps {
   onOpenPlanning: () => void;
   onEveningReset: () => void;
   onAdjustPlan?: () => void;
+  onViewParked?: () => void;
 }
 
 function resolveDashboardState(
@@ -50,6 +51,7 @@ export function CalmDailySummary({
   onOpenPlanning,
   onEveningReset,
   onAdjustPlan,
+  onViewParked,
 }: CalmDailySummaryProps) {
   const state = resolveDashboardState(
     morningComplete,
@@ -174,6 +176,18 @@ export function CalmDailySummary({
             accessibilityHint="Reopens morning planning to make changes"
           >
             Adjust plan
+          </Button>
+        )}
+        {onViewParked && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={onViewParked}
+            accessibilityRole="button"
+            accessibilityLabel="View parked"
+            accessibilityHint="Opens things saved for later"
+          >
+            View parked
           </Button>
         )}
       </View>
