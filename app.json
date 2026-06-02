@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "scheme": "lumomobile",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
     "ios": {
       "bundleIdentifier": "com.meltmyheart.lumo"
     },
