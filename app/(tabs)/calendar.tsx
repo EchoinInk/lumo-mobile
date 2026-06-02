@@ -3,6 +3,7 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { getTasksForCalendarDate } from "@/src/features/calendar/utils/calendarTasks";
 import { useTasks } from "@/src/features/tasks";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import {
@@ -44,9 +45,7 @@ export default function CalendarScreen() {
   const today = weekDays.find((item) => item.isToday) ?? weekDays[0];
   const [selectedDate, setSelectedDate] = useState(today.dateKey);
   const { tasks } = useTasks();
-  const selectedTasks = tasks.filter(
-    (task) => !task.deletedAt && task.dueDate === selectedDate,
-  );
+  const selectedTasks = getTasksForCalendarDate(tasks, selectedDate);
   const selectedLabel =
     selectedDate === today.dateKey
       ? "Today's schedule"
