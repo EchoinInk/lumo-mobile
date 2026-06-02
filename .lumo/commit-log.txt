@@ -21510,3 +21510,9 @@ COMMIT: chore(lumo): update routineBundleApplyGuard.ts
 FILES:
 src/features/routines/services/routineBundleApplyGuard.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 03:26:32
+COMMIT: chore(lumo): update index.ts
+FILES:
+src/features/routines/index.ts
+
