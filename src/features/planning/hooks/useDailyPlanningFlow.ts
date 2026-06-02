@@ -200,6 +200,13 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
 
   const parkItem = useCallback(
     (sourceId: string, sourceType: PlanningSourceType = "task") => {
+      const parkedSelectedNextStep =
+        summary.nextStepId &&
+        (nextStepOptions.find((step) => step.id === summary.nextStepId)
+          ?.sourceId === sourceId ||
+          lowEnergyOptions.find((option) => option.id === summary.nextStepId)
+            ?.sourceId === sourceId);
+
       if (sourceType === "task") {
         updateTask(sourceId, { dueDate: shiftTaskDate(7) });
       } else if (sourceType === "brainDump") {
@@ -209,15 +216,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
       if (mode === "evening" && sourceType === "task") {
         persistSummary({
           ...summary,
-          nextStepId:
-            summary.nextStepId &&
-            (nextStepOptions.find((step) => step.id === summary.nextStepId)
-              ?.sourceId === sourceId ||
-              lowEnergyOptions.find(
-                (option) => option.id === summary.nextStepId,
-              )?.sourceId === sourceId)
-              ? undefined
-              : summary.nextStepId,
+          nextStepId: parkedSelectedNextStep ? undefined : summary.nextStepId,
           parkedIds: [...new Set([...summary.parkedIds, sourceId])],
           eveningParkedIds: [
             ...new Set([...summary.eveningParkedIds, sourceId]),
@@ -228,14 +227,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
 
       persistSummary({
         ...summary,
-        nextStepId:
-          summary.nextStepId &&
-          (nextStepOptions.find((step) => step.id === summary.nextStepId)
-            ?.sourceId === sourceId ||
-            lowEnergyOptions.find((option) => option.id === summary.nextStepId)
-              ?.sourceId === sourceId)
-            ? undefined
-            : summary.nextStepId,
+        nextStepId: parkedSelectedNextStep ? undefined : summary.nextStepId,
         parkedIds: [...new Set([...summary.parkedIds, sourceId])],
       });
     },

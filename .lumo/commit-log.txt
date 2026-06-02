@@ -21782,3 +21782,10 @@ src/features/planning/services/planningComposer.ts
 src/features/planning/services/planningStorage.ts
 src/features/planning/types/planning.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:57:36
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/testing/persistence/planningStorage.test.ts
+src/testing/planning/planningComposer.test.ts
+
