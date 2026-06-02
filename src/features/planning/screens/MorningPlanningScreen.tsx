@@ -1,4 +1,5 @@
 import { Screen } from "@/src/components/ui/Screen";
+import { ScreenBackButton } from "@/src/components/ui/ScreenBackButton";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import type {
   BrainDumpConversionTarget,
@@ -81,6 +82,7 @@ export function MorningPlanningScreen() {
 
   return (
     <Screen scrollable padded>
+      <ScreenBackButton fallbackPath="/(tabs)" />
       <SectionHeader
         title="Morning planning"
         subtitle={
