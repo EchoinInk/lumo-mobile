@@ -3,6 +3,7 @@ import { Card } from "@/src/components/ui/Card";
 import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
+import { useTasks } from "@/src/features/tasks";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import {
   Calendar as CalendarIcon,
@@ -13,18 +14,47 @@ import {
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-const weekDays = [
-  { day: "M", date: "13", isToday: false },
-  { day: "T", date: "14", isToday: false },
-  { day: "W", date: "15", isToday: true },
-  { day: "T", date: "16", isToday: false },
-  { day: "F", date: "17", isToday: false },
-  { day: "S", date: "18", isToday: false },
-  { day: "S", date: "19", isToday: false },
-];
+function toDateKey(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
+
+function buildVisibleWeek(anchor = new Date()) {
+  const start = new Date(anchor);
+  const day = start.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + mondayOffset);
+
+  const todayKey = toDateKey(anchor);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    const dateKey = toDateKey(date);
+    return {
+      day: date.toLocaleDateString(undefined, { weekday: "short" }).slice(0, 1),
+      date: String(date.getDate()),
+      dateKey,
+      isToday: dateKey === todayKey,
+    };
+  });
+}
 
 export default function CalendarScreen() {
-  const [selectedDate, setSelectedDate] = useState("15");
+  const weekDays = buildVisibleWeek();
+  const today = weekDays.find((item) => item.isToday) ?? weekDays[0];
+  const [selectedDate, setSelectedDate] = useState(today.dateKey);
+  const { tasks } = useTasks();
+  const selectedTasks = tasks.filter(
+    (task) => !task.deletedAt && task.dueDate === selectedDate,
+  );
+  const selectedLabel =
+    selectedDate === today.dateKey
+      ? "Today's schedule"
+      : new Date(`${selectedDate}T00:00:00`).toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "short",
+          day: "numeric",
+        });
 
   return (
     <Screen scrollable padded>
@@ -65,11 +95,11 @@ export default function CalendarScreen() {
           contentContainerStyle={styles.weekStripContent}
         >
           {weekDays.map((item, index) => {
-            const isSelected = selectedDate === item.date;
+            const isSelected = selectedDate === item.dateKey;
             return (
               <TouchableOpacity
                 key={index}
-                onPress={() => setSelectedDate(item.date)}
+                onPress={() => setSelectedDate(item.dateKey)}
                 style={[
                   styles.dayItem,
                   item.isToday && styles.dayItemToday,
@@ -106,15 +136,30 @@ export default function CalendarScreen() {
         </ScrollView>
       </Card>
 
-      <SectionHeader title="Today's schedule" />
-      <Card variant="outlined" style={styles.emptyCard}>
-        <Text variant="body" color={Colors.textSecondary}>
-          Nothing needs your attention here yet.
-        </Text>
-        <Text variant="caption" color={Colors.textTertiary}>
-          Your tasks and reminders will land here as scheduling grows.
-        </Text>
-      </Card>
+      <SectionHeader title={selectedLabel} />
+      {selectedTasks.length > 0 ? (
+        <View style={styles.taskList}>
+          {selectedTasks.map((task) => (
+            <Card key={task.id} variant="outlined" style={styles.taskCard}>
+              <Text variant="body" style={styles.taskTitle}>
+                {task.title}
+              </Text>
+              <Text variant="caption" color={Colors.textTertiary}>
+                {task.dueTime ? `At ${task.dueTime}` : "Scheduled task"}
+              </Text>
+            </Card>
+          ))}
+        </View>
+      ) : (
+        <Card variant="outlined" style={styles.emptyCard}>
+          <Text variant="body" color={Colors.textSecondary}>
+            Nothing needs your attention here yet.
+          </Text>
+          <Text variant="caption" color={Colors.textTertiary}>
+            Tasks with this date will appear here.
+          </Text>
+        </Card>
+      )}
 
       <CalmPlaceholderNote
         title="This space is coming together."
@@ -175,5 +220,16 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
     padding: Spacing.lg,
     marginBottom: Spacing.lg,
+  },
+  taskList: {
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  taskCard: {
+    padding: Spacing.lg,
+    gap: Spacing.xs,
+  },
+  taskTitle: {
+    fontWeight: "600",
   },
 });
