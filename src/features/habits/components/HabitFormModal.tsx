@@ -1,5 +1,4 @@
 import { Button } from "@/src/components/ui/Button";
-import { Card } from "@/src/components/ui/Card";
 import { Input } from "@/src/components/ui/Input";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
@@ -137,7 +136,7 @@ export function HabitFormModal({
                     style={styles.keyboardView}
                 >
                     <View style={styles.container}>
-                                <Card variant="elevated" style={styles.sheet}>
+                                <View style={styles.sheet}>
                                     {/* Header */}
                                     <View style={styles.header}>
                                         <View style={styles.titleContainer}>
@@ -379,7 +378,7 @@ export function HabitFormModal({
                                             </LinearGradient>
                                         </TouchableOpacity>
                                     </View>
-                                </Card>
+                                </View>
                             </View>
                 </KeyboardAvoidingView>
             </View>
@@ -410,10 +409,13 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     sheet: {
+        backgroundColor: Colors.card,
+        borderRadius: Radius["3xl"],
         maxHeight: "85%",
         padding: Spacing.xl,
         zIndex: 4,
         elevation: 4,
+        ...Shadows.xl,
     },
     header: {
         flexDirection: "row",
