@@ -413,9 +413,9 @@ const styles = StyleSheet.create({
         borderRadius: Radius["3xl"],
         maxHeight: "85%",
         padding: Spacing.xl,
+        ...Shadows.xl,
         zIndex: 4,
         elevation: 4,
-        ...Shadows.xl,
     },
     header: {
         flexDirection: "row",
