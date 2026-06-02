@@ -7,6 +7,7 @@ import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Text } from "@/src/components/ui/Text";
 import { RoutineBundleCard } from "@/src/features/routines/components/RoutineBundleCard";
 import {
+  createRoutineBundleApplyGuard,
   createTasksFromBundle,
   starterRoutineBundles,
   type RoutineBundle,
@@ -32,7 +33,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 type FilterType = "all" | "today" | "upcoming" | "done";
@@ -64,7 +65,8 @@ export default function TasksScreen() {
   const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
-  const [isApplyingBundle, setIsApplyingBundle] = useState(false);
+  const applyGuard = useRef(createRoutineBundleApplyGuard()).current;
+  const [applyingBundleIds, setApplyingBundleIds] = useState<string[]>([]);
   const {
     tasks,
     toggleTask,
@@ -130,13 +132,19 @@ export default function TasksScreen() {
   };
 
   const handleUseBundle = (bundle: RoutineBundle) => {
-    if (isApplyingBundle) return;
+    if (!applyGuard.begin(bundle.id)) return;
 
-    setIsApplyingBundle(true);
+    setApplyingBundleIds((current) =>
+      current.includes(bundle.id) ? current : [...current, bundle.id],
+    );
     try {
       createTasksFromBundle(bundle).forEach(createTask);
-    } finally {
-      setIsApplyingBundle(false);
+    } catch (error) {
+      applyGuard.release(bundle.id);
+      setApplyingBundleIds((current) =>
+        current.filter((bundleId) => bundleId !== bundle.id),
+      );
+      throw error;
     }
   };
 
@@ -449,12 +457,12 @@ export default function TasksScreen() {
       />
       <View style={styles.bundleList}>
         {starterRoutineBundles.map((bundle) => (
-          <RoutineBundleCard
-            key={bundle.id}
-            bundle={bundle}
-            onUse={handleUseBundle}
-            isApplying={isApplyingBundle}
-          />
+            <RoutineBundleCard
+              key={bundle.id}
+              bundle={bundle}
+              onUse={handleUseBundle}
+              isApplying={applyingBundleIds.includes(bundle.id)}
+            />
         ))}
       </View>
 
