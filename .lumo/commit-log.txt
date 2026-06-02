@@ -21534,3 +21534,9 @@ COMMIT: chore(lumo): update routineBundleApplyGuard.test.ts
 FILES:
 src/testing/routines/routineBundleApplyGuard.test.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 03:28:21
+COMMIT: chore(lumo): update BrainDumpEntryCard.tsx
+FILES:
+src/features/brain-dump/components/BrainDumpEntryCard.tsx
+
