@@ -19,7 +19,12 @@ export function getFocusSuggestions(
   const today = new Date().toISOString().split("T")[0];
 
   return tasks
-    .filter((task) => !task.completed && !task.deletedAt)
+    .filter(
+      (task) =>
+        !task.completed &&
+        !task.deletedAt &&
+        (!task.dueDate || task.dueDate <= today),
+    )
     .map((task): FocusSuggestion => {
       const isQuickWin =
         task.priority === "low" || task.energyRequired === "low";
