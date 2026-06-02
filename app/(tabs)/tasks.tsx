@@ -34,7 +34,13 @@ import {
   Trash2,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type FilterType = "all" | "today" | "upcoming" | "done";
 
@@ -123,6 +129,25 @@ export default function TasksScreen() {
     setModalMode("edit");
     setSelectedTask(task);
     setIsModalVisible(true);
+  };
+
+  const confirmDeleteTask = (task: Task) => {
+    Alert.alert(
+      "Delete this?",
+      "This removes it from Lumo. You can park it instead if you may want it later.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Park instead",
+          onPress: () => updateTask(task.id, { dueDate: tomorrow }),
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteTask(task.id),
+        },
+      ],
+    );
   };
 
   const handleModalSubmit = (data: CreateTaskInput) => {
@@ -424,10 +449,11 @@ export default function TasksScreen() {
 
                 {/* Delete Button */}
                 <TouchableOpacity
-                  onPress={() => deleteTask(task.id)}
+                  onPress={() => confirmDeleteTask(task)}
                   style={styles.actionButton}
                   activeOpacity={0.6}
                   accessibilityLabel={`Delete task: ${task.title}`}
+                  accessibilityHint="Asks before deleting this task"
                   accessibilityRole="button"
                 >
                   <Trash2 size={16} color={Colors.textTertiary} />
