@@ -8,11 +8,15 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 
 ### Phase 17.1 QA fixes
 
+- Brain Dump reminder conversion now asks for a simple schedule before saving: later today, tomorrow, this weekend, or no time
+- Routine Bundle loading reset fixed: rapid taps are still guarded, the button shows brief success feedback, and the action unlocks without an app reload
+- Today Focus / planning CTA wiring fixed: Start shows the existing Focus Mode banner, Snooze gently / Later visibly defer items out of Today Focus, and Adjust Plan routes back into morning planning
+- Add Task / Add Habit overlay visibility fixed by rendering modal backdrops and sheets as siblings with explicit stacking, keyboard avoidance, and safe bottom padding
 - Brain Dump conversion reachability fixed: each open thought now has an obvious `Review / Sort` action that reveals conversion choices for task, reminder, routine idea, and archive / park
 - Routine bundle duplicate prevention fixed: bundle creation now uses an immediate per-bundle guard so rapid repeated taps cannot create a second batch; guard coverage added in `routineBundleApplyGuard.test.ts`
 - Back/exit actions added to pushed routes: Brain Dump, Reminder Settings, Routine Bundles, Morning Planning, and Evening Reset now expose a small accessible Back action with route-specific fallback behavior
 - `npm run typecheck`: still blocked by existing `SharedTransitionCard.tsx` errors (`SharedTransition.custom` missing and implicit `any` for `values`); no new typecheck errors from these QA fixes
-- `npm test`: passed, **75 tests**, 0 failures
+- `npm test`: passed, **78 tests**, 0 failures
 - `npx expo start -c --dev-client`: skipped because port `8081` is already in use and Expo required interactive input in non-interactive mode
 
 ### Persistence map
