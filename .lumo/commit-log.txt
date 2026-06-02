@@ -21904,3 +21904,9 @@ COMMIT: chore(lumo): update BrainDumpScreen.tsx
 FILES:
 src/features/brain-dump/screens/BrainDumpScreen.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:27:33
+COMMIT: chore(lumo): update tasks.tsx
+FILES:
+app/(tabs)/tasks.tsx
+

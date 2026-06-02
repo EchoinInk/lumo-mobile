@@ -7,7 +7,7 @@ import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { EmptyTasks } from "../components/EmptyTasks";
 import { TaskFilterPills } from "../components/TaskFilterPills";
 import { TaskRow } from "../components/TaskRow";
@@ -43,6 +43,7 @@ export default function TasksScreen() {
     createTask,
     toggleTask,
     deleteTask,
+    updateTask,
   } = useTasks();
 
   const filteredTasks = React.useMemo(() => {
@@ -63,7 +64,30 @@ export default function TasksScreen() {
   };
 
   const handleDeleteTask = async (id: string) => {
-    await deleteTask(id);
+    const task = tasks.find((item) => item.id === id);
+    if (!task) return;
+
+    Alert.alert(
+      "Delete this?",
+      "This removes it from Lumo. You can park it instead if you may want it later.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Park instead",
+          onPress: () => {
+            const tomorrow = new Date(Date.now() + 86400000)
+              .toISOString()
+              .split("T")[0];
+            updateTask(id, { dueDate: tomorrow });
+          },
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteTask(id),
+        },
+      ],
+    );
   };
 
   const handleFocusTask = (taskId: string) => {
