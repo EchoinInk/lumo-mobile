@@ -242,6 +242,19 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     ],
   );
 
+  const bringBackParkedItem = useCallback(
+    (sourceId: string) => {
+      persistSummary({
+        ...summary,
+        parkedIds: summary.parkedIds.filter((id) => id !== sourceId),
+        eveningParkedIds: summary.eveningParkedIds.filter(
+          (id) => id !== sourceId,
+        ),
+      });
+    },
+    [summary, persistSummary],
+  );
+
   const markEveningBrainDumpVisited = useCallback(() => {
     persistSummary({ ...summary, eveningBrainDumpVisited: true });
   }, [summary, persistSummary]);
@@ -289,6 +302,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     carryOverItem,
     carryToTomorrow,
     parkItem,
+    bringBackParkedItem,
     markEveningBrainDumpVisited,
     resetMorningPlan,
     resetEveningReset,
