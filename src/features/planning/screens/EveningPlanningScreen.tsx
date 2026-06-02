@@ -1,4 +1,5 @@
 import { Screen } from "@/src/components/ui/Screen";
+import { ScreenBackButton } from "@/src/components/ui/ScreenBackButton";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { Button } from "@/src/components/ui/Button";
 import { EveningResetCard } from "@/src/features/planning/components/EveningResetCard";
@@ -26,6 +27,7 @@ export function EveningPlanningScreen() {
 
   return (
     <Screen scrollable padded>
+      <ScreenBackButton fallbackPath="/(tabs)" />
       <SectionHeader
         title="Evening reset"
         subtitle={
