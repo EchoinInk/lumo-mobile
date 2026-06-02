@@ -90,18 +90,6 @@ export default function DashboardScreen() {
       {/* Header Section */}
       <DashboardHeader />
 
-      {/* Daily Progress - hide in minimal mode */}
-      {shouldShowSection("progress") && (
-        <DailyProgressCard
-          title="Today's Progress"
-          progress={completionRate}
-          subtitle={supportiveLabel}
-          completedCount={completedTodayItems}
-          totalCount={totalTodayItems}
-          variant={shouldShowDecorativeElements ? "gradient" : "default"}
-        />
-      )}
-
       {/* Today's Focus - always visible */}
       <DashboardSection title="Today's Focus" actionLabel="View All">
         <TodayFocusCard
@@ -112,6 +100,16 @@ export default function DashboardScreen() {
           }
         />
       </DashboardSection>
+
+      {/* Compact Task Progress Card - below Today Focus in calm hierarchy */}
+      <DailyProgressCard
+        title="Today's Progress"
+        progress={completionRate}
+        subtitle={supportiveLabel}
+        completedCount={completedTodayItems}
+        totalCount={totalTodayItems}
+        variant={shouldShowDecorativeElements ? "gradient" : "default"}
+      />
 
       {/* Today's Routines - hide in minimal mode */}
       {shouldShowSection("habits") && (

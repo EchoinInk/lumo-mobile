@@ -43,6 +43,7 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Brain Dump conversion reachability fixed: each open thought now has an obvious `Review / Sort` action that reveals conversion choices for task, reminder, routine idea, and archive / park
 - Routine bundle duplicate prevention fixed: bundle creation now uses an immediate per-bundle guard so rapid repeated taps cannot create a second batch; guard coverage added in `routineBundleApplyGuard.test.ts`
 - Back/exit actions added to pushed routes: Brain Dump, Reminder Settings, Routine Bundles, Morning Planning, and Evening Reset now expose a small accessible Back action with route-specific fallback behavior
+- **Restored Dashboard compact task progress card**: Moved `DailyProgressCard` from conditional visibility to always-visible placement below Today Focus; removed `shouldShowSection("progress")` guard so progress summary is reliably shown in Dashboard hierarchy; component displays `X/Y tasks` with static ProgressBar and supportive completion labels; verified no Animated API crashes
 - `npm run typecheck`: still blocked by existing `SharedTransitionCard.tsx` errors (`SharedTransition.custom` missing and implicit `any` for `values`); no new typecheck errors from these QA fixes
 - `npm test`: passed, **88 tests**, 0 failures
 - `npx expo start -c --dev-client`: printed `Starting project at /Users/meltmyheart/Documents/GitHub/lumo-mobile`; spawned Expo/nativewind processes were stopped cleanly after no further Metro output appeared
