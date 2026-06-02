@@ -207,6 +207,7 @@ export function MorningPlanningCard({
             <LowEnergyPlanCard
               embedded
               options={lowEnergyOptions}
+              selectedId={selectedNextStep?.id}
               onChoose={onChooseLowEnergy}
               onPark={onParkLowEnergy}
             />

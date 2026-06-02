@@ -138,11 +138,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
       }
     }
 
-    if (summary.nextStepId) {
-      return undefined;
-    }
-
-    return energyLevel === "low" ? undefined : nextStepOptions[0];
+    return undefined;
   }, [summary.nextStepId, nextStepOptions, lowEnergyOptions, energyLevel]);
 
   const isHydrated =
@@ -154,13 +150,14 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
 
   const chooseEnergyLevel = useCallback(
     (level: PlanningEnergyLevel) => {
-      const next = composeDailyPlanningSummary(
-        { ...composerInput, energyLevel: level },
-        { ...summary, energyLevel: level },
-      );
-      persistSummary(next);
+      persistSummary({
+        ...summary,
+        energyLevel: level,
+        nextStepId: undefined,
+        morningCompleted: false,
+      });
     },
-    [composerInput, summary, persistSummary],
+    [summary, persistSummary],
   );
 
   const chooseNextStep = useCallback(

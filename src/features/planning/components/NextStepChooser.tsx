@@ -40,6 +40,7 @@ export function NextStepChooser({
     energyLevel === "low"
       ? "Choose the smallest useful step."
       : "Choose one small step.";
+  const isSelected = selected.id === selectedId;
 
   return (
     <Card
@@ -63,12 +64,14 @@ export function NextStepChooser({
       <View style={styles.actions}>
         <Button
           size="sm"
+          variant={isSelected ? "secondary" : "primary"}
           onPress={() => onStart(selected)}
           accessibilityRole="button"
           accessibilityLabel={`Choose ${selected.label}`}
           accessibilityHint="Selects this as your one small step for today"
+          accessibilityState={{ selected: isSelected }}
         >
-          Choose this
+          {isSelected ? "Chosen" : "Choose this"}
         </Button>
         {options.length > 1 && (
           <Button

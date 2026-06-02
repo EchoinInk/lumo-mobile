@@ -7,6 +7,7 @@ import { StyleSheet, View } from "react-native";
 
 interface LowEnergyPlanCardProps {
   options: LowEnergyOption[];
+  selectedId?: string;
   onChoose: (optionId: string) => void;
   onPark: (sourceId: string, sourceType: LowEnergyOption["sourceType"]) => void;
   embedded?: boolean;
@@ -14,6 +15,7 @@ interface LowEnergyPlanCardProps {
 
 export function LowEnergyPlanCard({
   options,
+  selectedId,
   onChoose,
   onPark,
   embedded = false,
@@ -38,39 +40,52 @@ export function LowEnergyPlanCard({
         </View>
       ) : (
         <View style={styles.list}>
-          {options.map((option) => (
-            <View key={option.id} style={styles.option}>
-              <View style={styles.optionText}>
-                <Text variant="caption" color={Colors.primary}>
-                  {option.reason}
-                </Text>
-                <Text variant="body" style={styles.optionLabel}>
-                  {option.label}
-                </Text>
+          {options.map((option) => {
+            const isSelected = option.id === selectedId;
+            return (
+              <View
+                key={option.id}
+                style={[styles.option, isSelected && styles.optionSelected]}
+              >
+                <View style={styles.optionText}>
+                  <Text variant="caption" color={Colors.primary}>
+                    {option.reason}
+                  </Text>
+                  <Text variant="body" style={styles.optionLabel}>
+                    {option.label}
+                  </Text>
+                  {isSelected && (
+                    <Text variant="caption" color={Colors.textTertiary}>
+                      Chosen for today
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.actions}>
+                  <Button
+                    size="sm"
+                    variant={isSelected ? "secondary" : "primary"}
+                    onPress={() => onChoose(option.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Choose ${option.label}`}
+                    accessibilityHint="Selects this as your one small step for today"
+                    accessibilityState={{ selected: isSelected }}
+                  >
+                    {isSelected ? "Chosen" : "Choose this"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => onPark(option.sourceId, option.sourceType)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Park ${option.label} for later`}
+                    accessibilityHint="Parks this option for later"
+                  >
+                    Park for later
+                  </Button>
+                </View>
               </View>
-              <View style={styles.actions}>
-                <Button
-                  size="sm"
-                  onPress={() => onChoose(option.id)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Choose ${option.label}`}
-                  accessibilityHint="Selects this as your one small step for today"
-                >
-                  Choose this
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => onPark(option.sourceId, option.sourceType)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Park ${option.label} for later`}
-                  accessibilityHint="Parks this option for later"
-                >
-                  Park for later
-                </Button>
-              </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </>
@@ -112,6 +127,12 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: Radius.xl,
     backgroundColor: Colors.card + "CC",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  optionSelected: {
+    borderColor: Colors.primary + "80",
+    backgroundColor: Colors.card,
   },
   optionText: {
     gap: Spacing.xs,
