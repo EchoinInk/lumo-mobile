@@ -5,13 +5,22 @@ import type {
   BrainDumpConversionTarget,
   BrainDumpEntry,
 } from "@/src/features/brain-dump";
+import {
+  getReminderScheduledAt,
+  reminderScheduleOptions,
+  type ReminderScheduleOptionId,
+} from "@/src/features/reminders";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 interface BrainDumpEntryCardProps {
   entry: BrainDumpEntry;
-  onConvert: (entry: BrainDumpEntry, target: BrainDumpConversionTarget) => void;
+  onConvert: (
+    entry: BrainDumpEntry,
+    target: BrainDumpConversionTarget,
+    scheduledAt?: string,
+  ) => void;
 }
 
 export function BrainDumpEntryCard({
@@ -19,6 +28,11 @@ export function BrainDumpEntryCard({
   onConvert,
 }: BrainDumpEntryCardProps) {
   const [isReviewing, setIsReviewing] = useState(false);
+  const [isSchedulingReminder, setIsSchedulingReminder] = useState(false);
+
+  const handleReminderSchedule = (optionId: ReminderScheduleOptionId) => {
+    onConvert(entry, "reminder", getReminderScheduledAt(optionId));
+  };
 
   return (
     <Card variant="outlined" style={styles.card}>
@@ -38,6 +52,36 @@ export function BrainDumpEntryCard({
         >
           Review / Sort
         </Button>
+      ) : isSchedulingReminder ? (
+        <View style={styles.actions}>
+          <Text
+            variant="caption"
+            color={Colors.textSecondary}
+            style={styles.actionLabel}
+          >
+            When should this reminder appear?
+          </Text>
+          {reminderScheduleOptions.map((option) => (
+            <Button
+              key={option.id}
+              size="sm"
+              variant={option.id === "tomorrow" ? "secondary" : "ghost"}
+              onPress={() => handleReminderSchedule(option.id)}
+              accessibilityLabel={option.accessibilityLabel}
+              accessibilityHint="Creates a reminder with this schedule"
+            >
+              {option.label}
+            </Button>
+          ))}
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() => setIsSchedulingReminder(false)}
+            accessibilityLabel="Back to sorting options"
+          >
+            Back
+          </Button>
+        </View>
       ) : (
         <View style={styles.actions}>
           <Text
@@ -59,9 +103,9 @@ export function BrainDumpEntryCard({
           <Button
             size="sm"
             variant="ghost"
-            onPress={() => onConvert(entry, "reminder")}
+            onPress={() => setIsSchedulingReminder(true)}
             accessibilityLabel="Convert to reminder"
-            accessibilityHint="Creates a reminder from this thought"
+            accessibilityHint="Shows simple reminder schedule choices"
           >
             Convert to reminder
           </Button>
