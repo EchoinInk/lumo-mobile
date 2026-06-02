@@ -1,7 +1,8 @@
 import { Colors, Radius, Spacing } from "@/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { DimensionValue, StyleSheet, View, ViewProps } from "react-native";
+import { StyleSheet, View } from "react-native";
+import type { DimensionValue, ViewProps } from "react-native";
 import { Text } from "./Text";
 
 interface ProgressBarProps extends ViewProps {
