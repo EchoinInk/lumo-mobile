@@ -36,3 +36,19 @@ export function testFocusSuggestionsLimitVisibleComplexity(): void {
 
   assertEqual(suggestions.length, 3, "focus suggestions should cap at 3");
 }
+
+export function testFocusSuggestionsExcludeDeferredTasks(): void {
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+  const suggestions = getFocusSuggestions([
+    { ...baseTask, id: "today", title: "Visible today" },
+    {
+      ...baseTask,
+      id: "tomorrow",
+      title: "Deferred",
+      dueDate: tomorrow,
+    },
+  ]);
+
+  assertEqual(suggestions.length, 1, "deferred tasks should leave Today Focus");
+  assertEqual(suggestions[0]?.task.id, "today", "today task should remain");
+}
