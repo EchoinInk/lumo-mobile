@@ -30,6 +30,7 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Add Task / Add Habit modal layering fixed again with plain high-contrast sheet surfaces above the backdrop
 - Completed Morning Planning `Adjust plan` CTA now uses a visible secondary button style while preserving the reset/reopen handler
 - Calendar future task visibility fixed: selected dates now show tasks with matching `dueDate`; empty dates show calm copy
+- Calendar week navigation wired: previous/next week controls now move the selected date so future-dated tasks beyond the current week are reachable
 - Brain Dump reminder conversion now asks for a simple schedule before saving: later today, tomorrow, this weekend, or no time
 - Routine Bundle loading reset fixed: rapid taps are still guarded, the button shows brief success feedback, and the action unlocks without an app reload
 - Today Focus / planning CTA wiring fixed: Start shows the existing Focus Mode banner, Snooze gently / Later visibly defer items out of Today Focus, and Adjust Plan routes back into morning planning

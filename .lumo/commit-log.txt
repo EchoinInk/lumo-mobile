@@ -21856,3 +21856,9 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:49:44
+COMMIT: chore(lumo): update calendar.tsx
+FILES:
+app/(tabs)/calendar.tsx
+
