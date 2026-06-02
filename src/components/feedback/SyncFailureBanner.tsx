@@ -10,11 +10,11 @@
  * - Offer clear retry path
  */
 
+import { Colors, Radius, Spacing } from "@/theme/tokens";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Colors, Radius, Spacing } from "@/theme/tokens";
 import { Text } from "../ui/Text";
-import { RetryButton } from "./index";
+import { RetryButton } from "./RetryButton";
 
 interface Props {
   onRetry: () => void;
