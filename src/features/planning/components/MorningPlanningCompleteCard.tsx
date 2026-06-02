@@ -97,7 +97,7 @@ export function MorningPlanningCompleteCard({
               variant="secondary"
               onPress={onAdjustPlan}
               accessibilityRole="button"
-              accessibilityLabel="Adjust plan"
+              accessibilityLabel="Adjust today's plan"
               accessibilityHint="Reopens morning planning to make changes"
             >
               Adjust plan
