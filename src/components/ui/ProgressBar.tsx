@@ -1,8 +1,6 @@
-import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { Colors, Radius, Spacing } from "@/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Animated, StyleSheet, View, ViewProps } from "react-native";
+import { StyleSheet, View, ViewProps } from "react-native";
 import { Text } from "./Text";
 
 interface ProgressBarProps extends ViewProps {
@@ -23,44 +21,11 @@ export function ProgressBar({
   style,
   ...props
 }: ProgressBarProps) {
-  const clampedProgress = Math.min(Math.max(progress, 0), 100);
-  const reducedMotion = useReducedMotion();
-  const animatedProgress = React.useRef(
-    new Animated.Value(clampedProgress),
-  ).current;
-  const animationRef = React.useRef<Animated.CompositeAnimation | null>(null);
-
-  React.useEffect(() => {
-    // Stop any existing animation before starting new one
-    if (animationRef.current) {
-      animationRef.current.stop();
-      animationRef.current = null;
-    }
-
-    if (reducedMotion) {
-      // Set value immediately without animation
-      animatedProgress.setValue(clampedProgress);
-    } else {
-      animationRef.current = Animated.timing(animatedProgress, {
-        toValue: clampedProgress,
-        duration: 300,
-        useNativeDriver: false,
-      });
-      animationRef.current.start();
-    }
-
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-        animationRef.current = null;
-      }
-    };
-  }, [clampedProgress, reducedMotion]);
-
-  const progressWidth = animatedProgress.interpolate({
-    inputRange: [0, 100],
-    outputRange: ["0%", "100%"],
-  });
+  // Clamp progress between 0 and 1 (handles both 0-1 and 0-100 ranges)
+  const normalizedProgress =
+    progress > 1
+      ? Math.min(Math.max(progress / 100, 0), 1)
+      : Math.min(Math.max(progress, 0), 1);
 
   const barStyle = {
     height,
@@ -71,7 +36,7 @@ export function ProgressBar({
 
   const fillStyle = {
     height: height,
-    width: progressWidth,
+    width: `${normalizedProgress * 100}%`,
     borderRadius: Radius.full,
   };
 
@@ -84,7 +49,7 @@ export function ProgressBar({
         style={fillStyle}
       />
     ) : (
-      <Animated.View style={[fillStyle, { backgroundColor: Colors.primary }]} />
+      <View style={[fillStyle, { backgroundColor: Colors.primary }]} />
     );
 
   return (
@@ -95,7 +60,7 @@ export function ProgressBar({
             {label || "Progress"}
           </Text>
           <Text variant="caption" color={Colors.textSecondary}>
-            {Math.round(clampedProgress)}%
+            {Math.round(normalizedProgress * 100)}%
           </Text>
         </View>
       )}

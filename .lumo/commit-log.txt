@@ -21450,3 +21450,9 @@ COMMIT: chore(lumo): update package.json
 FILES:
 package.json
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 02:40:51
+COMMIT: chore(lumo): update SyncFailureBanner.tsx
+FILES:
+src/components/feedback/SyncFailureBanner.tsx
+
