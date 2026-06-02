@@ -144,7 +144,7 @@ export const TaskRow = React.memo<TaskRowProps>(
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`Delete ${task.title}`}
-                accessibilityHint="Removes this task"
+                accessibilityHint="Asks before deleting this task"
               >
                 <Text style={styles.deleteText}>✕</Text>
               </TouchableOpacity>
