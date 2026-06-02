@@ -34,7 +34,11 @@ export function ProgressBar({
     overflow: "hidden" as const,
   };
 
-  const fillStyle = {
+  const fillStyle: {
+    height: number;
+    width: `${string}%`;
+    borderRadius: number;
+  } = {
     height: height,
     width: `${normalizedProgress * 100}%`,
     borderRadius: Radius.full,
