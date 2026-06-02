@@ -122,6 +122,23 @@ export function testLowEnergyOptionsPreferTinyActions(): void {
   );
 }
 
+export function testLowEnergyOptionsProvideFallbackWhenEmpty(): void {
+  const options = getLowEnergyOptions({
+    tasks: [],
+    reminders: [],
+    routineLabels: [],
+    brainDumpEntries: [],
+    energyLevel: "low",
+    today,
+  });
+
+  assertEqual(
+    options[0]?.label,
+    "Take a small reset",
+    "low energy path should always offer one tiny fallback action",
+  );
+}
+
 export function testNextStepsCapAtThree(): void {
   const steps = getSuggestedNextSteps({
     tasks: [1, 2, 3, 4, 5].map((index) => ({

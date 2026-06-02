@@ -21770,3 +21770,15 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:57:05
+COMMIT: feat(lumo): evolve components and logic (7 files)
+FILES:
+app/(tabs)/index.tsx
+src/features/planning/components/CalmDailySummary.tsx
+src/features/planning/components/NextStepChooser.tsx
+src/features/planning/hooks/useDailyPlanningFlow.ts
+src/features/planning/services/planningComposer.ts
+src/features/planning/services/planningStorage.ts
+src/features/planning/types/planning.ts
+

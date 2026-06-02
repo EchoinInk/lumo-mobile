@@ -12,11 +12,13 @@ export async function testNormalizeDailyPlanningSummaryFallsBackSafely(): Promis
   const summary = normalizeDailyPlanningSummary({
     date: "2026-01-01",
     selectedFocusIds: ["a", 1, null] as unknown as string[],
+    parkedIds: ["task-1", null] as unknown as string[],
     energyLevel: "invalid" as never,
     morningCompleted: "yes" as never,
   });
 
   assertEqual(summary.selectedFocusIds.join(","), "a", "non-string ids should be filtered");
+  assertEqual(summary.parkedIds.join(","), "task-1", "valid parked ids should be preserved");
   assertEqual(summary.energyLevel, undefined, "invalid energy should be cleared");
   assertEqual(summary.morningCompleted, false, "invalid booleans should default false");
 }
