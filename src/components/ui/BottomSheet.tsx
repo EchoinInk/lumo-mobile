@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: Radius['3xl'],
     paddingTop: Spacing.lg,
     paddingHorizontal: Spacing.lg,
+    ...Shadows.xl,
     zIndex: 3,
     elevation: 3,
-    ...Shadows.xl,
   },
   handle: {
     width: 40,
