@@ -11,12 +11,14 @@ interface RoutineBundleCardProps {
   bundle: RoutineBundle;
   onUse: (bundle: RoutineBundle) => void;
   isApplying?: boolean;
+  isApplied?: boolean;
 }
 
 export function RoutineBundleCard({
   bundle,
   onUse,
   isApplying = false,
+  isApplied = false,
 }: RoutineBundleCardProps) {
   const [items, setItems] = useState(bundle.items);
 
@@ -55,9 +57,13 @@ export function RoutineBundleCard({
         disabled={isApplying}
         loading={isApplying}
         accessibilityLabel={`Use ${bundle.title} bundle`}
-        accessibilityHint="Creates tasks from the edited bundle items"
+        accessibilityHint={
+          isApplied
+            ? "Tasks were created from this bundle"
+            : "Creates tasks from the edited bundle items"
+        }
       >
-        Use bundle
+        {isApplied ? "Added" : "Use bundle"}
       </Button>
     </Card>
   );
