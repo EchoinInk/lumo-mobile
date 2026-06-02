@@ -32,6 +32,7 @@ export default function BrainDumpScreen() {
   const handleConvert = (
     entry: BrainDumpEntry,
     target: BrainDumpConversionTarget,
+    scheduledAt?: string,
   ) => {
     if (target === "task") {
       const task = createTask({ title: entry.text, priority: "medium" });
@@ -40,7 +41,7 @@ export default function BrainDumpScreen() {
     }
 
     if (target === "reminder") {
-      const reminder = reminders.addReminder({ title: entry.text });
+      const reminder = reminders.addReminder({ title: entry.text, scheduledAt });
       convertEntry(entry.id, target, reminder?.id);
       return;
     }
