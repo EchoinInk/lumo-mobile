@@ -478,7 +478,7 @@ export default function TasksScreen() {
         }
       />
       <View style={styles.bundleList}>
-        {starterRoutineBundles.map((bundle) => (
+        {starterRoutineBundles.slice(0, 3).map((bundle) => (
             <RoutineBundleCard
               key={bundle.id}
               bundle={bundle}
