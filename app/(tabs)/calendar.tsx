@@ -41,7 +41,8 @@ function buildVisibleWeek(anchor = new Date()) {
 }
 
 export default function CalendarScreen() {
-  const weekDays = buildVisibleWeek();
+  const [weekAnchor, setWeekAnchor] = useState(new Date());
+  const weekDays = buildVisibleWeek(weekAnchor);
   const today = weekDays.find((item) => item.isToday) ?? weekDays[0];
   const [selectedDate, setSelectedDate] = useState(today.dateKey);
   const { tasks } = useTasks();
@@ -54,6 +55,15 @@ export default function CalendarScreen() {
           month: "short",
           day: "numeric",
         });
+  const shiftWeek = (days: number) => {
+    setWeekAnchor((current) => {
+      const next = new Date(current);
+      next.setDate(current.getDate() + days);
+      const nextWeek = buildVisibleWeek(next);
+      setSelectedDate(nextWeek[0]?.dateKey ?? toDateKey(next));
+      return next;
+    });
+  };
 
   return (
     <Screen scrollable padded>
@@ -64,15 +74,19 @@ export default function CalendarScreen() {
           <View style={styles.headerControls}>
             <TouchableOpacity
               style={styles.controlButton}
+              onPress={() => shiftWeek(-7)}
               accessibilityRole="button"
               accessibilityLabel="Previous week"
+              accessibilityHint="Shows the previous week"
             >
               <ChevronLeft size={20} color={Colors.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.controlButton}
+              onPress={() => shiftWeek(7)}
               accessibilityRole="button"
               accessibilityLabel="Next week"
+              accessibilityHint="Shows the next week"
             >
               <ChevronRight size={20} color={Colors.textSecondary} />
             </TouchableOpacity>

@@ -21850,3 +21850,9 @@ COMMIT: chore(lumo): update MorningPlanningCompleteCard.tsx
 FILES:
 src/features/planning/components/MorningPlanningCompleteCard.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:47:10
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+
