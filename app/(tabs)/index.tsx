@@ -10,7 +10,6 @@ import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { useHabits } from "@/src/features/habits";
 import {
   CalmDailySummary,
-  MorningPlanningCard,
   useDailyPlanningFlow,
 } from "@/src/features/planning";
 import { useTasks } from "@/src/features/tasks";
@@ -144,16 +143,6 @@ export default function DashboardScreen() {
       {/* Greeting Header */}
       <SectionHeader title="Good morning, Alex" subtitle="You've got this" />
 
-      {/* Daily Progress Card */}
-      <DailyProgressCard
-        title="Today's Progress"
-        progress={completionRate}
-        subtitle={supportiveLabel}
-        completedCount={completedTodayItems}
-        totalCount={totalTodayItems}
-        variant="gradient"
-      />
-
       <CalmDailySummary
         nextStep={planning.selectedNextStep}
         energyLevel={planning.energyLevel}
@@ -189,17 +178,18 @@ export default function DashboardScreen() {
         onLater={(taskId) => shiftTaskDate(taskId, 1)}
       />
 
-      <MorningPlanningCard
-        compact
-        morningComplete={planning.morningComplete}
-        onOpenPlanning={() =>
-          router.push({ pathname: "/planning/morning" as const } as any)
-        }
-      />
-
       {/* Quick Actions */}
       <SectionHeader title="Quick Actions" />
       <QuickActions onQuickCapture={() => setIsQuickCaptureVisible(true)} />
+
+      <DailyProgressCard
+        title="Today's Progress"
+        progress={completionRate}
+        subtitle={supportiveLabel}
+        completedCount={completedTodayItems}
+        totalCount={totalTodayItems}
+        variant="default"
+      />
 
       <QuickCaptureSheet
         visible={isQuickCaptureVisible}

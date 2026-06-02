@@ -21910,3 +21910,9 @@ COMMIT: chore(lumo): update tasks.tsx
 FILES:
 app/(tabs)/tasks.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:27:54
+COMMIT: chore(lumo): update TaskRow.tsx
+FILES:
+src/features/tasks/components/TaskRow.tsx
+
