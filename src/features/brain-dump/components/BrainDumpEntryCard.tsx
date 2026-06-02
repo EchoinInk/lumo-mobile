@@ -40,7 +40,11 @@ export function BrainDumpEntryCard({
         </Button>
       ) : (
         <View style={styles.actions}>
-          <Text variant="caption" color={Colors.textSecondary} style={styles.actionLabel}>
+          <Text
+            variant="caption"
+            color={Colors.textSecondary}
+            style={styles.actionLabel}
+          >
             Sort this thought
           </Text>
           <Button
@@ -52,33 +56,33 @@ export function BrainDumpEntryCard({
           >
             Convert to task
           </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onPress={() => onConvert(entry, "reminder")}
-          accessibilityLabel="Convert to reminder"
-          accessibilityHint="Creates a reminder from this thought"
-        >
-          Convert to reminder
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onPress={() => onConvert(entry, "routine_idea")}
-          accessibilityLabel="Save as routine idea"
-          accessibilityHint="Marks this thought as a routine idea for later"
-        >
-          Routine idea
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onPress={() => onConvert(entry, "archived_note")}
-          accessibilityLabel="Archive thought"
-          accessibilityHint="Parks this thought so it no longer appears in review"
-        >
-          Archive / park
-        </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() => onConvert(entry, "reminder")}
+            accessibilityLabel="Convert to reminder"
+            accessibilityHint="Creates a reminder from this thought"
+          >
+            Convert to reminder
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() => onConvert(entry, "routine_idea")}
+            accessibilityLabel="Save as routine idea"
+            accessibilityHint="Marks this thought as a routine idea for later"
+          >
+            Routine idea
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() => onConvert(entry, "archived_note")}
+            accessibilityLabel="Archive thought"
+            accessibilityHint="Parks this thought so it no longer appears in review"
+          >
+            Archive / park
+          </Button>
         </View>
       )}
     </Card>
