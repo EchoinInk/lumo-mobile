@@ -151,7 +151,7 @@ export function CalmDailySummary({
         {state === "evening_available" && (
           <Button
             size="sm"
-            variant="ghost"
+            variant="secondary"
             onPress={onEveningReset}
             accessibilityRole="button"
             accessibilityLabel="Evening reset"
@@ -163,7 +163,7 @@ export function CalmDailySummary({
         {state === "morning_complete" && onAdjustPlan && (
           <Button
             size="sm"
-            variant="ghost"
+            variant="secondary"
             onPress={onAdjustPlan}
             accessibilityRole="button"
             accessibilityLabel="Adjust plan"

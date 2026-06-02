@@ -21739,3 +21739,9 @@ COMMIT: chore(lumo): update useDailyPlanningFlow.ts
 FILES:
 src/features/planning/hooks/useDailyPlanningFlow.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:51:01
+COMMIT: chore(lumo): update CalmDailySummary.tsx
+FILES:
+src/features/planning/components/CalmDailySummary.tsx
+
