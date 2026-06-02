@@ -12,7 +12,7 @@ export function testRoutineBundleGuardBlocksDuplicateStarts(): void {
   );
 }
 
-export function testRoutineBundleGuardCanReleaseAfterFailure(): void {
+export function testRoutineBundleGuardCanReleaseAfterCompletion(): void {
   const guard = createRoutineBundleApplyGuard();
 
   guard.begin("starter");
@@ -21,6 +21,6 @@ export function testRoutineBundleGuardCanReleaseAfterFailure(): void {
   assertEqual(
     guard.begin("starter"),
     true,
-    "released bundle should be available after failure",
+    "released bundle should be available after completion",
   );
 }
