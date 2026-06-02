@@ -8,6 +8,11 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 
 ### Phase 17.1 QA fixes
 
+- Planning entry points added: More now links to Morning Planning and Evening Reset while Dashboard keeps planning actions visible when relevant
+- Routine Bundles entry point added in More alongside the existing Tasks entry point
+- Add Task / Add Habit modal layering fixed again with plain high-contrast sheet surfaces above the backdrop
+- Completed Morning Planning `Adjust plan` CTA now uses a visible secondary button style while preserving the reset/reopen handler
+- Calendar future task visibility fixed: selected dates now show tasks with matching `dueDate`; empty dates show calm copy
 - Brain Dump reminder conversion now asks for a simple schedule before saving: later today, tomorrow, this weekend, or no time
 - Routine Bundle loading reset fixed: rapid taps are still guarded, the button shows brief success feedback, and the action unlocks without an app reload
 - Today Focus / planning CTA wiring fixed: Start shows the existing Focus Mode banner, Snooze gently / Later visibly defer items out of Today Focus, and Adjust Plan routes back into morning planning
@@ -16,7 +21,7 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Routine bundle duplicate prevention fixed: bundle creation now uses an immediate per-bundle guard so rapid repeated taps cannot create a second batch; guard coverage added in `routineBundleApplyGuard.test.ts`
 - Back/exit actions added to pushed routes: Brain Dump, Reminder Settings, Routine Bundles, Morning Planning, and Evening Reset now expose a small accessible Back action with route-specific fallback behavior
 - `npm run typecheck`: still blocked by existing `SharedTransitionCard.tsx` errors (`SharedTransition.custom` missing and implicit `any` for `values`); no new typecheck errors from these QA fixes
-- `npm test`: passed, **78 tests**, 0 failures
+- `npm test`: passed, **80 tests**, 0 failures
 - `npx expo start -c --dev-client`: skipped because port `8081` is already in use and Expo required interactive input in non-interactive mode
 
 ### Persistence map
