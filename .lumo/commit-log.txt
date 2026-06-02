@@ -21822,3 +21822,10 @@ FILES:
 app/(tabs)/more/index.tsx
 src/features/brain-dump/screens/BrainDumpScreen.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:38:45
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/testing/persistence/brainDumpStorage.test.ts
+src/testing/routes/routeScan.test.ts
+
