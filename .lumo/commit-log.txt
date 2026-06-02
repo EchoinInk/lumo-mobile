@@ -21844,3 +21844,9 @@ src/features/planning/components/MorningPlanningCard.tsx
 src/features/planning/components/NextStepChooser.tsx
 src/features/planning/hooks/useDailyPlanningFlow.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:45:38
+COMMIT: chore(lumo): update MorningPlanningCompleteCard.tsx
+FILES:
+src/features/planning/components/MorningPlanningCompleteCard.tsx
+
