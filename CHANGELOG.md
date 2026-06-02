@@ -13,14 +13,19 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Verified clear Dashboard plan adjustment path: Adjust plan is visible, high-contrast, and reopens editable morning planning
 - Fixed planning CTA wiring polish: normal and low-energy next-step selection now uses an explicit `Choose this` action that visibly selects a step and enables completion
 - Made planning selection state visible: choosing energy no longer silently auto-selects a default step, `Choose this` changes to `Chosen`, and the completion CTA appears only after a real selected next step
+- Made energy selection clearer with visible selected copy and selected accessibility state for Low, Medium, and Steady
 - Added a low-energy fallback next step so empty data states still have one tiny selectable action instead of a stuck planning screen
 - Fixed `Park for later` feedback in planning by tracking parked source ids and filtering them out of carry-over, low-energy, and next-step suggestions
+- Fixed carry-over action feedback by filtering carried items out of the active planning list after `Carry into today`
 - Added a Parked Items view at `/parked` for planning items and archived Brain Dump thoughts, with a calm empty state and source labels
 - Added subtle parked-item entry points from Dashboard Today's shape, Brain Dump (`Parked thoughts`), and More (`Parked items`)
 - Added `Bring back` actions so archived Brain Dump thoughts return to the open review list and planning parked ids become eligible for suggestions again
+- Added confirmed delete actions for active tasks, parked items, and Brain Dump thoughts while preserving the existing task, planning, and Brain Dump stores
+- Added a `Park instead` option to task and Brain Dump delete confirmations where the existing flow supports it
 - Clarified park/archive behavior by keeping archived Brain Dump thoughts visible in the parked review surface instead of disappearing from the user
 - Rechecked Add Task and Add Habit modal structure: transparent modal, backdrop behind content, sheet above backdrop, keyboard avoidance, and readable controls remain in place
 - Dashboard calmness pass: removed the secondary routines block from the main Dashboard and trimmed Quick Actions to Quick Capture, Brain Dump, Calendar, and More
+- Dashboard density pass: reordered the active Dashboard to Greeting, Today's shape, Today Focus, Quick Actions, then quieter progress; removed the duplicate compact planning prompt
 - Morning planning adjustment fixed: completed plans can reopen the editable flow while preserving current energy and selected next step
 - Evening reset adjustment added: completed evening reset now has an `Adjust reset` action that reopens the reset flow
 - Dashboard evening reset entry improved: CalmDailySummary now exposes Evening reset after morning planning is complete and before evening reset is done
@@ -39,7 +44,7 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Routine bundle duplicate prevention fixed: bundle creation now uses an immediate per-bundle guard so rapid repeated taps cannot create a second batch; guard coverage added in `routineBundleApplyGuard.test.ts`
 - Back/exit actions added to pushed routes: Brain Dump, Reminder Settings, Routine Bundles, Morning Planning, and Evening Reset now expose a small accessible Back action with route-specific fallback behavior
 - `npm run typecheck`: still blocked by existing `SharedTransitionCard.tsx` errors (`SharedTransition.custom` missing and implicit `any` for `values`); no new typecheck errors from these QA fixes
-- `npm test`: passed, **87 tests**, 0 failures
+- `npm test`: passed, **88 tests**, 0 failures
 - `npx expo start -c --dev-client`: printed `Starting project at /Users/meltmyheart/Documents/GitHub/lumo-mobile`; spawned Expo/nativewind processes were stopped cleanly after no further Metro output appeared
 
 ### Persistence map
