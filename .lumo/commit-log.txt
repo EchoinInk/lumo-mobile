@@ -21808,3 +21808,10 @@ FILES:
 app/(tabs)/index.tsx
 src/features/planning/components/CalmDailySummary.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:38:18
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/parked/index.tsx
+src/features/planning/components/ParkedItemsScreen.tsx
+

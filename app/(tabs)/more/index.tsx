@@ -7,6 +7,7 @@ import { Colors, Radius, Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import {
     ArrowRight,
+    Archive,
     CreditCard,
     Dumbbell,
     Layers,
@@ -135,6 +136,12 @@ export default function MoreScreen() {
       icon: <Layers size={22} color={Colors.blue} />,
       color: Colors.blue,
       route: "/routine-bundles",
+    },
+    {
+      title: "Parked items",
+      icon: <Archive size={22} color={Colors.textSecondary} />,
+      color: Colors.textSecondary,
+      route: "/parked",
     },
     {
       title: "Settings",

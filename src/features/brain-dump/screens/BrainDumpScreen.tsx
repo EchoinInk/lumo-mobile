@@ -11,6 +11,7 @@ import type {
 import { useReminders } from "@/src/features/reminders";
 import { useTasks } from "@/src/features/tasks";
 import { Spacing } from "@/src/theme/tokens";
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button } from "@/src/components/ui/Button";
@@ -56,6 +57,18 @@ export default function BrainDumpScreen() {
         title="Brain Dump"
         subtitle="Unload first. Decide later."
       />
+      <View style={styles.secondaryAction}>
+        <Button
+          size="sm"
+          variant="ghost"
+          onPress={() => router.push({ pathname: "/parked" as const } as any)}
+          accessibilityRole="button"
+          accessibilityLabel="Parked thoughts"
+          accessibilityHint="Opens thoughts and items saved for later"
+        >
+          Parked thoughts
+        </Button>
+      </View>
 
       <View style={styles.capture}>
         <Input
@@ -96,6 +109,10 @@ export default function BrainDumpScreen() {
 }
 
 const styles = StyleSheet.create({
+  secondaryAction: {
+    alignItems: "flex-start",
+    marginBottom: Spacing.md,
+  },
   capture: {
     gap: Spacing.md,
     marginBottom: Spacing.xl,
