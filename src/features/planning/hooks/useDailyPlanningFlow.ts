@@ -199,6 +199,10 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     persistSummary({ ...summary, morningCompleted: false });
   }, [summary, persistSummary]);
 
+  const resetEveningReset = useCallback(() => {
+    persistSummary({ ...summary, eveningCompleted: false });
+  }, [summary, persistSummary]);
+
   const completeMorningPlan = useCallback(() => {
     const next = composeDailyPlanningSummary(composerInput, {
       ...summary,
@@ -211,9 +215,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     persistSummary({ ...summary, eveningCompleted: true });
   }, [summary, persistSummary]);
 
-  const morningComplete =
-    summary.morningCompleted ||
-    Boolean(summary.energyLevel && summary.nextStepId);
+  const morningComplete = summary.morningCompleted;
   const showEveningReset =
     mode === "evening" ||
     (new Date().getHours() >= 18 && !summary.eveningCompleted);
@@ -237,6 +239,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     parkItem,
     markEveningBrainDumpVisited,
     resetMorningPlan,
+    resetEveningReset,
     completeMorningPlan,
     completeEveningReset,
   };
