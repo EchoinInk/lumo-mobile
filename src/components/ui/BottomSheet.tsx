@@ -1,6 +1,14 @@
 import { Colors, Radius, Shadows, Spacing } from '@/theme/tokens';
-import React, { useEffect } from 'react';
-import { Animated, PanResponder, StyleSheet, TouchableOpacity, View, ViewProps } from 'react-native';
+import React from 'react';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+  ViewProps,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetProps extends ViewProps {
@@ -20,80 +28,61 @@ export function BottomSheet({
   ...props 
 }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
-  const translateY = React.useRef(new Animated.Value(0)).current;
-  const [isVisible, setIsVisible] = React.useState(visible);
-
-  useEffect(() => {
-    if (visible) {
-      setIsVisible(true);
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(translateY, {
-        toValue: 1000,
-        duration: 250,
-        useNativeDriver: true,
-      }).start(() => setIsVisible(false));
-    }
-  }, [visible]);
-
-  const panResponder = React.useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return gestureState.dy > 10;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          translateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 200) {
-          onClose?.();
-        } else {
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
-
-  if (!isVisible) return null;
 
   return (
-    <View style={[StyleSheet.absoluteFill, styles.overlay]} {...panResponder.panHandlers}>
-      <TouchableOpacity 
-        style={StyleSheet.absoluteFill} 
-        activeOpacity={1}
-        onPress={onClose}
-      />
-      <Animated.View
-        className={className}
-        style={[
-          styles.container,
-          {
-            transform: [{ translateY }],
-            paddingBottom: insets.bottom || Spacing.lg,
-          },
-          style,
-        ]}
-      >
-        <View style={styles.handle} />
-        {children}
-      </Animated.View>
-    </View>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalRoot}>
+        <Pressable
+          accessibilityLabel="Close bottom sheet"
+          accessibilityRole="button"
+          style={styles.backdrop}
+          onPress={onClose}
+        />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          pointerEvents="box-none"
+          style={styles.sheetLayer}
+        >
+          <View
+            className={className}
+            style={[
+              styles.container,
+              {
+                paddingBottom: Math.max(insets.bottom, Spacing.lg),
+              },
+              style,
+            ]}
+            {...props}
+          >
+            <View style={styles.handle} />
+            {children}
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    backgroundColor: Colors.overlay,
+  modalRoot: {
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Colors.overlay,
+    zIndex: 1,
+  },
+  sheetLayer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    zIndex: 2,
+    elevation: 2,
   },
   container: {
     backgroundColor: Colors.card,
@@ -101,6 +90,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: Radius['3xl'],
     paddingTop: Spacing.lg,
     paddingHorizontal: Spacing.lg,
+    zIndex: 3,
+    elevation: 3,
     ...Shadows.xl,
   },
   handle: {
