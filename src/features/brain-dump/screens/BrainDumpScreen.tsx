@@ -13,13 +13,13 @@ import { useTasks } from "@/src/features/tasks";
 import { Spacing } from "@/src/theme/tokens";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { Button } from "@/src/components/ui/Button";
 import { BrainDumpEntryCard } from "../components/BrainDumpEntryCard";
 
 export default function BrainDumpScreen() {
   const [text, setText] = useState("");
-  const { addEntry, convertEntry, openEntries } = useBrainDump();
+  const { addEntry, convertEntry, deleteEntry, openEntries } = useBrainDump();
   const { createTask } = useTasks();
   const reminders = useReminders();
 
@@ -48,6 +48,25 @@ export default function BrainDumpScreen() {
     }
 
     convertEntry(entry.id, target);
+  };
+
+  const handleDelete = (entry: BrainDumpEntry) => {
+    Alert.alert(
+      "Delete this?",
+      "This removes it from Lumo. You can park it instead if you may want it later.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Park instead",
+          onPress: () => convertEntry(entry.id, "archived_note"),
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteEntry(entry.id),
+        },
+      ],
+    );
   };
 
   return (
@@ -100,6 +119,7 @@ export default function BrainDumpScreen() {
               key={entry.id}
               entry={entry}
               onConvert={handleConvert}
+              onDelete={handleDelete}
             />
           ))
         )}
