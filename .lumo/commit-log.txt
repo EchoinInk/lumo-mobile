@@ -21880,3 +21880,9 @@ COMMIT: chore(lumo): update useBrainDumpStore.ts
 FILES:
 src/features/brain-dump/store/useBrainDumpStore.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:26:28
+COMMIT: chore(lumo): update useDailyPlanningFlow.ts
+FILES:
+src/features/planning/hooks/useDailyPlanningFlow.ts
+

@@ -11,7 +11,7 @@ import { useDailyPlanningFlow } from "@/src/features/planning/hooks/useDailyPlan
 import { useReminders } from "@/src/features/reminders";
 import { useTasks } from "@/src/features/tasks";
 import { Colors, Spacing } from "@/src/theme/tokens";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 type ParkedItem = {
   id: string;
@@ -19,6 +19,7 @@ type ParkedItem = {
   sourceLabel: string;
   parkedAt?: string;
   onBringBack: () => void;
+  onDelete?: () => void;
 };
 
 function formatDate(value?: string): string | undefined {
@@ -34,9 +35,24 @@ function formatDate(value?: string): string | undefined {
 export default function ParkedItemsScreen() {
   const planning = useDailyPlanningFlow("morning");
   const brainDump = useBrainDump();
-  const { tasks } = useTasks();
+  const { tasks, deleteTask } = useTasks();
   const { reminders } = useReminders();
   const { habits } = useHabits();
+
+  const confirmDelete = (title: string, onDelete: () => void) => {
+    Alert.alert(
+      "Delete this?",
+      "This removes it from Lumo. You can park it instead if you may want it later.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: onDelete,
+        },
+      ],
+    );
+  };
 
   const archivedThoughts: ParkedItem[] = brainDump.entries
     .filter((entry) => entry.status === "archived")
@@ -46,6 +62,7 @@ export default function ParkedItemsScreen() {
       sourceLabel: "Brain Dump",
       parkedAt: entry.convertedAt ?? entry.updatedAt,
       onBringBack: () => brainDump.restoreEntry(entry.id),
+      onDelete: () => brainDump.deleteEntry(entry.id),
     }));
 
   const planningParkedIds = [
@@ -64,6 +81,10 @@ export default function ParkedItemsScreen() {
           title: task.title,
           sourceLabel: "Planning · Task",
           onBringBack: () => planning.bringBackParkedItem(sourceId),
+          onDelete: () => {
+            deleteTask(sourceId);
+            planning.removeParkedItem(sourceId);
+          },
         };
       }
 
@@ -74,6 +95,7 @@ export default function ParkedItemsScreen() {
           title: reminder.title,
           sourceLabel: "Planning · Reminder",
           onBringBack: () => planning.bringBackParkedItem(sourceId),
+          onDelete: () => planning.removeParkedItem(sourceId),
         };
       }
 
@@ -88,6 +110,10 @@ export default function ParkedItemsScreen() {
             brainDump.restoreEntry(thought.id);
             planning.bringBackParkedItem(sourceId);
           },
+          onDelete: () => {
+            brainDump.deleteEntry(thought.id);
+            planning.removeParkedItem(sourceId);
+          },
         };
       }
 
@@ -98,6 +124,7 @@ export default function ParkedItemsScreen() {
           title: routine?.title ?? "Take a small reset",
           sourceLabel: "Planning · Routine",
           onBringBack: () => planning.bringBackParkedItem(sourceId),
+          onDelete: () => planning.removeParkedItem(sourceId),
         };
       }
 
@@ -106,6 +133,7 @@ export default function ParkedItemsScreen() {
         title: "Saved for later",
         sourceLabel: "Planning",
         onBringBack: () => planning.bringBackParkedItem(sourceId),
+        onDelete: () => planning.removeParkedItem(sourceId),
       };
     })
     .filter(
@@ -148,16 +176,30 @@ export default function ParkedItemsScreen() {
                 )}
               </View>
 
-              <Button
-                size="sm"
-                variant="secondary"
-                onPress={item.onBringBack}
-                accessibilityRole="button"
-                accessibilityLabel={`Bring back ${item.title}`}
-                accessibilityHint="Returns this item to active planning or Brain Dump review"
-              >
-                Bring back
-              </Button>
+              <View style={styles.actions}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onPress={item.onBringBack}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Bring back ${item.title}`}
+                  accessibilityHint="Returns this item to active planning or Brain Dump review"
+                >
+                  Bring back
+                </Button>
+                {item.onDelete && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => confirmDelete(item.title, item.onDelete!)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Delete parked item ${item.title}`}
+                    accessibilityHint="Asks for confirmation before permanently removing this parked item"
+                  >
+                    Delete
+                  </Button>
+                )}
+              </View>
             </Card>
           ))}
         </View>
@@ -178,5 +220,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "600",
+  },
+  actions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
   },
 });
