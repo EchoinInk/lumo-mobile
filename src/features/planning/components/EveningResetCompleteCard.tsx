@@ -10,6 +10,7 @@ interface EveningResetCompleteCardProps {
   parkedCount: number;
   brainDumpVisited: boolean;
   onBackToDashboard: () => void;
+  onAdjustReset?: () => void;
 }
 
 export function EveningResetCompleteCard({
@@ -17,6 +18,7 @@ export function EveningResetCompleteCard({
   parkedCount,
   brainDumpVisited,
   onBackToDashboard,
+  onAdjustReset,
 }: EveningResetCompleteCardProps) {
   return (
     <PlanningGentleFade>
@@ -61,6 +63,17 @@ export function EveningResetCompleteCard({
           >
             Back to Dashboard
           </Button>
+          {onAdjustReset && (
+            <Button
+              variant="secondary"
+              onPress={onAdjustReset}
+              accessibilityRole="button"
+              accessibilityLabel="Adjust reset"
+              accessibilityHint="Reopens evening reset to change what carries forward"
+            >
+              Adjust reset
+            </Button>
+          )}
         </View>
       </Card>
     </PlanningGentleFade>
@@ -80,6 +93,7 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   actions: {
+    gap: Spacing.sm,
     marginTop: Spacing.xs,
   },
 });
