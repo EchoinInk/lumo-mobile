@@ -54,7 +54,7 @@ export function RoutineBundleCard({
             items: items.filter((item) => item.title.trim().length > 0),
           })
         }
-        disabled={isApplying}
+        disabled={isApplying || isApplied}
         loading={isApplying}
         accessibilityLabel={`Use ${bundle.title} bundle`}
         accessibilityHint={
