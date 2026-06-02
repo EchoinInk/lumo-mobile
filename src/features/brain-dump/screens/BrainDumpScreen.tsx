@@ -1,6 +1,7 @@
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Input } from "@/src/components/ui/Input";
 import { Screen } from "@/src/components/ui/Screen";
+import { ScreenBackButton } from "@/src/components/ui/ScreenBackButton";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useBrainDump } from "@/src/features/brain-dump";
 import type {
@@ -49,6 +50,7 @@ export default function BrainDumpScreen() {
 
   return (
     <Screen scrollable padded keyboardAvoiding>
+      <ScreenBackButton fallbackPath="/(tabs)" />
       <SectionHeader
         title="Brain Dump"
         subtitle="Unload first. Decide later."
