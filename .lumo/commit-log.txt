@@ -21757,3 +21757,10 @@ COMMIT: chore(lumo): update planningDisplay.ts
 FILES:
 src/features/planning/services/planningDisplay.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:51:57
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+src/features/planning/components/CalmDailySummary.tsx
+src/testing/planning/calmDailySummary.test.ts
+

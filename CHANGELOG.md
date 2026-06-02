@@ -8,6 +8,9 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 
 ### Phase 17.1 QA fixes
 
+- Fixed raw next-step ID display in Today's shape: Dashboard now rejects numeric/raw labels and falls back to calm copy instead of showing ids like `2`
+- Added defensive fallback for unresolved planning next steps so stale `nextStepId` values do not trap the Dashboard summary
+- Verified clear Dashboard plan adjustment path: Adjust plan is visible, high-contrast, and reopens editable morning planning
 - Morning planning adjustment fixed: completed plans can reopen the editable flow while preserving current energy and selected next step
 - Evening reset adjustment added: completed evening reset now has an `Adjust reset` action that reopens the reset flow
 - Dashboard evening reset entry improved: CalmDailySummary now exposes Evening reset after morning planning is complete and before evening reset is done
@@ -25,7 +28,7 @@ Local-first data layer audit before tester rollout. Focused on preventing data l
 - Routine bundle duplicate prevention fixed: bundle creation now uses an immediate per-bundle guard so rapid repeated taps cannot create a second batch; guard coverage added in `routineBundleApplyGuard.test.ts`
 - Back/exit actions added to pushed routes: Brain Dump, Reminder Settings, Routine Bundles, Morning Planning, and Evening Reset now expose a small accessible Back action with route-specific fallback behavior
 - `npm run typecheck`: still blocked by existing `SharedTransitionCard.tsx` errors (`SharedTransition.custom` missing and implicit `any` for `values`); no new typecheck errors from these QA fixes
-- `npm test`: passed, **82 tests**, 0 failures
+- `npm test`: passed, **85 tests**, 0 failures
 - `npx expo start -c --dev-client`: skipped because port `8081` is already in use and Expo required interactive input in non-interactive mode
 
 ### Persistence map
