@@ -21697,3 +21697,9 @@ COMMIT: chore(lumo): update EveningResetCompleteCard.tsx
 FILES:
 src/features/planning/components/EveningResetCompleteCard.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:34:40
+COMMIT: chore(lumo): update EveningResetCard.tsx
+FILES:
+src/features/planning/components/EveningResetCard.tsx
+

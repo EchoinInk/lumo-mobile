@@ -16,6 +16,10 @@ export function EveningPlanningScreen() {
     flow.completeEveningReset();
   }, [flow]);
 
+  const handleAdjustReset = useCallback(() => {
+    flow.resetEveningReset();
+  }, [flow]);
+
   const handleBackToDashboard = useCallback(() => {
     router.back();
   }, []);
@@ -47,6 +51,7 @@ export function EveningPlanningScreen() {
         onAddToBrainDump={handleAddToBrainDump}
         onFinishReset={handleFinish}
         onBackToDashboard={handleBackToDashboard}
+        onAdjustReset={handleAdjustReset}
       />
     </Screen>
   );
