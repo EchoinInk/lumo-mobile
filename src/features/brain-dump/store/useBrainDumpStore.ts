@@ -25,6 +25,7 @@ type BrainDumpActions = {
   ) => void;
   archiveEntry: (id: string) => void;
   restoreEntry: (id: string) => void;
+  deleteEntry: (id: string) => void;
   clearConverted: () => void;
 };
 
@@ -113,6 +114,12 @@ export const useBrainDumpStore = create<BrainDumpStore>((set, get) => ({
           }
         : entry,
     );
+    set({ entries });
+    persist(entries);
+  },
+
+  deleteEntry: (id) => {
+    const entries = get().entries.filter((entry) => entry.id !== id);
     set({ entries });
     persist(entries);
   },
