@@ -44,7 +44,7 @@ export function CarryOverReviewCard({
               accessibilityLabel={`Carry ${item.label} gently into today`}
               accessibilityHint="Moves this item into today's plan without pressure"
             >
-              Carry gently
+              Carry into today
             </Button>
             <Button
               size="sm"
