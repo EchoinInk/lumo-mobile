@@ -21486,3 +21486,9 @@ COMMIT: chore(lumo): update ProgressBar.tsx
 FILES:
 src/components/ui/ProgressBar.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 03:25:03
+COMMIT: chore(lumo): update ScreenBackButton.tsx
+FILES:
+src/components/ui/ScreenBackButton.tsx
+

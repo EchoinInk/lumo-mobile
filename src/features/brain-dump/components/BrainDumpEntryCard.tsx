@@ -6,6 +6,7 @@ import type {
   BrainDumpEntry,
 } from "@/src/features/brain-dump";
 import { Colors, Spacing } from "@/src/theme/tokens";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 interface BrainDumpEntryCardProps {
@@ -17,6 +18,8 @@ export function BrainDumpEntryCard({
   entry,
   onConvert,
 }: BrainDumpEntryCardProps) {
+  const [isReviewing, setIsReviewing] = useState(false);
+
   return (
     <Card variant="outlined" style={styles.card}>
       <Text variant="body" style={styles.text}>
@@ -25,40 +28,59 @@ export function BrainDumpEntryCard({
       <Text variant="caption" color={Colors.textTertiary}>
         Review gently when ready.
       </Text>
-      <View style={styles.actions}>
+      {!isReviewing ? (
         <Button
           size="sm"
           variant="secondary"
-          onPress={() => onConvert(entry, "task")}
-          accessibilityLabel="Convert to task"
+          onPress={() => setIsReviewing(true)}
+          accessibilityLabel="Review brain dump thought"
+          accessibilityHint="Shows calm options for sorting this thought"
         >
-          Task
+          Review / Sort
         </Button>
+      ) : (
+        <View style={styles.actions}>
+          <Text variant="caption" color={Colors.textSecondary} style={styles.actionLabel}>
+            Sort this thought
+          </Text>
+          <Button
+            size="sm"
+            variant="secondary"
+            onPress={() => onConvert(entry, "task")}
+            accessibilityLabel="Convert to task"
+            accessibilityHint="Creates a task from this thought"
+          >
+            Convert to task
+          </Button>
         <Button
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "reminder")}
           accessibilityLabel="Convert to reminder"
+          accessibilityHint="Creates a reminder from this thought"
         >
-          Reminder
+          Convert to reminder
         </Button>
         <Button
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "routine_idea")}
           accessibilityLabel="Save as routine idea"
+          accessibilityHint="Marks this thought as a routine idea for later"
         >
-          Routine
+          Routine idea
         </Button>
         <Button
           size="sm"
           variant="ghost"
           onPress={() => onConvert(entry, "archived_note")}
           accessibilityLabel="Archive thought"
+          accessibilityHint="Parks this thought so it no longer appears in review"
         >
-          Archive
+          Archive / park
         </Button>
-      </View>
+        </View>
+      )}
     </Card>
   );
 }
@@ -75,5 +97,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: Spacing.sm,
     marginTop: Spacing.sm,
+  },
+  actionLabel: {
+    width: "100%",
   },
 });
