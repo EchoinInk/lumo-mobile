@@ -33,7 +33,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react-native";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 type FilterType = "all" | "today" | "upcoming" | "done";
@@ -66,7 +66,9 @@ export default function TasksScreen() {
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const applyGuard = useRef(createRoutineBundleApplyGuard()).current;
+  const releaseTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [applyingBundleIds, setApplyingBundleIds] = useState<string[]>([]);
+  const [appliedBundleIds, setAppliedBundleIds] = useState<string[]>([]);
   const {
     tasks,
     toggleTask,
@@ -79,6 +81,12 @@ export default function TasksScreen() {
     isLoading,
     clearError,
   } = useTasks();
+
+  useEffect(() => {
+    return () => {
+      releaseTimers.current.forEach(clearTimeout);
+    };
+  }, []);
 
   const handleRetryLoad = () => {
     clearError();
@@ -139,6 +147,20 @@ export default function TasksScreen() {
     );
     try {
       createTasksFromBundle(bundle).forEach(createTask);
+      setAppliedBundleIds((current) =>
+        current.includes(bundle.id) ? current : [...current, bundle.id],
+      );
+      releaseTimers.current.push(
+        setTimeout(() => {
+          applyGuard.release(bundle.id);
+          setApplyingBundleIds((current) =>
+            current.filter((bundleId) => bundleId !== bundle.id),
+          );
+          setAppliedBundleIds((current) =>
+            current.filter((bundleId) => bundleId !== bundle.id),
+          );
+        }, 1200),
+      );
     } catch (error) {
       applyGuard.release(bundle.id);
       setApplyingBundleIds((current) =>
@@ -462,6 +484,7 @@ export default function TasksScreen() {
               bundle={bundle}
               onUse={handleUseBundle}
               isApplying={applyingBundleIds.includes(bundle.id)}
+              isApplied={appliedBundleIds.includes(bundle.id)}
             />
         ))}
       </View>
