@@ -1,4 +1,3 @@
-import { Card } from "@/src/components/ui/Card";
 import { Input } from "@/src/components/ui/Input";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Shadows, Spacing } from "@/src/theme/tokens";
@@ -157,7 +156,7 @@ export function TaskFormModal({
           style={styles.keyboardView}
         >
           <View style={styles.container}>
-                <Card variant="elevated" style={styles.sheet}>
+                <View style={styles.sheet}>
                   {/* Header */}
                   <View style={styles.header}>
                     <View style={styles.titleContainer}>
@@ -411,7 +410,7 @@ export function TaskFormModal({
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
-                </Card>
+                </View>
               </View>
           </KeyboardAvoidingView>
         </View>
