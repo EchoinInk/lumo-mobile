@@ -94,7 +94,7 @@ export function MorningPlanningCompleteCard({
           )}
           {onAdjustPlan && (
             <Button
-              variant="ghost"
+              variant="secondary"
               onPress={onAdjustPlan}
               accessibilityRole="button"
               accessibilityLabel="Adjust plan"
