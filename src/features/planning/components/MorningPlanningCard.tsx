@@ -109,10 +109,20 @@ function PlanningEnergyPicker({
               >
                 {option.label}
               </Text>
+              {isSelected && (
+                <Text variant="small" color={Colors.textInverse}>
+                  Selected
+                </Text>
+              )}
             </TouchableOpacity>
           );
         })}
       </View>
+      {value && (
+        <Text variant="caption" color={Colors.textTertiary}>
+          {energyOptions.find((option) => option.value === value)?.hint}
+        </Text>
+      )}
     </View>
   );
 }
@@ -303,8 +313,11 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   energyOption: {
+    flexGrow: 1,
     minHeight: 44,
     justifyContent: "center",
+    alignItems: "center",
+    gap: 2,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.full,

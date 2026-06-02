@@ -21916,3 +21916,9 @@ COMMIT: chore(lumo): update TaskRow.tsx
 FILES:
 src/features/tasks/components/TaskRow.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:28:36
+COMMIT: chore(lumo): update CarryOverReviewCard.tsx
+FILES:
+src/features/planning/components/CarryOverReviewCard.tsx
+
