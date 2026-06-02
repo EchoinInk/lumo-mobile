@@ -21801,3 +21801,10 @@ COMMIT: chore(lumo): update CHANGELOG.md
 FILES:
 CHANGELOG.md
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 09:37:46
+COMMIT: chore(lumo): refine system (2 files)
+FILES:
+app/(tabs)/index.tsx
+src/features/planning/components/CalmDailySummary.tsx
+
