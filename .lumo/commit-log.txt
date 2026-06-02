@@ -21751,3 +21751,9 @@ COMMIT: chore(lumo): update CalmDailySummary.tsx
 FILES:
 src/features/planning/components/CalmDailySummary.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:51:46
+COMMIT: chore(lumo): update planningDisplay.ts
+FILES:
+src/features/planning/services/planningDisplay.ts
+

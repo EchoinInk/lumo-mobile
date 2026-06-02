@@ -5,6 +5,7 @@ import type {
   PlanningEnergyLevel,
   PlanningNextStep,
 } from "@/src/features/planning/types/planning";
+import { getPlanningNextStepDisplayLabel } from "@/src/features/planning/services/planningDisplay";
 import { Colors, Spacing } from "@/src/theme/tokens";
 import { StyleSheet, View } from "react-native";
 
@@ -36,17 +37,6 @@ function resolveDashboardState(
   if (showEveningReset && morningComplete) return "evening_available";
   if (morningComplete) return "morning_complete";
   return "not_planned";
-}
-
-export function getPlanningNextStepDisplayLabel(
-  nextStep?: PlanningNextStep,
-): string | undefined {
-  const label = nextStep?.label?.trim();
-  if (!label) return undefined;
-  if (/^\d+$/.test(label)) return undefined;
-  if (/^(undefined|null)$/i.test(label)) return undefined;
-  if (label === nextStep?.id || label === nextStep?.sourceId) return undefined;
-  return label;
 }
 
 export function CalmDailySummary({

@@ -1,4 +1,4 @@
-import { getPlanningNextStepDisplayLabel } from "@/features/planning/components/CalmDailySummary";
+import { getPlanningNextStepDisplayLabel } from "@/features/planning/services/planningDisplay";
 import type { PlanningNextStep } from "@/features/planning/types/planning";
 import { assertEqual } from "../testUtils";
 
