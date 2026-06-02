@@ -1,7 +1,7 @@
 import { Colors, Radius, Spacing } from "@/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { StyleSheet, View, ViewProps } from "react-native";
+import { DimensionValue, StyleSheet, View, ViewProps } from "react-native";
 import { Text } from "./Text";
 
 interface ProgressBarProps extends ViewProps {
@@ -23,6 +23,7 @@ export function ProgressBar({
   ...props
 }: ProgressBarProps) {
   const clampedProgress = Math.min(Math.max(progress / 100, 0), 1);
+  const progressWidth: DimensionValue = `${clampedProgress * 100}%`;
 
   const barStyle = {
     height,
@@ -33,7 +34,7 @@ export function ProgressBar({
 
   const fillStyle = {
     height: height,
-    width: `${clampedProgress * 100}%`,
+    width: progressWidth,
     borderRadius: Radius.full,
   };
 
