@@ -11,10 +11,10 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    TouchableWithoutFeedback,
     View,
 } from "react-native";
 import { CreateHabitInput, Habit, HabitColor, HabitFrequency } from "../types/habit";
@@ -121,17 +121,22 @@ export function HabitFormModal({
         <Modal
             visible={visible}
             transparent
-            animationType="slide"
+            animationType="fade"
             onRequestClose={handleClose}
         >
-            <TouchableWithoutFeedback onPress={handleClose}>
-                <View style={styles.overlay}>
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={styles.keyboardView}
-                    >
-                        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-                            <View style={styles.container}>
+            <View style={styles.modalRoot}>
+                <Pressable
+                    style={styles.backdrop}
+                    onPress={handleClose}
+                    accessibilityRole="button"
+                    accessibilityLabel="Close habit form"
+                />
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    pointerEvents="box-none"
+                    style={styles.keyboardView}
+                >
+                    <View style={styles.container}>
                                 <Card variant="elevated" style={styles.sheet}>
                                     {/* Header */}
                                     <View style={styles.header}>
@@ -376,30 +381,39 @@ export function HabitFormModal({
                                     </View>
                                 </Card>
                             </View>
-                        </TouchableWithoutFeedback>
-                    </KeyboardAvoidingView>
-                </View>
-            </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
+            </View>
         </Modal>
     );
 }
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: Colors.overlay,
+    modalRoot: {
+        ...StyleSheet.absoluteFillObject,
         justifyContent: "flex-end",
     },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: Colors.overlay,
+        zIndex: 1,
+    },
     keyboardView: {
+        ...StyleSheet.absoluteFillObject,
         justifyContent: "flex-end",
+        zIndex: 2,
+        elevation: 2,
     },
     container: {
         paddingHorizontal: Spacing.lg,
         paddingBottom: Platform.OS === "ios" ? 34 : Spacing.lg,
+        zIndex: 3,
+        elevation: 3,
     },
     sheet: {
         maxHeight: "85%",
         padding: Spacing.xl,
+        zIndex: 4,
+        elevation: 4,
     },
     header: {
         flexDirection: "row",
