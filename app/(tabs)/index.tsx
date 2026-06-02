@@ -6,6 +6,7 @@ import { FocusSuggestionList } from "@/src/features/dashboard/components/FocusSu
 import { TodaysRoutinesCard } from "@/src/features/dashboard/components/TodaysRoutinesCard";
 import { calculateDailyProgress } from "@/src/features/dashboard/utils/dashboardProgress";
 import { getFocusSuggestions } from "@/src/features/dashboard/utils/focusSuggestions";
+import { FocusModeBanner } from "@/src/features/focus/components/FocusModeBanner";
 import { useFocusMode } from "@/src/features/focus/hooks/useFocusMode";
 import { useHabits } from "@/src/features/habits";
 import {
@@ -100,7 +101,12 @@ function QuickActions({ onQuickCapture }: { onQuickCapture: () => void }) {
 
 export default function DashboardScreen() {
   const [isQuickCaptureVisible, setIsQuickCaptureVisible] = useState(false);
-  const { enableFocusMode, setActiveFocusTask } = useFocusMode();
+  const {
+    isFocusModeEnabled,
+    disableFocusMode,
+    enableFocusMode,
+    setActiveFocusTask,
+  } = useFocusMode();
   const planning = useDailyPlanningFlow("morning");
 
   // Get real data from Tasks and Habits
@@ -151,6 +157,8 @@ export default function DashboardScreen() {
 
   return (
     <Screen scrollable padded>
+      {isFocusModeEnabled && <FocusModeBanner onExit={disableFocusMode} />}
+
       {/* Greeting Header */}
       <SectionHeader title="Good morning, Alex" subtitle="You've got this" />
 
