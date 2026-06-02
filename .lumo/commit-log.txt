@@ -21703,3 +21703,9 @@ COMMIT: chore(lumo): update EveningResetCard.tsx
 FILES:
 src/features/planning/components/EveningResetCard.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:34:54
+COMMIT: chore(lumo): update useDailyPlanningFlow.ts
+FILES:
+src/features/planning/hooks/useDailyPlanningFlow.ts
+
