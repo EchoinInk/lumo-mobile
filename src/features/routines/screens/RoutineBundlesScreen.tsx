@@ -9,14 +9,22 @@ import {
 } from "@/src/features/routines";
 import { useTasks } from "@/src/features/tasks";
 import { Spacing } from "@/src/theme/tokens";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { RoutineBundleCard } from "../components/RoutineBundleCard";
 
 export default function RoutineBundlesScreen() {
   const { createTask } = useTasks();
   const applyGuard = useRef(createRoutineBundleApplyGuard()).current;
+  const releaseTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [applyingBundleIds, setApplyingBundleIds] = useState<string[]>([]);
+  const [appliedBundleIds, setAppliedBundleIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    return () => {
+      releaseTimers.current.forEach(clearTimeout);
+    };
+  }, []);
 
   const handleUseBundle = (bundle: typeof starterRoutineBundles[0]) => {
     if (!applyGuard.begin(bundle.id)) return;
@@ -30,6 +38,20 @@ export default function RoutineBundlesScreen() {
       tasks.forEach((task) => {
         createTask(task);
       });
+      setAppliedBundleIds((current) =>
+        current.includes(bundle.id) ? current : [...current, bundle.id],
+      );
+      releaseTimers.current.push(
+        setTimeout(() => {
+          applyGuard.release(bundle.id);
+          setApplyingBundleIds((current) =>
+            current.filter((bundleId) => bundleId !== bundle.id),
+          );
+          setAppliedBundleIds((current) =>
+            current.filter((bundleId) => bundleId !== bundle.id),
+          );
+        }, 1200),
+      );
     } catch (error) {
       applyGuard.release(bundle.id);
       setApplyingBundleIds((current) =>
@@ -60,6 +82,7 @@ export default function RoutineBundlesScreen() {
               bundle={bundle}
               onUse={handleUseBundle}
               isApplying={applyingBundleIds.includes(bundle.id)}
+              isApplied={appliedBundleIds.includes(bundle.id)}
             />
           ))
         )}
