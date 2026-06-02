@@ -79,13 +79,28 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
         ...summary.parkedIds,
         ...summary.eveningParkedIds,
       ]);
+      const carriedSourceIds = new Set(
+        summary.carryOverIds.map((id) => id.replace(/^carry-/, "")),
+      );
       const items =
         mode === "evening"
           ? getEveningCarryOverItems(tasks)
           : getGentleCarryOverItems(tasks);
-      return items.filter((item) => !parkedSourceIds.has(item.sourceId));
+      return items.filter(
+        (item) =>
+          !parkedSourceIds.has(item.sourceId) &&
+          !carriedSourceIds.has(item.sourceId) &&
+          !summary.eveningCarriedIds.includes(item.sourceId),
+      );
     },
-    [tasks, mode, summary.parkedIds, summary.eveningParkedIds],
+    [
+      tasks,
+      mode,
+      summary.parkedIds,
+      summary.eveningParkedIds,
+      summary.carryOverIds,
+      summary.eveningCarriedIds,
+    ],
   );
   const brainDumpQueue = useMemo(
     () => getBrainDumpReviewQueue(openEntries),
@@ -252,6 +267,19 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     [summary, persistSummary],
   );
 
+  const removeParkedItem = useCallback(
+    (sourceId: string) => {
+      persistSummary({
+        ...summary,
+        parkedIds: summary.parkedIds.filter((id) => id !== sourceId),
+        eveningParkedIds: summary.eveningParkedIds.filter(
+          (id) => id !== sourceId,
+        ),
+      });
+    },
+    [summary, persistSummary],
+  );
+
   const markEveningBrainDumpVisited = useCallback(() => {
     persistSummary({ ...summary, eveningBrainDumpVisited: true });
   }, [summary, persistSummary]);
@@ -300,6 +328,7 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
     carryToTomorrow,
     parkItem,
     bringBackParkedItem,
+    removeParkedItem,
     markEveningBrainDumpVisited,
     resetMorningPlan,
     resetEveningReset,
