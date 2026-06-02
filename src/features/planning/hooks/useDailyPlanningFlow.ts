@@ -115,6 +115,10 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
       }
     }
 
+    if (summary.nextStepId) {
+      return undefined;
+    }
+
     return energyLevel === "low" ? undefined : nextStepOptions[0];
   }, [summary.nextStepId, nextStepOptions, lowEnergyOptions, energyLevel]);
 

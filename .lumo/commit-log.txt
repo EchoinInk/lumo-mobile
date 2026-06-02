@@ -21727,3 +21727,9 @@ COMMIT: chore(lumo): update starterBundles.test.ts
 FILES:
 src/testing/routines/starterBundles.test.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:36:34
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+
