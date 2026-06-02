@@ -25,7 +25,7 @@ function buildVisibleWeek(anchor = new Date()) {
   const mondayOffset = day === 0 ? -6 : 1 - day;
   start.setDate(start.getDate() + mondayOffset);
 
-  const todayKey = toDateKey(anchor);
+  const todayKey = toDateKey(new Date());
 
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(start);
@@ -41,14 +41,14 @@ function buildVisibleWeek(anchor = new Date()) {
 }
 
 export default function CalendarScreen() {
+  const todayKey = toDateKey(new Date());
   const [weekAnchor, setWeekAnchor] = useState(new Date());
   const weekDays = buildVisibleWeek(weekAnchor);
-  const today = weekDays.find((item) => item.isToday) ?? weekDays[0];
-  const [selectedDate, setSelectedDate] = useState(today.dateKey);
+  const [selectedDate, setSelectedDate] = useState(todayKey);
   const { tasks } = useTasks();
   const selectedTasks = getTasksForCalendarDate(tasks, selectedDate);
   const selectedLabel =
-    selectedDate === today.dateKey
+    selectedDate === todayKey
       ? "Today's schedule"
       : new Date(`${selectedDate}T00:00:00`).toLocaleDateString(undefined, {
           weekday: "long",
@@ -107,11 +107,11 @@ export default function CalendarScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.weekStripContent}
         >
-          {weekDays.map((item, index) => {
+          {weekDays.map((item) => {
             const isSelected = selectedDate === item.dateKey;
             return (
               <TouchableOpacity
-                key={index}
+                key={item.dateKey}
                 onPress={() => setSelectedDate(item.dateKey)}
                 style={[
                   styles.dayItem,
