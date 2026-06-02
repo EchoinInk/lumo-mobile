@@ -21789,3 +21789,9 @@ FILES:
 src/testing/persistence/planningStorage.test.ts
 src/testing/planning/planningComposer.test.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:59:00
+COMMIT: chore(lumo): update useDailyPlanningFlow.ts
+FILES:
+src/features/planning/hooks/useDailyPlanningFlow.ts
+
