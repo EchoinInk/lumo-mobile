@@ -21643,3 +21643,9 @@ COMMIT: chore(lumo): update MorningPlanningCompleteCard.tsx
 FILES:
 src/features/planning/components/MorningPlanningCompleteCard.tsx
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 06:01:35
+COMMIT: chore(lumo): update TaskFormModal.tsx
+FILES:
+src/features/tasks/components/TaskFormModal.tsx
+

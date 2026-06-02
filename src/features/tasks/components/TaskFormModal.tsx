@@ -441,10 +441,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   sheet: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius["3xl"],
     maxHeight: "85%",
     padding: Spacing.xl,
     zIndex: 4,
     elevation: 4,
+    ...Shadows.xl,
   },
   header: {
     flexDirection: "row",
