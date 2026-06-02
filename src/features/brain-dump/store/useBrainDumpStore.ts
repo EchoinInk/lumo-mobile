@@ -24,6 +24,7 @@ type BrainDumpActions = {
     linkedEntityId?: string,
   ) => void;
   archiveEntry: (id: string) => void;
+  restoreEntry: (id: string) => void;
   clearConverted: () => void;
 };
 
@@ -93,6 +94,27 @@ export const useBrainDumpStore = create<BrainDumpStore>((set, get) => ({
 
   archiveEntry: (id) => {
     get().convertEntry(id, "archived_note");
+  },
+
+  restoreEntry: (id) => {
+    const entry = get().entries.find((item) => item.id === id);
+    if (!entry || entry.status === "open") return;
+
+    const now = new Date().toISOString();
+    const entries = get().entries.map((entry) =>
+      entry.id === id
+        ? {
+            ...entry,
+            status: "open" as const,
+            convertedAt: undefined,
+            convertedTo: undefined,
+            linkedEntityId: undefined,
+            updatedAt: now,
+          }
+        : entry,
+    );
+    set({ entries });
+    persist(entries);
   },
 
   clearConverted: () => {
