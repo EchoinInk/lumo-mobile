@@ -2,6 +2,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { PlanningGentleFade } from "@/src/features/planning/components/PlanningGentleFade";
+import { getPlanningNextStepDisplayLabel } from "@/src/features/planning/services/planningDisplay";
 import type {
   PlanningEnergyLevel,
   PlanningNextStep,
@@ -34,6 +35,8 @@ export function MorningPlanningCompleteCard({
   onOpenTodayFocus,
   onAdjustPlan,
 }: MorningPlanningCompleteCardProps) {
+  const nextStepLabel = getPlanningNextStepDisplayLabel(nextStep);
+
   return (
     <PlanningGentleFade>
       <Card variant="gradient" style={styles.card}>
@@ -50,9 +53,9 @@ export function MorningPlanningCompleteCard({
               Energy: {energyLabels[energyLevel]}
             </Text>
           )}
-          {nextStep && (
+          {nextStepLabel && (
             <Text variant="body" style={styles.nextStep}>
-              Start with: {nextStep.label}
+              Start with: {nextStepLabel}
             </Text>
           )}
           {carryOverCount > 0 && (
