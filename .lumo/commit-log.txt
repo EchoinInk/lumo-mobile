@@ -21886,3 +21886,9 @@ COMMIT: chore(lumo): update useDailyPlanningFlow.ts
 FILES:
 src/features/planning/hooks/useDailyPlanningFlow.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 10:26:53
+COMMIT: chore(lumo): update ParkedItemsScreen.tsx
+FILES:
+src/features/planning/components/ParkedItemsScreen.tsx
+

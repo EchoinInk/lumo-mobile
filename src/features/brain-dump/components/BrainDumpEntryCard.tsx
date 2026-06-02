@@ -21,11 +21,13 @@ interface BrainDumpEntryCardProps {
     target: BrainDumpConversionTarget,
     scheduledAt?: string,
   ) => void;
+  onDelete?: (entry: BrainDumpEntry) => void;
 }
 
 export function BrainDumpEntryCard({
   entry,
   onConvert,
+  onDelete,
 }: BrainDumpEntryCardProps) {
   const [isReviewing, setIsReviewing] = useState(false);
   const [isSchedulingReminder, setIsSchedulingReminder] = useState(false);
@@ -127,6 +129,17 @@ export function BrainDumpEntryCard({
           >
             Archive / park
           </Button>
+          {onDelete && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onPress={() => onDelete(entry)}
+              accessibilityLabel="Delete thought"
+              accessibilityHint="Asks for confirmation before permanently removing this thought"
+            >
+              Delete
+            </Button>
+          )}
         </View>
       )}
     </Card>
