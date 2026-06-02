@@ -19,6 +19,7 @@ interface EveningResetCardProps {
   onAddToBrainDump: () => void;
   onFinishReset: () => void;
   onBackToDashboard?: () => void;
+  onAdjustReset?: () => void;
 }
 
 export function EveningResetCard({
@@ -32,6 +33,7 @@ export function EveningResetCard({
   onAddToBrainDump,
   onFinishReset,
   onBackToDashboard,
+  onAdjustReset,
 }: EveningResetCardProps) {
   if (eveningCompleted && onBackToDashboard) {
     return (
@@ -40,6 +42,7 @@ export function EveningResetCard({
         parkedCount={parkedCount}
         brainDumpVisited={brainDumpVisited}
         onBackToDashboard={onBackToDashboard}
+        onAdjustReset={onAdjustReset}
       />
     );
   }
