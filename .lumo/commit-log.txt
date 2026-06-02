@@ -21709,3 +21709,9 @@ COMMIT: chore(lumo): update useDailyPlanningFlow.ts
 FILES:
 src/features/planning/hooks/useDailyPlanningFlow.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:35:19
+COMMIT: chore(lumo): update tasks.tsx
+FILES:
+app/(tabs)/tasks.tsx
+

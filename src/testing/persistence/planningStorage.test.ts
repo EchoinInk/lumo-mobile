@@ -55,3 +55,38 @@ export async function testCreateEmptyDailySummaryUsesToday(): Promise<void> {
   assertEqual(summary.date, today, "empty summary should use today");
   assertEqual(summary.eveningCompleted, false, "empty summary should not be completed");
 }
+
+export async function testPlanningAdjustmentsPreserveChoicesWhileReopening(): Promise<void> {
+  const completed = normalizeDailyPlanningSummary({
+    date: new Date().toISOString().split("T")[0],
+    energyLevel: "steady",
+    nextStepId: "task-1",
+    morningCompleted: true,
+    eveningCompleted: true,
+  });
+
+  const reopenedMorning = normalizeDailyPlanningSummary({
+    ...completed,
+    morningCompleted: false,
+  });
+  const reopenedEvening = normalizeDailyPlanningSummary({
+    ...completed,
+    eveningCompleted: false,
+  });
+
+  assertEqual(
+    reopenedMorning.nextStepId,
+    "task-1",
+    "morning adjustment should preserve selected next step",
+  );
+  assertEqual(
+    reopenedMorning.energyLevel,
+    "steady",
+    "morning adjustment should preserve energy level",
+  );
+  assertEqual(
+    reopenedEvening.eveningCompleted,
+    false,
+    "evening adjustment should reopen reset",
+  );
+}
