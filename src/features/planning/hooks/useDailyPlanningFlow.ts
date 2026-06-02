@@ -74,23 +74,46 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
   );
 
   const carryOverItems = useMemo(
-    () =>
-      mode === "evening"
-        ? getEveningCarryOverItems(tasks)
-        : getGentleCarryOverItems(tasks),
-    [tasks, mode],
+    () => {
+      const parkedSourceIds = new Set([
+        ...summary.parkedIds,
+        ...summary.eveningParkedIds,
+      ]);
+      const items =
+        mode === "evening"
+          ? getEveningCarryOverItems(tasks)
+          : getGentleCarryOverItems(tasks);
+      return items.filter((item) => !parkedSourceIds.has(item.sourceId));
+    },
+    [tasks, mode, summary.parkedIds, summary.eveningParkedIds],
   );
   const brainDumpQueue = useMemo(
     () => getBrainDumpReviewQueue(openEntries),
     [openEntries],
   );
   const nextStepOptions = useMemo(
-    () => getSuggestedNextSteps(composerInput),
-    [composerInput],
+    () => {
+      const parkedSourceIds = new Set([
+        ...summary.parkedIds,
+        ...summary.eveningParkedIds,
+      ]);
+      return getSuggestedNextSteps(composerInput).filter(
+        (step) => !parkedSourceIds.has(step.sourceId),
+      );
+    },
+    [composerInput, summary.parkedIds, summary.eveningParkedIds],
   );
   const lowEnergyOptions = useMemo(
-    () => getLowEnergyOptions(composerInput),
-    [composerInput],
+    () => {
+      const parkedSourceIds = new Set([
+        ...summary.parkedIds,
+        ...summary.eveningParkedIds,
+      ]);
+      return getLowEnergyOptions(composerInput).filter(
+        (option) => !parkedSourceIds.has(option.sourceId),
+      );
+    },
+    [composerInput, summary.parkedIds, summary.eveningParkedIds],
   );
 
   const selectedNextStep = useMemo((): PlanningNextStep | undefined => {
@@ -186,13 +209,45 @@ export function useDailyPlanningFlow(mode: PlanningFlowMode = "morning") {
       if (mode === "evening" && sourceType === "task") {
         persistSummary({
           ...summary,
+          nextStepId:
+            summary.nextStepId &&
+            (nextStepOptions.find((step) => step.id === summary.nextStepId)
+              ?.sourceId === sourceId ||
+              lowEnergyOptions.find(
+                (option) => option.id === summary.nextStepId,
+              )?.sourceId === sourceId)
+              ? undefined
+              : summary.nextStepId,
+          parkedIds: [...new Set([...summary.parkedIds, sourceId])],
           eveningParkedIds: [
             ...new Set([...summary.eveningParkedIds, sourceId]),
           ],
         });
+        return;
       }
+
+      persistSummary({
+        ...summary,
+        nextStepId:
+          summary.nextStepId &&
+          (nextStepOptions.find((step) => step.id === summary.nextStepId)
+            ?.sourceId === sourceId ||
+            lowEnergyOptions.find((option) => option.id === summary.nextStepId)
+              ?.sourceId === sourceId)
+            ? undefined
+            : summary.nextStepId,
+        parkedIds: [...new Set([...summary.parkedIds, sourceId])],
+      });
     },
-    [updateTask, archiveEntry, mode, summary, persistSummary],
+    [
+      updateTask,
+      archiveEntry,
+      mode,
+      summary,
+      nextStepOptions,
+      lowEnergyOptions,
+      persistSummary,
+    ],
   );
 
   const markEveningBrainDumpVisited = useCallback(() => {

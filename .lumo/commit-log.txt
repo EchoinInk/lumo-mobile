@@ -21764,3 +21764,9 @@ FILES:
 src/features/planning/components/CalmDailySummary.tsx
 src/testing/planning/calmDailySummary.test.ts
 
+━━━━━━━━━━━━━━━━━━━━━━
+TIME: 2026-06-03 08:52:21
+COMMIT: chore(lumo): update CHANGELOG.md
+FILES:
+CHANGELOG.md
+

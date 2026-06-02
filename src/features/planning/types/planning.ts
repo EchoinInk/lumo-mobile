@@ -52,6 +52,7 @@ export interface DailyPlanningSummary {
   energyLevel?: PlanningEnergyLevel;
   morningCompleted: boolean;
   eveningCompleted: boolean;
+  parkedIds: string[];
   eveningCarriedIds: string[];
   eveningParkedIds: string[];
   eveningBrainDumpVisited: boolean;

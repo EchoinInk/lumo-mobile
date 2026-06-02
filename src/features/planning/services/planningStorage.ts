@@ -36,6 +36,7 @@ export function normalizeDailyPlanningSummary(
     energyLevel,
     morningCompleted: summary.morningCompleted === true,
     eveningCompleted: summary.eveningCompleted === true,
+    parkedIds: sanitizeStringArray(summary.parkedIds),
     eveningCarriedIds: sanitizeStringArray(summary.eveningCarriedIds),
     eveningParkedIds: sanitizeStringArray(summary.eveningParkedIds),
     eveningBrainDumpVisited: summary.eveningBrainDumpVisited === true,

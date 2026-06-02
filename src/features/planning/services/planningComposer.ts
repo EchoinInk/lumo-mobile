@@ -150,6 +150,17 @@ export function getLowEnergyOptions(
     });
   }
 
+  if (options.length === 0) {
+    options.push({
+      id: "low-reset-small-reset",
+      label: "Take a small reset",
+      sourceType: "routine",
+      sourceId: "low-energy-reset",
+      effort: "tiny",
+      reason: "A tiny starting point",
+    });
+  }
+
   return options.slice(0, 3);
 }
 
@@ -270,6 +281,7 @@ export function composeDailyPlanningSummary(
     energyLevel: partial.energyLevel ?? input.energyLevel,
     morningCompleted: partial.morningCompleted ?? false,
     eveningCompleted: partial.eveningCompleted ?? false,
+    parkedIds: partial.parkedIds ?? [],
     eveningCarriedIds: partial.eveningCarriedIds ?? [],
     eveningParkedIds: partial.eveningParkedIds ?? [],
     eveningBrainDumpVisited: partial.eveningBrainDumpVisited ?? false,

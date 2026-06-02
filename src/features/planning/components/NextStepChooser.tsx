@@ -65,10 +65,10 @@ export function NextStepChooser({
           size="sm"
           onPress={() => onStart(selected)}
           accessibilityRole="button"
-          accessibilityLabel={`Start ${selected.label}`}
-          accessibilityHint="Begins this as your next step"
+          accessibilityLabel={`Choose ${selected.label}`}
+          accessibilityHint="Selects this as your one small step for today"
         >
-          Start this
+          Choose this
         </Button>
         {options.length > 1 && (
           <Button
@@ -135,4 +135,3 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
 });
-

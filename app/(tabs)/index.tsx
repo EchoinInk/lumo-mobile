@@ -3,7 +3,6 @@ import { Screen } from "@/src/components/ui/Screen";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { DailyProgressCard } from "@/src/features/dashboard/components/DailyProgressCard";
 import { FocusSuggestionList } from "@/src/features/dashboard/components/FocusSuggestionList";
-import { TodaysRoutinesCard } from "@/src/features/dashboard/components/TodaysRoutinesCard";
 import { calculateDailyProgress } from "@/src/features/dashboard/utils/dashboardProgress";
 import { getFocusSuggestions } from "@/src/features/dashboard/utils/focusSuggestions";
 import { FocusModeBanner } from "@/src/features/focus/components/FocusModeBanner";
@@ -22,7 +21,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Card } from "@/src/components/ui/Card";
 import { Text } from "@/src/components/ui/Text";
 import { Colors, Radius, Spacing } from "@/src/theme/tokens";
-import { Brain, Calendar, Cloud, Flame, Menu, Plus } from "lucide-react-native";
+import { Brain, Calendar, Cloud, Menu } from "lucide-react-native";
 import { useState } from "react";
 
 function QuickActions({ onQuickCapture }: { onQuickCapture: () => void }) {
@@ -38,19 +37,6 @@ function QuickActions({ onQuickCapture }: { onQuickCapture: () => void }) {
       icon: Brain,
       color: Colors.purple,
       onPress: () => router.push({ pathname: "/brain-dump" as const } as any),
-    },
-    {
-      label: "Add Task",
-      icon: Plus,
-      color: Colors.blue,
-      onPress: () => router.push({ pathname: "/(tabs)/tasks" as const } as any),
-    },
-    {
-      label: "Add Habit",
-      icon: Flame,
-      color: Colors.purple,
-      onPress: () =>
-        router.push({ pathname: "/(tabs)/more/habits" as const } as any),
     },
     {
       label: "Calendar",
@@ -117,11 +103,7 @@ export default function DashboardScreen() {
     updateTask,
     hasHydrated: tasksHydrated,
   } = useTasks();
-  const {
-    todayHabits,
-    completedToday: completedHabits,
-    toggleHabit,
-  } = useHabits();
+  const { todayHabits, completedToday: completedHabits } = useHabits();
 
   // Calculate daily progress combining tasks and habits
   const totalTasks = tasks.length;
@@ -209,16 +191,6 @@ export default function DashboardScreen() {
         morningComplete={planning.morningComplete}
         onOpenPlanning={() =>
           router.push({ pathname: "/planning/morning" as const } as any)
-        }
-      />
-
-      {/* Today's Routines */}
-      <TodaysRoutinesCard
-        habits={todayHabits.slice(0, 4)}
-        completedIds={completedHabits.map((h) => h.id)}
-        onToggle={toggleHabit}
-        onAddPress={() =>
-          router.push({ pathname: "/(tabs)/more/habits" as const } as any)
         }
       />
 
