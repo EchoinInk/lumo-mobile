@@ -36,6 +36,7 @@ export function testDailyReliefRoutesExist(): void {
 
   const required = [
     "brain-dump/index.tsx",
+    "parked/index.tsx",
     "planning/morning.tsx",
     "planning/evening.tsx",
     "routine-bundles/index.tsx",

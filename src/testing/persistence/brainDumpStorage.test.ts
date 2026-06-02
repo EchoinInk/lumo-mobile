@@ -55,3 +55,25 @@ export async function testConvertEntryIsIdempotent(): Promise<void> {
     "converted entry should not reload as unreviewed",
   );
 }
+
+export async function testArchivedBrainDumpEntryCanBeRestored(): Promise<void> {
+  useBrainDumpStore.setState({ entries: [], hasHydrated: false });
+
+  const entry = useBrainDumpStore.getState().addEntry({ text: "Park this" });
+  useBrainDumpStore.getState().archiveEntry(entry!.id);
+  assertEqual(
+    useBrainDumpStore.getState().entries[0]?.status,
+    "archived",
+    "archive should park the thought",
+  );
+
+  useBrainDumpStore.getState().restoreEntry(entry!.id);
+  const restored = useBrainDumpStore.getState().entries[0];
+
+  assertEqual(restored?.status, "open", "restored thought should return open");
+  assertEqual(
+    restored?.convertedTo,
+    undefined,
+    "restored thought should clear archive conversion metadata",
+  );
+}
